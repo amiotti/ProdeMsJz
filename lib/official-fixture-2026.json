@@ -1,0 +1,971 @@
+{
+  "source": "https://www.aljazeera.com/amp/sports/2025/12/6/full-match-schedule-of-the-fifa-world-cup-2026-dates-start-times-stadiums",
+  "fixtures": [
+    {
+      "stage": "group",
+      "dateHeading": "Thursday, June 11",
+      "matchLabel": "Mexico vs South Africa",
+      "localTime": "3pm",
+      "gmtInfo": "21:00 GMT",
+      "venue": "Mexico City Stadium, Mexico City, Mexico",
+      "homeTeam": "Mexico",
+      "awayTeam": "South Africa"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Thursday, June 11",
+      "matchLabel": "South Korea vs TDB",
+      "localTime": "10pm",
+      "gmtInfo": "04:00 GMT on Friday",
+      "venue": "Estadio Guadalajara, Zapopan, Mexico",
+      "homeTeam": "South Korea",
+      "awayTeam": "TDB"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Friday, June 12",
+      "matchLabel": "Canada vs TBD",
+      "localTime": "3pm",
+      "gmtInfo": "20:00 GMT",
+      "venue": "Toronto Stadium, Toronto, Canada",
+      "homeTeam": "Canada",
+      "awayTeam": "TBD"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Friday, June 12",
+      "matchLabel": "USA vs Paraguay",
+      "localTime": "9pm",
+      "gmtInfo": "05:00 GMT on Saturday",
+      "venue": "Los Angeles Stadium, Los Angeles, US",
+      "homeTeam": "USA",
+      "awayTeam": "Paraguay"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Saturday, June 13",
+      "matchLabel": "Qatar vs Switzerland",
+      "localTime": "3pm",
+      "gmtInfo": "23:00 GMT",
+      "venue": "San Francisco Bay Area Stadium, San Francisco, US",
+      "homeTeam": "Qatar",
+      "awayTeam": "Switzerland"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Saturday, June 13",
+      "matchLabel": "Brazil vs Morocco",
+      "localTime": "6pm",
+      "gmtInfo": "23:00 GMT",
+      "venue": "New York New Jersey Stadium, New Jersey, US",
+      "homeTeam": "Brazil",
+      "awayTeam": "Morocco"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Saturday, June 13",
+      "matchLabel": "Haiti vs Scotland",
+      "localTime": "9pm",
+      "gmtInfo": "02:00 GMT on Sunday",
+      "venue": "Boston Stadium, Boston, US",
+      "homeTeam": "Haiti",
+      "awayTeam": "Scotland"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Saturday, June 13",
+      "matchLabel": "Australia vs TBD",
+      "localTime": "midnight",
+      "gmtInfo": "08:00 GMT on Sunday",
+      "venue": "BC Place, Vancouver, Canada",
+      "homeTeam": "Australia",
+      "awayTeam": "TBD"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Sunday, June 14",
+      "matchLabel": "Germany vs Curacao",
+      "localTime": "1pm",
+      "gmtInfo": "19:00 GMT",
+      "venue": "Houston Stadium, Houston, US",
+      "homeTeam": "Germany",
+      "awayTeam": "Curacao"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Sunday, June 14",
+      "matchLabel": "Netherlands vs Japan",
+      "localTime": "4pm",
+      "gmtInfo": "22:00 GMT",
+      "venue": "Dallas Stadium, Dallas, US",
+      "homeTeam": "Netherlands",
+      "awayTeam": "Japan"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Sunday, June 14",
+      "matchLabel": "Ivory Coast vs Ecuador",
+      "localTime": "7pm",
+      "gmtInfo": "00:00 GMT on Monday",
+      "venue": "Philadelphia Stadium, Philadelphia, US",
+      "homeTeam": "Ivory Coast",
+      "awayTeam": "Ecuador"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Sunday, June 14",
+      "matchLabel": "TBD vs Tunisia",
+      "localTime": "10pm",
+      "gmtInfo": "04:00 GMT on Monday",
+      "venue": "Estadio Monterrey, Guadalupe, Mexico",
+      "homeTeam": "TBD",
+      "awayTeam": "Tunisia"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Monday, June 15",
+      "matchLabel": "Spain vs Cape Verde",
+      "localTime": "12pm",
+      "gmtInfo": "17:00 GMT",
+      "venue": "Atlanta Stadium, Atlanta, US",
+      "homeTeam": "Spain",
+      "awayTeam": "Cape Verde"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Monday, June 15",
+      "matchLabel": "Belgium vs Egypt",
+      "localTime": "3pm",
+      "gmtInfo": "23:00 GMT",
+      "venue": "BC Place, Vancouver, Canada",
+      "homeTeam": "Belgium",
+      "awayTeam": "Egypt"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Monday, June 15",
+      "matchLabel": "Saudi Arabia vs Uruguay",
+      "localTime": "6pm",
+      "gmtInfo": "23:00 GMT",
+      "venue": "Miami Stadium, Miami, US",
+      "homeTeam": "Saudi Arabia",
+      "awayTeam": "Uruguay"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Monday, June 15",
+      "matchLabel": "Iran vs New Zealand",
+      "localTime": "9pm",
+      "gmtInfo": "05:00 GMT on Tuesday",
+      "venue": "Los Angeles Stadium, Los Angeles, US",
+      "homeTeam": "Iran",
+      "awayTeam": "New Zealand"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Tuesday, June 16",
+      "matchLabel": "France vs Senegal",
+      "localTime": "3pm",
+      "gmtInfo": "20:00 GMT",
+      "venue": "New York New Jersey Stadium, New Jersey, US",
+      "homeTeam": "France",
+      "awayTeam": "Senegal"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Tuesday, June 16",
+      "matchLabel": "TBD vs Norway",
+      "localTime": "6pm",
+      "gmtInfo": "23:00 GMT",
+      "venue": "Boston Stadium, Boston, US",
+      "homeTeam": "TBD",
+      "awayTeam": "Norway"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Tuesday, June 16",
+      "matchLabel": "Argentina vs Algeria",
+      "localTime": "9pm",
+      "gmtInfo": "03:00 GMT on Wednesday",
+      "venue": "Kansas City Stadium, Kansas City, US",
+      "homeTeam": "Argentina",
+      "awayTeam": "Algeria"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Tuesday, June 16",
+      "matchLabel": "Austria vs Jordan",
+      "localTime": "midnight",
+      "gmtInfo": "08:00 GMT on Wednesday",
+      "venue": "San Francisco Bay Area Stadium, San Francisco, US",
+      "homeTeam": "Austria",
+      "awayTeam": "Jordan"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Wednesday, June 17",
+      "matchLabel": "Portugal vs TBD",
+      "localTime": "1pm",
+      "gmtInfo": "19:00 GMT",
+      "venue": "Houston Stadium, Houston, US",
+      "homeTeam": "Portugal",
+      "awayTeam": "TBD"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Wednesday, June 17",
+      "matchLabel": "England vs Croatia",
+      "localTime": "4pm",
+      "gmtInfo": "22:00 GMT",
+      "venue": "Dallas Stadium, Dallas, US",
+      "homeTeam": "England",
+      "awayTeam": "Croatia"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Wednesday, June 17",
+      "matchLabel": "Ghana vs Panama",
+      "localTime": "7pm",
+      "gmtInfo": "00:00 GMT on Thursday",
+      "venue": "Toronto Stadium, Toronto, Canada",
+      "homeTeam": "Ghana",
+      "awayTeam": "Panama"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Wednesday, June 17",
+      "matchLabel": "Uzbekistan vs Colombia",
+      "localTime": "10pm",
+      "gmtInfo": "04:00 GMT on Thursday",
+      "venue": "Mexico City Stadium, Mexico City, Mexico",
+      "homeTeam": "Uzbekistan",
+      "awayTeam": "Colombia"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Thursday, June 18",
+      "matchLabel": "TBD vs South Africa",
+      "localTime": "12pm",
+      "gmtInfo": "17:00 GMT",
+      "venue": "Atlanta Stadium, Atlanta, US",
+      "homeTeam": "TBD",
+      "awayTeam": "South Africa"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Thursday, June 18",
+      "matchLabel": "Switzerland vs TBD",
+      "localTime": "3pm",
+      "gmtInfo": "23:00 GMT",
+      "venue": "Los Angeles Stadium, Los Angeles, US",
+      "homeTeam": "Switzerland",
+      "awayTeam": "TBD"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Thursday, June 18",
+      "matchLabel": "Canada vs Qatar",
+      "localTime": "6pm",
+      "gmtInfo": "02:00 GMT on Friday",
+      "venue": "BC Place, Vancouver, Canada",
+      "homeTeam": "Canada",
+      "awayTeam": "Qatar"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Thursday, June 18",
+      "matchLabel": "Mexico vs South Korea",
+      "localTime": "9pm",
+      "gmtInfo": "03:00 GMT on Friday",
+      "venue": "Estadio Guadalajara, Zapopan, Mexico",
+      "homeTeam": "Mexico",
+      "awayTeam": "South Korea"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Friday, June 19",
+      "matchLabel": "Scotland vs Morocco",
+      "localTime": "6pm",
+      "gmtInfo": "23:00 GMT",
+      "venue": "Boston Stadium, Boston, US",
+      "homeTeam": "Scotland",
+      "awayTeam": "Morocco"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Friday, June 19",
+      "matchLabel": "USA vs Australia",
+      "localTime": "3pm",
+      "gmtInfo": "23:00 GMT",
+      "venue": "Seattle Stadium, Seattle, US",
+      "homeTeam": "USA",
+      "awayTeam": "Australia"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Friday, June 19",
+      "matchLabel": "Brazil vs Haiti",
+      "localTime": "9pm",
+      "gmtInfo": "02:00 GMT on Saturday",
+      "venue": "Philadelphia Stadium, Philadelphia, US",
+      "homeTeam": "Brazil",
+      "awayTeam": "Haiti"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Friday, June 19",
+      "matchLabel": "TBD vs Paraguay",
+      "localTime": "midnight",
+      "gmtInfo": "08:00 GMT on Saturday",
+      "venue": "San Francisco Bay Area Stadium, San Francisco, US",
+      "homeTeam": "TBD",
+      "awayTeam": "Paraguay"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Saturday, June 20",
+      "matchLabel": "Netherlands vs TBD",
+      "localTime": "1pm",
+      "gmtInfo": "19:00 GMT",
+      "venue": "Houston Stadium, Houston, US",
+      "homeTeam": "Netherlands",
+      "awayTeam": "TBD"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Saturday, June 20",
+      "matchLabel": "Germany vs Ivory Coast",
+      "localTime": "4pm",
+      "gmtInfo": "21:00 GMT",
+      "venue": "Toronto Stadium, Toronto, Canada",
+      "homeTeam": "Germany",
+      "awayTeam": "Ivory Coast"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Saturday, June 20",
+      "matchLabel": "Ecuador vs Curacao",
+      "localTime": "8pm",
+      "gmtInfo": "04:00 GMT on Sunday",
+      "venue": "Kansas City Stadium, Kansas City, US",
+      "homeTeam": "Ecuador",
+      "awayTeam": "Curacao"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Saturday, June 20",
+      "matchLabel": "Tunisia vs Japan",
+      "localTime": "midnight",
+      "gmtInfo": "06:00 GMT on Sunday",
+      "venue": "Estadio Monterrey, Guadalupe, Mexico",
+      "homeTeam": "Tunisia",
+      "awayTeam": "Japan"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Sunday, June 21",
+      "matchLabel": "Spain vs Saudi Arabia",
+      "localTime": "12pm",
+      "gmtInfo": "17:00 GMT",
+      "venue": "Atlanta Stadium, Atlanta, US",
+      "homeTeam": "Spain",
+      "awayTeam": "Saudi Arabia"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Sunday, June 21",
+      "matchLabel": "Belgium vs Iran",
+      "localTime": "3pm",
+      "gmtInfo": "23:00 GMT",
+      "venue": "Los Angeles Stadium, Los Angeles, US",
+      "homeTeam": "Belgium",
+      "awayTeam": "Iran"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Sunday, June 21",
+      "matchLabel": "Uruguay vs Cape Verde",
+      "localTime": "6pm",
+      "gmtInfo": "23:00 GMT",
+      "venue": "Miami Stadium, Miami, US",
+      "homeTeam": "Uruguay",
+      "awayTeam": "Cape Verde"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Sunday, June 21",
+      "matchLabel": "New Zealand vs Egypt",
+      "localTime": "9pm",
+      "gmtInfo": "05:00 GMT on Monday",
+      "venue": "BC Place, Vancouver, Canada",
+      "homeTeam": "New Zealand",
+      "awayTeam": "Egypt"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Monday, June 22",
+      "matchLabel": "Argentina vs Austria",
+      "localTime": "1pm",
+      "gmtInfo": "19:00 GMT",
+      "venue": "Dallas Stadium, Dallas, US",
+      "homeTeam": "Argentina",
+      "awayTeam": "Austria"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Monday, June 22",
+      "matchLabel": "France vs TBD",
+      "localTime": "5pm",
+      "gmtInfo": "22:00 GMT",
+      "venue": "Philadelphia Stadium, Philadelphia, US",
+      "homeTeam": "France",
+      "awayTeam": "TBD"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Monday, June 22",
+      "matchLabel": "Norway vs Senegal",
+      "localTime": "8pm",
+      "gmtInfo": "01:00 GMT on Tuesday",
+      "venue": "New York New Jersey Stadium, New Jersey, US",
+      "homeTeam": "Norway",
+      "awayTeam": "Senegal"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Monday, June 22",
+      "matchLabel": "Jordan vs Algeria",
+      "localTime": "11pm",
+      "gmtInfo": "07:00 GMT on Tuesday",
+      "venue": "San Francisco Bay Area Stadium, San Francisco, US",
+      "homeTeam": "Jordan",
+      "awayTeam": "Algeria"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Tuesday, June 23",
+      "matchLabel": "Portugal vs Uzbekistan",
+      "localTime": "1pm",
+      "gmtInfo": "19:00 GMT",
+      "venue": "Houston Stadium, Houston, US",
+      "homeTeam": "Portugal",
+      "awayTeam": "Uzbekistan"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Tuesday, June 23",
+      "matchLabel": "England vs Ghana",
+      "localTime": "4pm",
+      "gmtInfo": "21:00 GMT",
+      "venue": "Boston Stadium, Boston, US",
+      "homeTeam": "England",
+      "awayTeam": "Ghana"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Tuesday, June 23",
+      "matchLabel": "Panama vs Croatia",
+      "localTime": "7pm",
+      "gmtInfo": "00:00 GMT on Wednesday",
+      "venue": "Toronto Stadium, Toronto, Canada",
+      "homeTeam": "Panama",
+      "awayTeam": "Croatia"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Tuesday, June 23",
+      "matchLabel": "Colombia vs TBD",
+      "localTime": "10pm",
+      "gmtInfo": "04:00 GMT on Wednesday",
+      "venue": "Estadio Guadalajara, Zapopan, Mexico",
+      "homeTeam": "Colombia",
+      "awayTeam": "TBD"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Wednesday, June 24",
+      "matchLabel": "Switzerland vs Canada",
+      "localTime": "3pm",
+      "gmtInfo": "23:00 GMT",
+      "venue": "BC Place, Vancouver, Canada",
+      "homeTeam": "Switzerland",
+      "awayTeam": "Canada"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Wednesday, June 24",
+      "matchLabel": "TBD vs Qatar",
+      "localTime": "3pm",
+      "gmtInfo": "23:00 GMT",
+      "venue": "Seattle Stadium, Seattle, US",
+      "homeTeam": "TBD",
+      "awayTeam": "Qatar"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Wednesday, June 24",
+      "matchLabel": "Scotland vs Brazil",
+      "localTime": "6pm",
+      "gmtInfo": "23:00 GMT",
+      "venue": "Miami Stadium, Miami, US",
+      "homeTeam": "Scotland",
+      "awayTeam": "Brazil"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Wednesday, June 24",
+      "matchLabel": "Morocco vs Haiti",
+      "localTime": "6pm",
+      "gmtInfo": "23:00 GMT",
+      "venue": "Atlanta Stadium, Atlanta, US",
+      "homeTeam": "Morocco",
+      "awayTeam": "Haiti"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Wednesday, June 24",
+      "matchLabel": "TBD vs Mexico",
+      "localTime": "9pm",
+      "gmtInfo": "03:00 GMT on Thursday",
+      "venue": "Mexico City Stadium, Mexico City, Mexico",
+      "homeTeam": "TBD",
+      "awayTeam": "Mexico"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Wednesday, June 24",
+      "matchLabel": "South Africa vs South Korea",
+      "localTime": "9pm",
+      "gmtInfo": "03:00 GMT on Thursday",
+      "venue": "Estadio Monterrey, Guadalupe, Mexico",
+      "homeTeam": "South Africa",
+      "awayTeam": "South Korea"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Thursday, June 25",
+      "matchLabel": "Ecuador vs Germany",
+      "localTime": "4pm",
+      "gmtInfo": "21:00 GMT",
+      "venue": "New York New Jersey Stadium, New Jersey, US",
+      "homeTeam": "Ecuador",
+      "awayTeam": "Germany"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Thursday, June 25",
+      "matchLabel": "Curacao vs Ivory Coast",
+      "localTime": "4pm",
+      "gmtInfo": "21:00 GMT",
+      "venue": "Philadelphia Stadium, Philadelphia, US",
+      "homeTeam": "Curacao",
+      "awayTeam": "Ivory Coast"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Thursday, June 25",
+      "matchLabel": "Japan vs TBD",
+      "localTime": "7pm",
+      "gmtInfo": "01:00 GMT on Friday",
+      "venue": "Dallas Stadium, Dallas, US",
+      "homeTeam": "Japan",
+      "awayTeam": "TBD"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Thursday, June 25",
+      "matchLabel": "TBD vs USA",
+      "localTime": "10pm",
+      "gmtInfo": "06:00 GMT on Friday",
+      "venue": "Los Angeles Stadium, Los Angeles, US",
+      "homeTeam": "TBD",
+      "awayTeam": "USA"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Thursday, June 25",
+      "matchLabel": "Paraguay vs Australia",
+      "localTime": "10pm",
+      "gmtInfo": "06:00 GMT on Friday",
+      "venue": "San Francisco Bay Area Stadium, San Francisco, US",
+      "homeTeam": "Paraguay",
+      "awayTeam": "Australia"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Friday, June 26",
+      "matchLabel": "Norway vs France",
+      "localTime": "3pm",
+      "gmtInfo": "20:00 GMT",
+      "venue": "Boston Stadium, Boston, US",
+      "homeTeam": "Norway",
+      "awayTeam": "France"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Friday, June 26",
+      "matchLabel": "Senegal vs TDB 3pm",
+      "localTime": "",
+      "gmtInfo": "20:00 GMT",
+      "venue": "Toronto Stadium, Toronto, Canada",
+      "homeTeam": "Senegal",
+      "awayTeam": "TDB 3pm"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Friday, June 26",
+      "matchLabel": "Cape Verde vs Saudi Arabia",
+      "localTime": "8pm",
+      "gmtInfo": "02:00 GMT on Saturday",
+      "venue": "Houston Stadium, Houston, US",
+      "homeTeam": "Cape Verde",
+      "awayTeam": "Saudi Arabia"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Friday, June 26",
+      "matchLabel": "Uruguay vs Spain",
+      "localTime": "8pm",
+      "gmtInfo": "02:00 GMT on Saturday",
+      "venue": "Estadio Guadalajara, Zapopan, Mexico",
+      "homeTeam": "Uruguay",
+      "awayTeam": "Spain"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Friday, June 26",
+      "matchLabel": "Egypt vs Iran",
+      "localTime": "11pm",
+      "gmtInfo": "07:00 GMT on Saturday",
+      "venue": "Seattle Stadium, Seattle, US",
+      "homeTeam": "Egypt",
+      "awayTeam": "Iran"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Friday, June 26",
+      "matchLabel": "New Zealand vs Belgium",
+      "localTime": "11pm",
+      "gmtInfo": "07:00 GMT on Saturday",
+      "venue": "BC Place, Vancouver, Canada",
+      "homeTeam": "New Zealand",
+      "awayTeam": "Belgium"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Saturday, June 27",
+      "matchLabel": "Panama vs England",
+      "localTime": "5pm",
+      "gmtInfo": "22:00 GMT",
+      "venue": "New York New Jersey Stadium, New Jersey, US",
+      "homeTeam": "Panama",
+      "awayTeam": "England"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Saturday, June 27",
+      "matchLabel": "Croatia vs Ghana",
+      "localTime": "5pm",
+      "gmtInfo": "22:00 GMT",
+      "venue": "Philadelphia Stadium, Philadelphia, US",
+      "homeTeam": "Croatia",
+      "awayTeam": "Ghana"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Saturday, June 27",
+      "matchLabel": "Colombia vs Portugal",
+      "localTime": "7:30pm",
+      "gmtInfo": "02:30 GMT on Sunday",
+      "venue": "Miami Stadium, Miami, US",
+      "homeTeam": "Colombia",
+      "awayTeam": "Portugal"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Saturday, June 27",
+      "matchLabel": "TBD vs Uzbekistan",
+      "localTime": "7:30pm",
+      "gmtInfo": "02:30 GMT on Sunday",
+      "venue": "Atlanta Stadium, Atlanta, US",
+      "homeTeam": "TBD",
+      "awayTeam": "Uzbekistan"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Saturday, June 27",
+      "matchLabel": "Algeria vs Austria",
+      "localTime": "10pm",
+      "gmtInfo": "04:00 GMT on Sunday",
+      "venue": "Kansas City Stadium, Kansas City, US",
+      "homeTeam": "Algeria",
+      "awayTeam": "Austria"
+    },
+    {
+      "stage": "group",
+      "dateHeading": "Saturday, June 27",
+      "matchLabel": "Jordan vs Argentina",
+      "localTime": "10pm",
+      "gmtInfo": "04:00 GMT on Sunday",
+      "venue": "Dallas Stadium, Dallas, US",
+      "homeTeam": "Jordan",
+      "awayTeam": "Argentina"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Sunday, June 28",
+      "matchLabel": "Round of 32 match",
+      "localTime": "3pm",
+      "gmtInfo": "23:00 GMT",
+      "venue": "Los Angeles Stadium, Los Angeles, US"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Monday, June 29",
+      "matchLabel": "Round of 32 match",
+      "localTime": "1pm",
+      "gmtInfo": "19:00 GMT",
+      "venue": "Houston Stadium, Houston, US"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Monday, June 29",
+      "matchLabel": "Round of 32 match",
+      "localTime": "4:30pm",
+      "gmtInfo": "22:30 GMT",
+      "venue": "Boston Stadium, Boston, US"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Monday, June 29",
+      "matchLabel": "Round of 32 match",
+      "localTime": "9pm",
+      "gmtInfo": "03:00 GMT on Tuesday",
+      "venue": "Estadio Monterrey, Guadalupe, Mexico"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Tuesday, June 30",
+      "matchLabel": "Round of 32 match",
+      "localTime": "1pm",
+      "gmtInfo": "19:00 GMT",
+      "venue": "Dallas Stadium, Dallas, US"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Tuesday, June 30",
+      "matchLabel": "Round of 32 match",
+      "localTime": "5pm",
+      "gmtInfo": "22:00 GMT",
+      "venue": "New York New Jersey Stadium, New Jersey, US"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Tuesday, June 30",
+      "matchLabel": "Round of 32 match",
+      "localTime": "9pm",
+      "gmtInfo": "03:00 GMT on Wednesday",
+      "venue": "Mexico City Stadium, Mexico City, Mexico"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Wednesday, July 1",
+      "matchLabel": "Round of 32 match",
+      "localTime": "12pm",
+      "gmtInfo": "17:00 GMT",
+      "venue": "Atlanta Stadium, Atlanta, US"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Wednesday, July 1",
+      "matchLabel": "Round of 32 match",
+      "localTime": "4pm",
+      "gmtInfo": "00:00 GMT on Thursday",
+      "venue": "Seattle Stadium, Seattle, US"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Wednesday, July 1",
+      "matchLabel": "Round of 32 match",
+      "localTime": "8pm",
+      "gmtInfo": "04:00 GMT on Thursday",
+      "venue": "San Francisco Bay Area Stadium, San Francisco, US"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Thursday, July 2",
+      "matchLabel": "Round of 32 match",
+      "localTime": "3pm",
+      "gmtInfo": "23:00 GMT",
+      "venue": "Los Angeles Stadium, Los Angeles, US"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Thursday, July 2",
+      "matchLabel": "Round of 32 match",
+      "localTime": "7pm",
+      "gmtInfo": "00:00 GMT on Friday",
+      "venue": "Toronto Stadium, Toronto, Canada"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Thursday, July 2",
+      "matchLabel": "Round of 32 match",
+      "localTime": "11pm",
+      "gmtInfo": "07:00 GMT on Friday",
+      "venue": "BC Place, Vancouver, Canada"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Friday, July 3",
+      "matchLabel": "Round of 32 match",
+      "localTime": "2pm",
+      "gmtInfo": "21:00 GMT",
+      "venue": "Dallas Stadium, Dallas, US"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Friday, July 3",
+      "matchLabel": "Round of 32 match",
+      "localTime": "6pm",
+      "gmtInfo": "23:00 GMT",
+      "venue": "Miami Stadium, Miami, US"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Friday, July 3",
+      "matchLabel": "Round of 32 match",
+      "localTime": "9:30pm",
+      "gmtInfo": "03:30 GMT on Saturday",
+      "venue": "Kansas City Stadium, Kansas City, US"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Saturday, July 4",
+      "matchLabel": "Round of 16 match",
+      "localTime": "1pm",
+      "gmtInfo": "19:00 GMT",
+      "venue": "Houston Stadium, Houston, US"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Saturday, July 4",
+      "matchLabel": "Round of 16 match",
+      "localTime": "5pm",
+      "gmtInfo": "22:00 GMT",
+      "venue": "Philadelphia Stadium, Philadelphia, US"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Sunday, July 5",
+      "matchLabel": "Round of 16 match",
+      "localTime": "4pm",
+      "gmtInfo": "21:00 GMT",
+      "venue": "New York New Jersey Stadium, New Jersey, US"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Sunday, July 5",
+      "matchLabel": "Round of 16 match",
+      "localTime": "8pm",
+      "gmtInfo": "02:00 GMT on Monday",
+      "venue": "Mexico City Stadium, Mexico City, Mexico"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Monday, July 6",
+      "matchLabel": "Round of 16 match",
+      "localTime": "3pm",
+      "gmtInfo": "21:00 GMT",
+      "venue": "Dallas Stadium, Dallas, US"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Monday, July 6",
+      "matchLabel": "Round of 16 match",
+      "localTime": "8pm",
+      "gmtInfo": "04:00 GMT on Tuesday",
+      "venue": "Seattle Stadium, Seattle, US"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Tuesday, July 7",
+      "matchLabel": "Round of 16 match",
+      "localTime": "12pm",
+      "gmtInfo": "17:00 GMT",
+      "venue": "Atlanta Stadium, Atlanta, US"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Tuesday, July 7",
+      "matchLabel": "Round of 16 match",
+      "localTime": "4pm",
+      "gmtInfo": "00:00 GMT on Wednesday",
+      "venue": "BC Place, Vancouver, Canada"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Thursday, 9 July",
+      "matchLabel": "First quarterfinal",
+      "localTime": "4pm",
+      "gmtInfo": "21:00 GMT",
+      "venue": "Boston Stadium, Boston, US"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Friday, 10 July",
+      "matchLabel": "Second quarterfinal",
+      "localTime": "3pm",
+      "gmtInfo": "23:00 GMT",
+      "venue": "Los Angeles Stadium, Los Angeles, US"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Saturday, July 11",
+      "matchLabel": "Third quarterfinal",
+      "localTime": "5pm",
+      "gmtInfo": "22:00 GMT",
+      "venue": "Miami Stadium, Miami, US"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Saturday, July 11",
+      "matchLabel": "Fourth quarterfinal",
+      "localTime": "9pm",
+      "gmtInfo": "03:00 GMT on Sunday",
+      "venue": "Kansas City Stadium, Kansas City, US"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Tuesday, July 14",
+      "matchLabel": "First semifinal",
+      "localTime": "3pm",
+      "gmtInfo": "21:00 GMT",
+      "venue": "Dallas Stadium, Dallas, US"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Wednesday, July 15",
+      "matchLabel": "Second semifinal",
+      "localTime": "3pm",
+      "gmtInfo": "20:00 GMT",
+      "venue": "Atlanta Stadium, Atlanta, US"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Saturday, July 18",
+      "matchLabel": "Bronze medal match",
+      "localTime": "5pm",
+      "gmtInfo": "22:00 GMT",
+      "venue": "Miami Stadium, Miami, US"
+    },
+    {
+      "stage": "knockout",
+      "dateHeading": "Sunday, July 19",
+      "matchLabel": "Final",
+      "localTime": "3pm",
+      "gmtInfo": "20:00 GMT",
+      "venue": "New York New Jersey Stadium, New Jersey, US"
+    }
+  ]
+}
