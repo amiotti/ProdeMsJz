@@ -49,9 +49,6 @@ export function LoginForm() {
       <button className="btn btn-primary" type="submit" disabled={loading}>
         {loading ? 'Ingresando...' : 'Ingresar'}
       </button>
-      <button className="btn" type="button" onClick={() => router.push('/register')} disabled={loading}>
-        Registrarme
-      </button>
       {status ? <p className="status">{status}</p> : null}
     </form>
   );
