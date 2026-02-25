@@ -1,4 +1,4 @@
-﻿import { getState } from '@/lib/db';
+import { getState } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,17 +11,18 @@ export default async function RulesPage() {
       <div className="panel">
         <h2>Reglas del PRODE</h2>
         <p className="muted">
-          Estas reglas explican cÃ³mo registrarse, cargar pronÃ³sticos y cÃ³mo se arma la tabla de posiciones en esta app.
+          Estas reglas explican cómo registrarse, cargar pronósticos y cómo se arma la tabla de posiciones en esta
+          app.
         </p>
       </div>
 
       <div className="panel stack-md">
-        <h3>CÃ³mo participar</h3>
+        <h3>Cómo participar</h3>
         <ol className="rules-list">
-          <li>Registrate / iniciÃ¡ sesiÃ³n con tu cuenta.</li>
-          <li>EntrÃ¡ en `Predicciones` y cargÃ¡ resultados partido por partido.</li>
-          <li>PodÃ©s editar cada predicciÃ³n hasta 1 hora antes del inicio de ese partido.</li>
-          <li>Cuando se cargan resultados oficiales, la tabla se recalcula automÃ¡ticamente.</li>
+          <li>Registrate / iniciá sesión con tu cuenta.</li>
+          <li>Entrá en `Predicciones` y cargá resultados partido por partido.</li>
+          <li>Podés editar cada predicción hasta 1 hora antes del inicio de ese partido.</li>
+          <li>Cuando se cargan resultados oficiales, la tabla se recalcula automáticamente.</li>
         </ol>
       </div>
 
@@ -34,56 +35,60 @@ export default async function RulesPage() {
           </div>
           <div className="detail-card">
             <span className="detail-label">Acierto de signo</span>
-            <strong>{correctOutcome} punto{correctOutcome === 1 ? '' : 's'}</strong>
+            <strong>
+              {correctOutcome} punto{correctOutcome === 1 ? '' : 's'}
+            </strong>
           </div>
           <div className="detail-card">
             <span className="detail-label">Acierto de goles (1 equipo)</span>
             <strong>5 puntos</strong>
           </div>
           <div className="detail-card">
-            <span className="detail-label">PronÃ³stico incorrecto</span>
+            <span className="detail-label">Pronóstico incorrecto</span>
             <strong>0 puntos</strong>
           </div>
         </div>
         <p className="muted">
-          â€œAcierto de signoâ€ significa acertar ganador/empate/perdedor aunque no coincida el marcador exacto.
+          “Acierto de signo” significa acertar ganador/empate/perdedor aunque no coincida el marcador exacto.
         </p>
         <p className="muted">
-          Si acertÃ¡s la cantidad de goles del local o del visitante (uno de los dos), sumÃ¡s <strong>5 puntos</strong>.
+          Si acertás la cantidad de goles del local o del visitante (uno de los dos), sumás <strong>5 puntos</strong>.
           Ese puntaje puede combinarse con el acierto de signo.
         </p>
       </div>
 
       <div className="panel stack-md">
-        <h3>Ejemplos rÃ¡pidos</h3>
+        <h3>Ejemplos rápidos</h3>
         <div className="table-wrap">
           <table className="table">
             <thead>
               <tr>
-                <th>PronÃ³stico</th>
+                <th>Pronóstico</th>
                 <th>Resultado oficial</th>
                 <th>Puntaje</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Argentina 2 - 1 MÃ©xico</td>
-                <td>Argentina 2 - 1 MÃ©xico</td>
+                <td>Argentina 2 - 1 México</td>
+                <td>Argentina 2 - 1 México</td>
                 <td>{exactScore} (exacto)</td>
               </tr>
               <tr>
-                <td>Argentina 3 - 0 MÃ©xico</td>
-                <td>Argentina 2 - 0 MÃ©xico</td>
-                <td>{correctOutcome + 5} ({correctOutcome} por signo + 5 por goles visitante)</td>
+                <td>Argentina 3 - 0 México</td>
+                <td>Argentina 2 - 0 México</td>
+                <td>
+                  {correctOutcome + 5} ({correctOutcome} por signo + 5 por goles visitante)
+                </td>
               </tr>
               <tr>
-                <td>Argentina 1 - 1 MÃ©xico</td>
-                <td>Argentina 2 - 1 MÃ©xico</td>
+                <td>Argentina 1 - 1 México</td>
+                <td>Argentina 2 - 1 México</td>
                 <td>5 (acierto de goles visitante)</td>
               </tr>
               <tr>
-                <td>Argentina 0 - 2 MÃ©xico</td>
-                <td>Argentina 2 - 1 MÃ©xico</td>
+                <td>Argentina 0 - 2 México</td>
+                <td>Argentina 2 - 1 México</td>
                 <td>0</td>
               </tr>
             </tbody>
@@ -98,7 +103,7 @@ export default async function RulesPage() {
           <li>Mayor puntaje total.</li>
           <li>Mayor cantidad de resultados exactos.</li>
           <li>Mayor cantidad de aciertos de signo.</li>
-          <li>Orden alfabÃ©tico por nombre.</li>
+          <li>Orden alfabético por nombre.</li>
         </ol>
       </div>
 
@@ -113,3 +118,4 @@ export default async function RulesPage() {
     </section>
   );
 }
+
