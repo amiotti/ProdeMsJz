@@ -15,20 +15,24 @@ export default function LandingPage() {
 
   return (
     <section className="landing-screen">
-      <div className="public-theme-toggle"><ThemeToggle /></div>
+      <div className="public-theme-toggle">
+        <ThemeToggle />
+      </div>
       <div className="landing-backdrop" aria-hidden="true" />
       <div className="landing-orb landing-orb-a" aria-hidden="true" />
       <div className="landing-orb landing-orb-b" aria-hidden="true" />
+
       <div className="landing-grid">
         <div className="landing-panel landing-main">
           <p className="landing-kicker">PRODE MUNDIAL FIFA 2026</p>
           <h2 className="landing-title">
-            Jugá el <span>PRODE</span> con tu grupo
+            PARTICIPA DEL <span>PRODE LBB</span> 🍺
           </h2>
           <p className="landing-copy">
-            Registrate, pagá tu inscripción y cargá pronósticos partido por partido. El ranking se actualiza
-            automáticamente cuando se cargan los resultados oficiales.
+            Registrate, pagá la prata (no barrani) y cargá pronósticos partido por partido. El ranking se actualiza
+            automáticamente cuando se cargan los resultados oficiales. Así evitamos acomodos y excusas 😂
           </p>
+
           <div className="landing-cta-row">
             <Link className="landing-cta-primary" href="/login">
               Iniciar sesión / Registrarse
@@ -37,6 +41,7 @@ export default function LandingPage() {
               Ver tabla pública
             </Link>
           </div>
+
           <div className="landing-badges">
             <span className="landing-badge">Fixture completo</span>
             <span className="landing-badge">Predicciones por grupo</span>
