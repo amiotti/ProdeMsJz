@@ -24,6 +24,16 @@ type SeriesDatum = {
   emphasized?: boolean;
 };
 
+type OfficialMatchInsights = {
+  playedCount: number;
+  totalGoals: number;
+  avgGoals: number;
+  cleanSheets: number;
+  topScoring: BarDatum[];
+  biggestMargins: BarDatum[];
+  hardestMatches: BarDatum[];
+};
+
 function BarChart({ data, height = 220 }: { data: BarDatum[]; height?: number }) {
   const max = Math.max(1, ...data.map((d) => d.value));
   const width = 760;
@@ -366,6 +376,167 @@ function getPositionDeltaFromLastDate(state: StateResponse, analytics: StatsAnal
   return prevPos - currentPos;
 }
 
+function getOfficialMatchInsights(state: StateResponse): OfficialMatchInsights {
+  const playedMatches = [...state.db.matches]
+    .filter((match) => match.officialResult)
+    .sort((a, b) => new Date(a.kickoffAt).getTime() - new Date(b.kickoffAt).getTime());
+
+  if (playedMatches.length === 0) {
+    return {
+      playedCount: 0,
+      totalGoals: 0,
+      avgGoals: 0,
+      cleanSheets: 0,
+      topScoring: [],
+      biggestMargins: [],
+      hardestMatches: [],
+    };
+  }
+
+  const predictionsByMatch = new Map<string, Prediction[]>();
+  for (const prediction of state.db.predictions) {
+    if (!predictionsByMatch.has(prediction.matchId)) predictionsByMatch.set(prediction.matchId, []);
+    predictionsByMatch.get(prediction.matchId)!.push(prediction);
+  }
+
+  let totalGoals = 0;
+  let cleanSheets = 0;
+
+  const topScoring = playedMatches
+    .map((match) => {
+      const total = (match.officialResult?.home ?? 0) + (match.officialResult?.away ?? 0);
+      totalGoals += total;
+      if ((match.officialResult?.home ?? 0) === 0 || (match.officialResult?.away ?? 0) === 0) {
+        cleanSheets += 1;
+      }
+
+      return {
+        label: `${match.homeTeam} ${match.officialResult?.home} - ${match.officialResult?.away} ${match.awayTeam}`,
+        value: total,
+        note: `${formatDateShort(match.kickoffAt)} | ${match.groupId}`,
+      };
+    })
+    .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label, 'es'))
+    .slice(0, 5);
+
+  const biggestMargins = playedMatches
+    .map((match) => ({
+      label: `${match.homeTeam} ${match.officialResult?.home} - ${match.officialResult?.away} ${match.awayTeam}`,
+      value: Math.abs((match.officialResult?.home ?? 0) - (match.officialResult?.away ?? 0)),
+      note: `${formatDateShort(match.kickoffAt)} | ${match.groupId}`,
+    }))
+    .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label, 'es'))
+    .slice(0, 5);
+
+  const hardestMatches = playedMatches
+    .map((match) => {
+      const predictions = predictionsByMatch.get(match.id) ?? [];
+      const accurateOutcome = predictions.reduce((acc, prediction) => {
+        if (!match.officialResult) return acc;
+        const points = calculatePredictionPoints(prediction, match.officialResult, state.db.pointsConfig);
+        return acc + (points.exactHit || points.outcomeHit ? 1 : 0);
+      }, 0);
+      const accuracy = predictions.length > 0 ? Math.round((accurateOutcome / predictions.length) * 100) : 0;
+
+      return {
+        label: `${match.homeTeam} ${match.officialResult?.home} - ${match.officialResult?.away} ${match.awayTeam}`,
+        value: 100 - accuracy,
+        note:
+          predictions.length > 0
+            ? `${accurateOutcome}/${predictions.length} acertaron signo`
+            : 'Sin predicciones evaluadas',
+      };
+    })
+    .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label, 'es'))
+    .slice(0, 5);
+
+  return {
+    playedCount: playedMatches.length,
+    totalGoals,
+    avgGoals: totalGoals / playedMatches.length,
+    cleanSheets,
+    topScoring,
+    biggestMargins,
+    hardestMatches,
+  };
+}
+
+function OfficialMatchStatsPanel({ state }: { state: StateResponse }) {
+  const insights = getOfficialMatchInsights(state);
+
+  return (
+    <section className="stack-md">
+      <div className="panel stack-md">
+        <div className="section-head">
+          <h3>Partidos oficiales</h3>
+          <span>Metricas calculadas con resultados cargados</span>
+        </div>
+
+        <div className="detail-grid">
+          <div className="detail-card">
+            <span className="detail-label">Partidos evaluados</span>
+            <strong>{insights.playedCount}</strong>
+            <span className="muted compact-text">Solo encuentros con resultado oficial.</span>
+          </div>
+          <div className="detail-card">
+            <span className="detail-label">Goles convertidos</span>
+            <strong>{insights.totalGoals}</strong>
+            <span className="muted compact-text">Total acumulado en partidos oficiales.</span>
+          </div>
+          <div className="detail-card">
+            <span className="detail-label">Promedio de gol</span>
+            <strong>{insights.avgGoals.toFixed(2)}</strong>
+            <span className="muted compact-text">Media de goles por partido jugado.</span>
+          </div>
+          <div className="detail-card">
+            <span className="detail-label">Arcos en cero</span>
+            <strong>{insights.cleanSheets}</strong>
+            <span className="muted compact-text">Partidos donde un equipo no recibio goles.</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="stats-grid">
+        <div className="panel stack-md">
+          <div className="section-head">
+            <h3>Partidos con mas goles</h3>
+            <span>Top 5</span>
+          </div>
+          {insights.topScoring.length > 0 ? (
+            <HorizontalBars data={insights.topScoring} />
+          ) : (
+            <p className="muted">Aun no hay resultados oficiales cargados.</p>
+          )}
+        </div>
+
+        <div className="panel stack-md">
+          <div className="section-head">
+            <h3>Mayores diferencias</h3>
+            <span>Top 5</span>
+          </div>
+          {insights.biggestMargins.length > 0 ? (
+            <HorizontalBars data={insights.biggestMargins} />
+          ) : (
+            <p className="muted">Aun no hay resultados oficiales cargados.</p>
+          )}
+        </div>
+      </div>
+
+      <div className="panel stack-md">
+        <div className="section-head">
+          <h3>Partidos mas dificiles</h3>
+          <span>Menor acierto de signo del grupo</span>
+        </div>
+        {insights.hardestMatches.length > 0 ? (
+          <HorizontalBars data={insights.hardestMatches} percent />
+        ) : (
+          <p className="muted">Aun no hay resultados oficiales cargados.</p>
+        )}
+      </div>
+    </section>
+  );
+}
+
 function AdminStatsDashboard({ state }: { state: StateResponse }) {
   const analytics = getStatsAnalytics(state);
   const predictionsByGroup = analytics.predictionsByGroup.map((g) => ({ label: g.groupId, value: g.count, note: g.groupName }));
@@ -443,6 +614,8 @@ function AdminStatsDashboard({ state }: { state: StateResponse }) {
           height={240}
         />
       </div>
+
+      <OfficialMatchStatsPanel state={state} />
     </section>
   );
 }
@@ -648,6 +821,8 @@ function UserStatsDashboard({ state, user }: { state: StateResponse; user: User 
           </div>
         </div>
       </div>
+
+      <OfficialMatchStatsPanel state={state} />
     </section>
   );
 }
