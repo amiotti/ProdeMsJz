@@ -63,7 +63,16 @@ export default function TermsPage() {
           <li>En caso de errores materiales manifiestos, la organización puede corregir resultados, puntajes, fixtures o clasificaciones para reflejar correctamente la realidad deportiva.</li>
         </ul>
 
-        <h3>6. Modelo de premios</h3>
+        <h3>6. Sistema de puntaje</h3>
+        <ul className="list">
+          <li>El resultado exacto otorga 20 puntos.</li>
+          <li>Acertar ganador o empate, sin acertar el resultado exacto, otorga 10 puntos.</li>
+          <li>Acertar la cantidad de goles de uno solo de los dos equipos otorga 5 puntos.</li>
+          <li>Si no existe ningún acierto computable, el puntaje de ese partido es 0.</li>
+          <li>La lógica de puntaje se aplica automáticamente sobre los resultados oficiales cargados en la plataforma.</li>
+        </ul>
+
+        <h3>7. Modelo de premios</h3>
         <ul className="list">
           <li>La plataforma puede operar con esquema de premios top 5 u otro esquema que el organizador publique antes del inicio del torneo.</li>
           <li>Los premios en dinero, órdenes de compra, cenas, indumentaria u otros beneficios están sujetos a disponibilidad y a las reglas específicas anunciadas por el organizador.</li>
@@ -71,27 +80,27 @@ export default function TermsPage() {
           <li>La organización puede reemplazar premios no monetarios por otros de valor equivalente o similar, cuando existan causas justificadas.</li>
         </ul>
 
-        <h3>7. Conducta prohibida</h3>
+        <h3>8. Conducta prohibida</h3>
         <ul className="list">
           <li>Queda prohibido manipular resultados, intentar alterar el funcionamiento del sitio, acceder sin autorización, automatizar acciones o explotar vulnerabilidades.</li>
           <li>También se prohíbe utilizar la plataforma para canalizar apuestas, captar fondos para juegos de azar, ofrecer servicios de betting o fomentar conductas de ludopatía.</li>
           <li>La organización podrá suspender o cancelar cuentas por fraude, abuso, incumplimiento de reglas, falta de pago o uso contrario a la ley.</li>
         </ul>
 
-        <h3>8. Limitación de responsabilidad</h3>
+        <h3>9. Limitación de responsabilidad</h3>
         <ul className="list">
           <li>La plataforma se ofrece bajo criterio de disponibilidad razonable. Pueden existir interrupciones por mantenimiento, fallas de terceros, problemas de conectividad o causas de fuerza mayor.</li>
           <li>La organización no garantiza disponibilidad continua, ausencia absoluta de errores ni compatibilidad con todos los navegadores o dispositivos.</li>
           <li>La responsabilidad del organizador se limita, en la máxima medida permitida por la ley aplicable, al valor efectivamente abonado por el usuario para la edición vigente del torneo.</li>
         </ul>
 
-        <h3>9. Propiedad intelectual y contenidos</h3>
+        <h3>10. Propiedad intelectual y contenidos</h3>
         <ul className="list">
           <li>El software, diseño, marca del servicio, textos originales, base de datos estructurada y desarrollos propios pertenecen a sus titulares y no pueden copiarse, revenderse o explotarse sin autorización.</li>
           <li>Los nombres de equipos, marcas, escudos o referencias deportivas pertenecen a sus respectivos titulares y se utilizan con fines descriptivos e informativos.</li>
         </ul>
 
-        <h3>10. Ley aplicable y jurisdicción</h3>
+        <h3>11. Ley aplicable y jurisdicción</h3>
         <ul className="list">
           <li>Estos Términos se rigen por las leyes de la República Argentina.</li>
           <li>En la medida permitida por la normativa aplicable, cualquier controversia será sometida a los tribunales ordinarios con jurisdicción en la Ciudad Autónoma de Buenos Aires, sin perjuicio de los derechos del consumidor que resulten inderogables.</li>

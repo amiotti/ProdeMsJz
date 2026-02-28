@@ -99,7 +99,7 @@ export function RegisterForm({ registrationAmountArs }: { registrationAmountArs:
         <span className="auth-legal-text">
           Acepto los{' '}
           <Link href="/terms" className="auth-legal-link" target="_blank" rel="noreferrer">
-            Términos y Condiciones
+            T&amp;C
           </Link>
         </span>
       </label>

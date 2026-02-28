@@ -604,12 +604,12 @@
     {
       "stage": "group",
       "dateHeading": "Friday, June 26",
-      "matchLabel": "Senegal vs TDB 3pm",
-      "localTime": "",
+      "matchLabel": "Senegal vs TBD",
+      "localTime": "3pm",
       "gmtInfo": "20:00 GMT",
       "venue": "Toronto Stadium, Toronto, Canada",
       "homeTeam": "Senegal",
-      "awayTeam": "TDB 3pm"
+      "awayTeam": "TBD"
     },
     {
       "stage": "group",
