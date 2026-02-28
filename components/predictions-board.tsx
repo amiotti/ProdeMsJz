@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
@@ -366,11 +366,11 @@ export function PredictionsBoard({
       <div className="panel stack-md">
         <h3>Predicciones bloqueadas hasta confirmar pago</h3>
         <p className="muted">
-          Tu usuario tiene estado de inscripción <strong>{currentUser.registrationPaymentStatus ?? 'pending'}</strong>. Debes completar y confirmar el pago de <strong>${registrationAmountArs.toLocaleString('es-AR')}</strong> para acceder a la carga de predicciones.
+          Tu usuario tiene estado de inscripciÃ³n <strong>{currentUser.registrationPaymentStatus ?? 'pending'}</strong>. Debes completar y confirmar el pago de <strong>${registrationAmountArs.toLocaleString('es-AR')}</strong> para acceder a la carga de predicciones.
         </p>
         <div className="cta-row">
           <button className="btn btn-primary" type="button" onClick={startRegistrationPayment} disabled={paying}>
-            {paying ? 'Redirigiendo a GalioPay...' : 'Pagar inscripción'}
+            {paying ? 'Redirigiendo a GalioPay...' : 'Pagar inscripciÃ³n'}
           </button>
           <Link className="cta-link" href="/payment/return">
             Revisar estado del pago
@@ -387,11 +387,6 @@ export function PredictionsBoard({
   return (
     <section className="stack-lg">
       <div className="panel toolbar-grid">
-        <label>
-          Usuario activo
-          <input value={`${currentUser.name} (${currentUser.email})`} disabled />
-        </label>
-
         <label>
           Filtrar grupo
           <select value={selectedGroupId} onChange={(e) => setSelectedGroupId(e.target.value)}>

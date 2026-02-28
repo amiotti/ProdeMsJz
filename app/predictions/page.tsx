@@ -1,4 +1,4 @@
-import { cookies } from 'next/headers';
+﻿import { cookies } from 'next/headers';
 
 import { PredictionsBoard } from '@/components/predictions-board';
 import { getSessionCookieName } from '@/lib/auth';
@@ -25,4 +25,3 @@ export default async function PredictionsPage() {
     </section>
   );
 }
-

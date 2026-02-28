@@ -585,7 +585,7 @@ function AdminStatsDashboard({ state }: { state: StateResponse }) {
           {participationBars.length > 0 ? <HorizontalBars data={participationBars} /> : <p className="muted">Aun no hay predicciones.</p>}
         </div>
         <div className="panel stack-md">
-          <div className="section-head"><h3>Precisión global del PRODE</h3><span>Predicciones evaluadas</span></div>
+          <div className="section-head"><h3>PrecisiÃ³n global del PRODE</h3><span>Predicciones evaluadas</span></div>
           <DonutChart
             centerLabel="pred."
             segments={[
@@ -683,80 +683,45 @@ function UserStatsDashboard({ state, user }: { state: StateResponse; user: User 
   if (riskPct >= 35) badges.push('Kamikaze');
   if (outcomePct >= 60) badges.push('Analista');
   if (userRow && rank && rank <= 3) badges.push('Podio');
-  if (totalScored > 0 && exactPct < 5 && outcomePct < 30) badges.push('Pecho frío');
+  if (totalScored > 0 && exactPct < 5 && outcomePct < 30) badges.push('Pecho frÃ­o');
 
   return (
     <section className="stack-lg">
       <div className="panel stack-md">
         <h2>Estadisticas personales</h2>
         <p className="muted">
-          Tu dashboard del PRODE: rendimiento, precisión, tendencia y comparación con el grupo.
+          Tu dashboard del PRODE: rendimiento, precisiÃ³n, tendencia y comparaciÃ³n con el grupo.
         </p>
         <div className="detail-grid">
           <div className="detail-card">
             <span className="detail-label">Ranking general</span>
             <strong>{rank ? `#${rank}` : 'Sin ranking'}</strong>
-            <span className="muted compact-text">{userRow ? `${userRow.totalPoints} puntos` : 'Aún no hay puntaje'}</span>
+            <span className="muted compact-text">{userRow ? `${userRow.totalPoints} puntos` : 'AÃºn no hay puntaje'}</span>
           </div>
           <div className="detail-card">
-            <span className="detail-label">Diferencia con el líder</span>
+            <span className="detail-label">Diferencia con el lÃ­der</span>
             <strong>{diffToLeader ?? 0} pts</strong>
-            <span className="muted compact-text">{leader ? `Líder: ${leader.firstName} ${leader.lastName}` : 'Sin líder aun'}</span>
+            <span className="muted compact-text">{leader ? `LÃ­der: ${leader.firstName} ${leader.lastName}` : 'Sin lÃ­der aun'}</span>
           </div>
           <div className="detail-card">
             <span className="detail-label">Probabilidad de ganar</span>
             <strong>{userProb}%</strong>
-            <span className="muted compact-text">Modelo simple de simulación (Monte Carlo)</span>
+            <span className="muted compact-text">Modelo simple de simulaciÃ³n (Monte Carlo)</span>
           </div>
           <div className="detail-card">
             <span className="detail-label">Posiciones ganadas</span>
             <strong>
               {positionDelta == null ? '-' : positionDelta > 0 ? `+${positionDelta}` : String(positionDelta)}
             </strong>
-            <span className="muted compact-text">Comparado con la última fecha evaluada.</span>
+            <span className="muted compact-text">Comparado con la Ãºltima fecha evaluada.</span>
           </div>
         </div>
       </div>
 
-      <div className="stats-grid">
-        <div className="panel stack-md">
-          <div className="section-head">
-            <h3>Ranking general</h3>
-            <span>Puntaje por jugador</span>
-          </div>
-          <HorizontalBars
-            data={state.leaderboard.map((r) => ({
-              label: `${r.firstName} ${r.lastName}`,
-              value: r.totalPoints,
-              note: `${(exactsByUser.get(r.userId)?.exacts ?? 0)} exactos`,
-            }))}
-          />
-        </div>
-
-        <div className="panel stack-md">
-          <div className="section-head">
-            <h3>Precisión de tus pronósticos</h3>
-            <span>{totalScored} evaluadas</span>
-          </div>
-          <HorizontalBars
-            percent
-            data={[
-              { label: 'Ganador / empate correcto', value: outcomePct, note: `${outcomeCount}/${totalScored || 0}` },
-              { label: 'Resultado exacto', value: exactPct, note: `${exactCount}/${totalScored || 0}` },
-              { label: 'Diferencia de goles', value: diffPct, note: `${diffCount}/${totalScored || 0}` },
-            ]}
-          />
-          <div className="badge-grid">
-            {(badges.length > 0 ? badges : ['Participante activo']).map((badge) => (
-              <span key={badge} className="badge-pill">{badge}</span>
-            ))}
-          </div>
-        </div>
-      </div>
 
       <div className="panel stack-md">
         <div className="section-head">
-          <h3>Evolución del puntaje</h3>
+          <h3>EvoluciÃ³n del puntaje</h3>
           <span>Acumulado por partido con resultado oficial</span>
         </div>
         <UserEvolutionComparisonChart labels={evolutionLabels} users={evolutionUsers} currentUserId={user.id} />
@@ -765,7 +730,7 @@ function UserStatsDashboard({ state, user }: { state: StateResponse; user: User 
       <div className="stats-grid">
         <div className="panel stack-md">
           <div className="section-head">
-            <h3>Predicciones del próximo partido</h3>
+            <h3>Predicciones del prÃ³ximo partido</h3>
             <span>{nextMatch ? `${nextMatch.homeTeam} vs ${nextMatch.awayTeam}` : 'Sin partidos futuros'}</span>
           </div>
           {nextMatch ? (
@@ -788,7 +753,7 @@ function UserStatsDashboard({ state, user }: { state: StateResponse; user: User 
         <div className="panel stack-md">
           <div className="section-head">
             <h3>Probabilidad de ganar</h3>
-            <span>Top 8 (simulación)</span>
+            <span>Top 8 (simulaciÃ³n)</span>
           </div>
           <HorizontalBars percent data={montecarlo} />
           <p className="muted">
@@ -812,7 +777,7 @@ function UserStatsDashboard({ state, user }: { state: StateResponse; user: User 
           <div className="detail-card">
             <span className="detail-label">Resultados exactos</span>
             <strong>{exactCount}</strong>
-            <span className="muted compact-text">Tu métrica de "adicto al detalle".</span>
+            <span className="muted compact-text">Tu mÃ©trica de "adicto al detalle".</span>
           </div>
           <div className="detail-card">
             <span className="detail-label">Predicciones evaluadas</span>
