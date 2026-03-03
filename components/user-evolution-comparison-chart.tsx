@@ -35,7 +35,7 @@ function LineChart({
 
   return (
     <div className="line-chart-wrap">
-      <svg className="chart-svg" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Grafico de evolucion">
+      <svg className="chart-svg" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Gráfico de evolucion">
         <g transform={`translate(${padding.left},${padding.top})`}>
           {Array.from({ length: 5 }).map((_, i) => {
             const y = (innerH / 4) * i;
@@ -99,7 +99,7 @@ export function UserEvolutionComparisonChart({
   const compareOptions = users.filter((u) => u.userId !== currentUserId);
 
   if (!currentUser || labels.length === 0) {
-    return <p className="muted">Todavia no hay partidos con resultado oficial para graficar evolucion.</p>;
+    return <p className="muted">Todavía no hay partidos con resultado oficial para graficar evolución.</p>;
   }
 
   return (

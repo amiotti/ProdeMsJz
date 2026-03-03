@@ -100,7 +100,7 @@ export function RegisterForm({ registrationAmountArs }: { registrationAmountArs:
           required
         />
         <span className="auth-legal-text">
-          Acepto los{' '}
+          Acepto los {' '}
           <Link href="/terms" className="auth-legal-link" target="_blank" rel="noreferrer">
             T&amp;C
           </Link>
