@@ -1,5 +1,5 @@
-import type { Group, Match, ProdeDB } from '@/lib/types';
-import { WORLD_CUP_2026_GROUPS, applyOfficialFixtureToGroupMatches } from '@/lib/worldcup26';
+﻿import type { Group, Match, ProdeDB } from '@/lib/types';
+import { WORLD_CUP_2026_GROUPS, applyOfficialFixtureToGroupMatches, buildKnockoutMatches } from '@/lib/worldcup26';
 
 const PAIRINGS_BY_MATCHDAY: Array<Array<[number, number]>> = [
   [
@@ -42,10 +42,11 @@ export function createSeedDb(): ProdeDB {
   const now = new Date().toISOString();
 
   const groups = WORLD_CUP_2026_GROUPS;
-  const matches = applyOfficialFixtureToGroupMatches(groups.flatMap((group) => generateGroupMatches(group)));
+  const groupMatches = applyOfficialFixtureToGroupMatches(groups.flatMap((group) => generateGroupMatches(group)));
+  const matches = [...groupMatches, ...buildKnockoutMatches()];
 
   return {
-    version: 3,
+    version: 4,
     pointsConfig: {
       exactScore: 20,
       correctOutcome: 10,
@@ -57,4 +58,3 @@ export function createSeedDb(): ProdeDB {
     updatedAt: now,
   };
 }
-

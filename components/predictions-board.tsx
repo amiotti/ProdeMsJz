@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
@@ -10,8 +10,8 @@ import { estimateMatchProbabilities } from '@/lib/worldcup26';
 
 type DraftMap = Record<string, { home: string; away: string }>;
 type ViewMode = 'group' | 'date';
-type GroupSection = { groupId: string; groupName: string; teams: string[]; matches: Match[] };
-type DateMatch = Match & { _groupName: string };
+type MatchSection = { id: string; title: string; subtitle: string; matches: Match[]; saveLabel: string };
+type DateMatch = Match & { _meta: string };
 type DateSection = { label: string; matches: DateMatch[] };
 
 function sortMatches(a: Match, b: Match) {
@@ -35,7 +35,7 @@ export function PredictionsBoard({
   const [loading, setLoading] = useState(!initialState);
   const [saving, setSaving] = useState(false);
   const [savingMatchId, setSavingMatchId] = useState<string | null>(null);
-  const [savingGroupId, setSavingGroupId] = useState<string | null>(null);
+  const [savingSectionId, setSavingSectionId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [selectedGroupId, setSelectedGroupId] = useState('ALL');
   const [viewMode, setViewMode] = useState<ViewMode>('group');
@@ -75,30 +75,60 @@ export function PredictionsBoard({
 
   const lockedMatchIds = useMemo(() => {
     const nowMs = Date.now();
-    return new Set(
-      state?.db.matches.filter((m) => !isPredictionEditable(m.kickoffAt, nowMs)).map((m) => m.id) ?? [],
-    );
+    return new Set(state?.db.matches.filter((m) => !isPredictionEditable(m.kickoffAt, nowMs)).map((m) => m.id) ?? []);
   }, [state?.db.matches]);
 
-  const groupedMatches = useMemo(() => {
-    if (!state) return [] as GroupSection[];
+  const editableMatches = useMemo(() => {
     const nowMs = Date.now();
-    return state.db.groups.map((group) => ({
-      groupId: group.id,
-      groupName: group.name,
-      teams: group.teams,
-      matches: state.db.matches.filter((m) => m.groupId === group.id && isPredictionEditable(m.kickoffAt, nowMs)).sort(sortMatches),
-    }));
-  }, [state]);
+    return [...(state?.db.matches ?? [])].filter((match) => isPredictionEditable(match.kickoffAt, nowMs)).sort(sortMatches);
+  }, [state?.db.matches]);
 
-  const visibleGroups = useMemo(
-    () => groupedMatches.filter((group) => (selectedGroupId === 'ALL' || group.groupId === selectedGroupId) && group.matches.length > 0),
-    [groupedMatches, selectedGroupId],
-  );
+  const groupSections = useMemo(() => {
+    if (!state) return [] as MatchSection[];
+    return state.db.groups
+      .map((group) => ({
+        id: group.id,
+        title: group.name,
+        subtitle: group.teams.join(' · '),
+        matches: editableMatches.filter((match) => match.groupId === group.id),
+        saveLabel: 'Guardar grupo',
+      }))
+      .filter((section) => section.matches.length > 0);
+  }, [editableMatches, state]);
+
+  const knockoutSections = useMemo(() => {
+    const byStage = new Map<string, Match[]>();
+    for (const match of editableMatches.filter((item) => item.groupId === 'KO')) {
+      const stage = match.stage ?? 'Fase final';
+      const list = byStage.get(stage) ?? [];
+      list.push(match);
+      byStage.set(stage, list);
+    }
+    return [...byStage.entries()].map(([stage, matches]) => ({
+      id: `KO-${stage}`,
+      title: stage,
+      subtitle: '',
+      matches,
+      saveLabel: 'Guardar etapa',
+    }));
+  }, [editableMatches]);
+
+  const visibleSections = useMemo(() => {
+    const sections: MatchSection[] = [];
+    if (selectedGroupId === 'ALL') {
+      sections.push(...groupSections);
+      sections.push(...knockoutSections);
+    } else if (selectedGroupId === 'KO') {
+      sections.push(...knockoutSections);
+    } else {
+      sections.push(...groupSections.filter((section) => section.id === selectedGroupId));
+    }
+    return sections;
+  }, [groupSections, knockoutSections, selectedGroupId]);
 
   const visibleDateSections = useMemo(() => {
-    const flat: DateMatch[] = visibleGroups.flatMap((group) =>
-      group.matches.map((match) => ({ ...match, _groupName: group.groupName })),
+    const flat: DateMatch[] = visibleSections.flatMap((section) =>
+      section.matches.map((match) => ({ ...match, _meta: section.title })),
     );
     flat.sort(sortMatches);
 
@@ -109,7 +139,7 @@ export function PredictionsBoard({
       byDate.get(dateKey)!.matches.push(match);
     }
     return [...byDate.values()];
-  }, [visibleGroups]);
+  }, [visibleSections]);
 
   function setDraft(matchId: string, side: 'home' | 'away', value: string) {
     if (lockedMatchIds.has(matchId)) return;
@@ -150,11 +180,8 @@ export function PredictionsBoard({
       return;
     }
 
-    if (targetMatchId) {
-      setSavingMatchId(targetMatchId);
-    } else {
-      setSaving(true);
-    }
+    if (targetMatchId) setSavingMatchId(targetMatchId);
+    else setSaving(true);
     setMessage(null);
 
     try {
@@ -164,23 +191,14 @@ export function PredictionsBoard({
         body: JSON.stringify({ predictions }),
       });
       const data = await response.json();
-
-      if (!response.ok || !data.ok) {
-        throw new Error(data.error || 'No se pudo guardar');
-      }
+      if (!response.ok || !data.ok) throw new Error(data.error || 'No se pudo guardar');
 
       setState(data.state as StateResponse);
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new Event('prode-predictions-changed'));
       }
-      const locked = Array.isArray(data.lockedMatches) ? (data.lockedMatches as string[]) : [];
-      setMessage(
-        locked.length > 0
-          ? `Predicciones guardadas. ${locked.length} partido(s) ya est?n cerrados (menos de 1 hora para el inicio) y no se modificaron.`
-          : targetMatchId
-            ? 'Predicción guardada correctamente. Puedes editarla hasta 1 hora antes del partido.'
-            : 'Predicciones guardadas correctamente. Puedes editarlas hasta 1 hora antes de cada partido.',
-      );
+
+      setMessage(targetMatchId ? 'Predicción guardada correctamente.' : 'Predicciones guardadas correctamente.');
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Error al guardar predicciones');
     } finally {
@@ -189,7 +207,7 @@ export function PredictionsBoard({
     }
   }
 
-  async function saveGroupPredictions(groupId: string, matchIds: string[]) {
+  async function saveSectionPredictions(sectionId: string, matchIds: string[]) {
     if (!currentUser) {
       setMessage('Debes iniciar sesión para cargar predicciones.');
       return;
@@ -207,11 +225,11 @@ export function PredictionsBoard({
       }));
 
     if (predictions.length === 0) {
-      setMessage('No hay predicciones nuevas para guardar en este grupo.');
+      setMessage('No hay predicciones nuevas para guardar en esta sección.');
       return;
     }
 
-    setSavingGroupId(groupId);
+    setSavingSectionId(sectionId);
     setMessage(null);
     try {
       const response = await fetch('/api/predictions', {
@@ -220,25 +238,17 @@ export function PredictionsBoard({
         body: JSON.stringify({ predictions }),
       });
       const data = await response.json();
-
-      if (!response.ok || !data.ok) {
-        throw new Error(data.error || 'No se pudo guardar');
-      }
+      if (!response.ok || !data.ok) throw new Error(data.error || 'No se pudo guardar');
 
       setState(data.state as StateResponse);
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new Event('prode-predictions-changed'));
       }
-      const locked = Array.isArray(data.lockedMatches) ? (data.lockedMatches as string[]) : [];
-      setMessage(
-        locked.length > 0
-          ? `Predicciones del grupo guardadas. ${locked.length} partido(s) ya están cerrados y no se modificaron.`
-          : 'Predicciones del grupo guardadas correctamente.',
-      );
+      setMessage('Predicciones guardadas correctamente.');
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Error al guardar predicciones');
     } finally {
-      setSavingGroupId(null);
+      setSavingSectionId(null);
     }
   }
 
@@ -251,9 +261,7 @@ export function PredictionsBoard({
         headers: { 'Content-Type': 'application/json' },
       });
       const data = await response.json();
-      if (!response.ok || !data.ok) {
-        throw new Error(data.error || 'No se pudo generar el pago');
-      }
+      if (!response.ok || !data.ok) throw new Error(data.error || 'No se pudo generar el pago');
       const redirectUrl = data.url as string | undefined;
       if (!redirectUrl) throw new Error('GalioPay no devolvió URL de checkout');
       window.location.href = redirectUrl;
@@ -266,13 +274,13 @@ export function PredictionsBoard({
 
   function renderMatchCard(match: Match, extraMeta?: string) {
     const draft = drafts[match.id] ?? { home: '', away: '' };
-    const isLocked = lockedMatchIds.has(match.id);
     const kickoff = formatKickoffArgentina(match.kickoffAt);
+    const headerMeta = match.groupId === 'KO' ? match.stage ?? 'Fase final' : `Grupo ${match.groupId} - Fecha ${match.matchday}`;
 
     return (
       <div key={match.id} className="match-card">
         <div>
-          <p className="match-meta">Fecha {match.matchday} - {kickoff}</p>
+          <p className="match-meta">{headerMeta} - {kickoff}</p>
           {extraMeta ? <p className="match-meta">{extraMeta}</p> : null}
           <p className="match-meta">Sede: {match.venue ?? 'Pendiente de confirmar'}</p>
           <div className="fixture-row">
@@ -280,14 +288,15 @@ export function PredictionsBoard({
             <span className="vs">vs</span>
             <TeamName teamName={match.awayTeam} linkToTeam />
           </div>
-          <p className="prob-row">
-            Probabilidades (estimadas):{' '}
-            {(() => {
-              const p = estimateMatchProbabilities(match.homeTeam, match.awayTeam);
-              return `${p.homeWinPct}% ${match.homeTeam} | ${p.drawPct}% empate | ${p.awayWinPct}% ${match.awayTeam}`;
-            })()}
-          </p>
-          {isLocked ? <p className="match-meta">Predicci?n cerrada (menos de 1 hora para el inicio)</p> : null}
+          {match.groupId !== 'KO' ? (
+            <p className="prob-row">
+              Probabilidades (estimadas):{' '}
+              {(() => {
+                const p = estimateMatchProbabilities(match.homeTeam, match.awayTeam);
+                return `${p.homeWinPct}% ${match.homeTeam} | ${p.drawPct}% empate | ${p.awayWinPct}% ${match.awayTeam}`;
+              })()}
+            </p>
+          ) : null}
           {match.officialResult ? (
             <p className="official-result">
               Oficial: {match.officialResult.home} - {match.officialResult.away}
@@ -295,13 +304,12 @@ export function PredictionsBoard({
           ) : null}
         </div>
 
-        <div className={`score-inputs${isLocked ? ' is-locked' : ''}`}>
+        <div className="score-inputs">
           <input
             inputMode="numeric"
             value={draft.home}
             onChange={(e) => setDraft(match.id, 'home', e.target.value)}
             aria-label={`Goles ${match.homeTeam}`}
-            disabled={isLocked}
           />
           <span className="score-divider">-</span>
           <input
@@ -309,14 +317,12 @@ export function PredictionsBoard({
             value={draft.away}
             onChange={(e) => setDraft(match.id, 'away', e.target.value)}
             aria-label={`Goles ${match.awayTeam}`}
-            disabled={isLocked}
           />
           <button
             className="btn btn-primary btn-small"
             type="button"
             onClick={() => savePredictions(match.id)}
-            disabled={isLocked || saving || savingMatchId === match.id || draft.home === '' || draft.away === ''}
-            title="Guardar esta predicci?n"
+            disabled={saving || savingMatchId === match.id || draft.home === '' || draft.away === ''}
           >
             {savingMatchId === match.id ? 'Guardando...' : 'Guardar'}
           </button>
@@ -385,6 +391,7 @@ export function PredictionsBoard({
           Filtrar grupo
           <select value={selectedGroupId} onChange={(e) => setSelectedGroupId(e.target.value)}>
             <option value="ALL">Todos</option>
+            <option value="KO">Fase final</option>
             {state.db.groups.map((group) => (
               <option key={group.id} value={group.id}>
                 {group.name}
@@ -396,7 +403,7 @@ export function PredictionsBoard({
         <label>
           Ver por
           <select value={viewMode} onChange={(e) => setViewMode(e.target.value as ViewMode)}>
-            <option value="group">Grupo</option>
+            <option value="group">Grupo / etapa</option>
             <option value="date">Fecha de partido</option>
           </select>
         </label>
@@ -404,52 +411,47 @@ export function PredictionsBoard({
 
       <div className="panel">
         <p className="muted">
-          Regla de cierre: las predicciones se pueden crear o editar hasta <strong>1 hora antes</strong> del inicio de cada partido. Después del cierre quedan bloqueadas.
+          Regla de cierre: las predicciones se pueden crear o editar hasta <strong>1 hora antes</strong> del inicio de cada partido. Después del cierre ya no se muestran en esta pantalla.
         </p>
       </div>
 
       {message ? <p className="status">{message}</p> : null}
 
       {viewMode === 'group'
-        ? visibleGroups.map((group) => (
-          <div key={group.groupId} className="panel stack-md">
-            <div className="section-head">
-              <h3>{group.groupName}</h3>
-              <div className="fixture-inline">
-                <span>{group.matches.length} partidos pendientes</span>
-                <button
-                  className="btn btn-primary btn-small"
-                  type="button"
-                  onClick={() => saveGroupPredictions(group.groupId, group.matches.map((m) => m.id))}
-                  disabled={savingGroupId === group.groupId || saving}
-                >
-                  {savingGroupId === group.groupId ? 'Guardando...' : 'Guardar grupo'}
-                </button>
+        ? visibleSections.map((section) => (
+            <div key={section.id} className="panel stack-md">
+              <div className="section-head">
+                <h3>{section.title}</h3>
+                <div className="fixture-inline">
+                  <span>{section.matches.length} partidos pendientes</span>
+                  <button
+                    className="btn btn-primary btn-small"
+                    type="button"
+                    onClick={() => saveSectionPredictions(section.id, section.matches.map((m) => m.id))}
+                    disabled={savingSectionId === section.id || saving}
+                  >
+                    {savingSectionId === section.id ? 'Guardando...' : section.saveLabel}
+                  </button>
+                </div>
+              </div>
+
+              {section.subtitle ? <p className="muted compact-text">{section.subtitle}</p> : null}
+              <div className="match-list">{section.matches.map((match) => renderMatchCard(match))}</div>
+            </div>
+          ))
+        : visibleDateSections.map((section) => (
+            <div key={section.label} className="panel stack-md">
+              <div className="section-head">
+                <h3>{section.label}</h3>
+                <span>{section.matches.length} partidos pendientes</span>
+              </div>
+              <div className="match-list">
+                {section.matches.map((match) => renderMatchCard(match, match._meta))}
               </div>
             </div>
+          ))}
 
-            <div className="teams-chip-row">
-              {group.teams.map((team) => (
-                <TeamName key={team} teamName={team} linkToTeam className="chip team-chip" />
-              ))}
-            </div>
-
-            <div className="match-list">{group.matches.map((match) => renderMatchCard(match))}</div>
-          </div>
-        ))
-        : visibleDateSections.map((section) => (
-          <div key={section.label} className="panel stack-md">
-            <div className="section-head">
-              <h3>{section.label}</h3>
-              <span>{section.matches.length} partidos pendientes</span>
-            </div>
-            <div className="match-list">
-              {section.matches.map((match) => renderMatchCard(match, match._groupName))}
-            </div>
-          </div>
-        ))}
-
-      {(viewMode === 'group' ? visibleGroups.length === 0 : visibleDateSections.length === 0) ? (
+      {(viewMode === 'group' ? visibleSections.length === 0 : visibleDateSections.length === 0) ? (
         <div className="panel">
           <p className="muted">No hay partidos disponibles para predecir en el filtro actual. Solo se muestran partidos cuya ventana de carga sigue abierta.</p>
         </div>
@@ -457,4 +459,6 @@ export function PredictionsBoard({
     </section>
   );
 }
+
+
 

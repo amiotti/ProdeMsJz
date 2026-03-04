@@ -1143,7 +1143,7 @@ export function buildKnockoutCalendar(): CalendarEvent[] {
     awayTeam: `Cruce pendiente (${73 + i})`,
   }));
   addStage(
-    'Dieciseisavos',
+    '16avos',
     ['2026-06-28', '2026-06-29', '2026-06-30', '2026-07-01', '2026-07-02', '2026-07-03'],
     [3, 3, 3, 3, 2, 2],
     r32Labels,
@@ -1154,7 +1154,7 @@ export function buildKnockoutCalendar(): CalendarEvent[] {
     homeTeam: `Ganador M${73 + i * 2}`,
     awayTeam: `Ganador M${74 + i * 2}`,
   }));
-  addStage('Octavos', ['2026-07-04', '2026-07-05', '2026-07-06', '2026-07-07'], [2, 2, 2, 2], r16Labels);
+  addStage('8vos', ['2026-07-04', '2026-07-05', '2026-07-06', '2026-07-07'], [2, 2, 2, 2], r16Labels);
 
   const qfLabels = Array.from({ length: 4 }, (_, i) => ({
     id: `KO-${97 + i}`,
@@ -1168,7 +1168,7 @@ export function buildKnockoutCalendar(): CalendarEvent[] {
     homeTeam: `Ganador M${97 + i * 2}`,
     awayTeam: `Ganador M${98 + i * 2}`,
   }));
-  addStage('Semifinales', ['2026-07-14', '2026-07-15'], [1, 1], sfLabels);
+  addStage('Semifinal', ['2026-07-14', '2026-07-15'], [1, 1], sfLabels);
 
   events.push({
     id: 'KO-103',
@@ -1188,6 +1188,25 @@ export function buildKnockoutCalendar(): CalendarEvent[] {
   return events;
 }
 
+export function buildKnockoutMatches(): Match[] {
+  const knockoutRows = ensureCompleteOfficialFixtureRows(OFFICIAL_FIXTURE_ROWS).filter((row) => row.stage === 'knockout');
+  const knockoutCalendar = buildKnockoutCalendar();
+
+  return knockoutCalendar.map((fixture, index) => {
+    const row = knockoutRows[index];
+    return {
+      id: fixture.id,
+      groupId: 'KO',
+      stage: fixture.stage,
+      matchday: index + 1,
+      homeTeam: fixture.homeTeam,
+      awayTeam: fixture.awayTeam,
+      kickoffAt: row ? getOfficialRowKickoffIso(row) : fixture.date,
+      venue: row?.venue ?? fixture.venue ?? null,
+      officialResult: null,
+    } satisfies Match;
+  });
+}
 export type CalendarFixture = CalendarEvent;
 
 export function getOfficialGroupStageFixtures() {
@@ -1297,6 +1316,9 @@ export function buildCalendarFixtures(
 
   return fixtures.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 }
+
+
+
 
 
 

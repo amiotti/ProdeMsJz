@@ -1,7 +1,8 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useMemo, useState } from 'react';
 
+import { formatKickoffArgentina } from '@/lib/datetime';
 import { TeamName } from '@/components/team-name';
 import type { Match, StateResponse } from '@/lib/types';
 
@@ -19,6 +20,26 @@ type GroupStandingRow = {
   dg: number;
   pts: number;
 };
+
+const KNOCKOUT_STAGE_ORDER: Record<string, number> = {
+  '32avos': 1,
+  '16avos': 2,
+  '8vos': 3,
+  Cuartos: 4,
+  Semifinal: 5,
+  'Tercer puesto': 6,
+  Final: 7,
+};
+
+function getStageOrder(match: Match) {
+  if (match.groupId !== 'KO') return 0;
+  return KNOCKOUT_STAGE_ORDER[match.stage ?? ''] ?? 99;
+}
+
+function getGroupSortOrder(groupId: string) {
+  if (groupId === 'KO') return 99;
+  return groupId.charCodeAt(0) - 64;
+}
 
 function buildGroupStandings(state: StateResponse) {
   const standingsByGroup = new Map<string, GroupStandingRow[]>();
@@ -46,7 +67,7 @@ function buildGroupStandings(state: StateResponse) {
   }
 
   for (const match of state.db.matches) {
-    if (!match.officialResult) continue;
+    if (!match.officialResult || match.groupId === 'KO') continue;
     const home = byTeam.get(match.homeTeam);
     const away = byTeam.get(match.awayTeam);
     if (!home || !away) continue;
@@ -138,7 +159,9 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
     const matches = state.db.matches.filter((m) => selectedGroupId === 'ALL' || m.groupId === selectedGroupId);
     return matches.sort((a, b) => {
       if (sortMode === 'group') {
-        if (a.groupId !== b.groupId) return a.groupId.localeCompare(b.groupId, 'es');
+        if (a.groupId !== b.groupId) return getGroupSortOrder(a.groupId) - getGroupSortOrder(b.groupId);
+        const stageDiff = getStageOrder(a) - getStageOrder(b);
+        if (stageDiff !== 0) return stageDiff;
         if (a.matchday !== b.matchday) return a.matchday - b.matchday;
       }
       const kickoffDiff = new Date(a.kickoffAt).getTime() - new Date(b.kickoffAt).getTime();
@@ -204,6 +227,7 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
           Filtrar grupo
           <select value={selectedGroupId} onChange={(e) => setSelectedGroupId(e.target.value)}>
             <option value="ALL">Todos</option>
+            <option value="KO">Fase final</option>
             {state.db.groups.map((group) => (
               <option key={group.id} value={group.id}>
                 {group.name}
@@ -216,7 +240,7 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
           Ordenar por
           <select value={sortMode} onChange={(e) => setSortMode(e.target.value as ResultsSortMode)}>
             <option value="date">Fecha</option>
-            <option value="group">Grupo</option>
+            <option value="group">Grupo / etapa</option>
           </select>
         </label>
 
@@ -253,13 +277,12 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
           {visibleMatches.map((match) => {
             const draft = drafts[match.id] ?? { home: '', away: '' };
             const readOnly = !state.viewer.isAdmin;
+            const meta = match.groupId === 'KO' ? match.stage ?? 'Fase final' : `Grupo ${match.groupId} - Fecha ${match.matchday}`;
 
             return (
               <div className="match-card" key={match.id}>
                 <div>
-                  <p className="match-meta">
-                    {match.groupId} - Fecha {match.matchday}
-                  </p>
+                  <p className="match-meta">{meta} - {formatKickoffArgentina(match.kickoffAt)}</p>
                   {match.venue ? <p className="match-meta">Sede: {match.venue}</p> : null}
                   <div className="fixture-row">
                     <TeamName teamName={match.homeTeam} linkToTeam />
@@ -276,6 +299,10 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
               </div>
             );
           })}
+        </div>
+      ) : selectedGroupId === 'KO' ? (
+        <div className="panel">
+          <p className="muted">La tabla de posiciones aplica solo a la fase de grupos.</p>
         </div>
       ) : (
         <div className="stack-lg">
@@ -331,5 +358,10 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
     </section>
   );
 }
+
+
+
+
+
 
 

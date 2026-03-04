@@ -1,4 +1,4 @@
-export type Score = {
+﻿export type Score = {
   home: number;
   away: number;
 };
@@ -12,6 +12,7 @@ export type Group = {
 export type Match = {
   id: string;
   groupId: string;
+  stage?: string;
   matchday: number;
   homeTeam: string;
   awayTeam: string;
@@ -85,4 +86,3 @@ export type StateResponse = {
     predictions: number;
   };
 };
-

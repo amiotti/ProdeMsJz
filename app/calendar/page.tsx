@@ -1,26 +1,21 @@
 ﻿import { TeamName } from '@/components/team-name';
 import { getState } from '@/lib/db';
 import { formatKickoffArgentina } from '@/lib/datetime';
-import { buildCalendarFixtures, hasKnownTeam } from '@/lib/worldcup26';
 
 export const dynamic = 'force-dynamic';
 
 export default async function CalendarPage() {
   const state = await getState();
-  const groupStageFixtures = [...state.db.matches]
+  const fixtures = [...state.db.matches]
     .sort((a, b) => new Date(a.kickoffAt).getTime() - new Date(b.kickoffAt).getTime())
     .map((match) => ({
       id: match.id,
-      stage: `Fase de grupos - ${match.groupId}`,
+      stage: match.groupId === 'KO' ? match.stage ?? 'Fase final' : `Fase de grupos - ${match.groupId}`,
       date: match.kickoffAt,
       homeTeam: match.homeTeam,
       awayTeam: match.awayTeam,
       venue: match.venue ?? null,
     }));
-  const knockoutFixtures = buildCalendarFixtures(state.db.matches).filter((fixture) => fixture.stage === 'Fase final');
-  const fixtures = [...groupStageFixtures, ...knockoutFixtures].sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
-  );
 
   return (
     <section className="stack-lg">
@@ -52,24 +47,8 @@ export default async function CalendarPage() {
                 </td>
                 <td>{fixture.stage}</td>
                 <td>{formatKickoffArgentina(fixture.date)}</td>
-                <td>
-                  {fixture.awayTeam && hasKnownTeam(fixture.homeTeam) ? (
-                    <TeamName teamName={fixture.homeTeam} linkToTeam />
-                  ) : (
-                    fixture.homeTeam
-                  )}
-                </td>
-                <td>
-                  {fixture.awayTeam ? (
-                    hasKnownTeam(fixture.awayTeam) ? (
-                      <TeamName teamName={fixture.awayTeam} linkToTeam />
-                    ) : (
-                      fixture.awayTeam
-                    )
-                  ) : (
-                    '-'
-                  )}
-                </td>
+                <td><TeamName teamName={fixture.homeTeam} linkToTeam /></td>
+                <td><TeamName teamName={fixture.awayTeam} linkToTeam /></td>
                 <td>{fixture.venue ?? '-'}</td>
               </tr>
             ))}
