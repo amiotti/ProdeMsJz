@@ -3163,3 +3163,191 @@ html[data-theme='dark'] .site-footer {
   }
 }
 
+
+textarea {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--text);
+  padding: 0.75rem;
+  outline: none;
+  resize: vertical;
+  min-height: 132px;
+  font: inherit;
+}
+
+textarea:focus {
+  border-color: rgba(38, 217, 198, 0.5);
+  box-shadow: 0 0 0 2px rgba(38, 217, 198, 0.12);
+}
+
+.stack-xs {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.field-error {
+  color: #cf3f24;
+  font-size: 0.82rem;
+}
+
+.contact-page-shell {
+  position: relative;
+}
+
+.contact-floating-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.contact-hero-panel h2 {
+  margin: 0;
+}
+
+.contact-hero-copy {
+  max-width: 760px;
+}
+
+.contact-grid-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.contact-form-panel {
+  max-width: none;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.contact-form-span {
+  grid-column: 1 / -1;
+}
+
+.contact-side-panel {
+  min-height: 100%;
+}
+
+.contact-info-card {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0.85rem 0.95rem;
+  background: rgba(255, 255, 255, 0.24);
+  display: grid;
+  gap: 0.2rem;
+}
+
+.contact-admin-list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.contact-admin-card {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 0.95rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08)),
+    rgba(255, 255, 255, 0.08);
+  display: grid;
+  gap: 0.75rem;
+}
+
+.contact-admin-head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 0.85rem;
+}
+
+.contact-admin-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.8rem;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.contact-admin-meta a {
+  text-decoration: underline;
+  text-underline-offset: 0.15rem;
+}
+
+.contact-admin-message {
+  margin: 0;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+.contact-status-field {
+  min-width: 170px;
+}
+
+.contact-status-badge {
+  width: fit-content;
+}
+
+.contact-status-badge.status-new {
+  color: #7b4000;
+}
+
+.contact-status-badge.status-contacted {
+  color: #005b73;
+}
+
+.contact-status-badge.status-resolved {
+  color: #246214;
+}
+
+@media (max-width: 900px) {
+  .contact-grid-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .contact-form-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-admin-head {
+    flex-direction: column;
+  }
+
+  .contact-status-field {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+html[data-theme='dark'] textarea {
+  background: rgba(0, 0, 0, 0.24);
+  color: var(--text);
+}
+
+html[data-theme='dark'] .field-error {
+  color: #ff9c82;
+}
+
+html[data-theme='dark'] .contact-info-card,
+html[data-theme='dark'] .contact-admin-card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015)),
+    rgba(9, 11, 19, 0.35);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+html[data-theme='dark'] .contact-status-badge.status-new {
+  color: #ffd9a8;
+}
+
+html[data-theme='dark'] .contact-status-badge.status-contacted {
+  color: #a8ebff;
+}
+
+html[data-theme='dark'] .contact-status-badge.status-resolved {
+  color: #cbf5bf;
+}

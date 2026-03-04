@@ -74,7 +74,7 @@ export async function AppShell({ children }: { children: ReactNode }) {
         <div className="container site-footer-inner">
           <p>(c) {new Date().getFullYear()} PRODE Mundial 2026. Sitio web desarrollado por Agustín Miotti.</p>
           <p>
-            Proyecto de código abierto, descargable desde {' '}
+            Proyecto de código abierto, descargable desde{' '}
             <a href="https://github.com/amiotti/ProdeAmigos" target="_blank" rel="noreferrer">
               GitHub
             </a>
@@ -82,6 +82,7 @@ export async function AppShell({ children }: { children: ReactNode }) {
           </p>
           <p><Link href="/terms">Términos y condiciones</Link></p>
           <p><Link href="/privacy">Privacidad</Link></p>
+          <p><Link href="/contact">Contacto</Link></p>
           <p><Link href="/legal">Aviso legal</Link></p>
         </div>
       </footer>

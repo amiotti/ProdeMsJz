@@ -37,6 +37,20 @@ export type User = {
   updatedAt?: string;
 };
 
+export type ContactMessageStatus = 'new' | 'contacted' | 'resolved';
+
+export type ContactMessage = {
+  id: string;
+  userId?: string | null;
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  status: ContactMessageStatus;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type Prediction = {
   id: string;
   userId: string;

@@ -1,9 +1,9 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import { cookies } from 'next/headers';
 
 import { UsersPanel } from '@/components/users-panel';
 import { getSessionCookieName } from '@/lib/auth';
-import { getUserFromSessionToken, listUsers } from '@/lib/db';
+import { getUserFromSessionToken, listContactMessages, listUsers } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,9 +38,6 @@ export default async function UsersPage() {
     );
   }
 
-  const users = await listUsers();
-  return <UsersPanel initialUsers={users} />;
+  const [users, messages] = await Promise.all([listUsers(), listContactMessages()]);
+  return <UsersPanel initialUsers={users} initialMessages={messages} />;
 }
-
-
-

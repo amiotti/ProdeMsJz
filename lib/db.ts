@@ -4,7 +4,7 @@ import { hashPassword, verifyPassword, verifySession } from '@/lib/auth';
 import { getInstantAdminDb, tx } from '@/lib/instant';
 import { computeLeaderboard } from '@/lib/prode';
 import { createSeedDb } from '@/lib/seed';
-import type { LeaderboardRow, Prediction, ProdeDB, Score, StateResponse, User } from '@/lib/types';
+import type { ContactMessage, ContactMessageStatus, LeaderboardRow, Prediction, ProdeDB, Score, StateResponse, User } from '@/lib/types';
 
 type UserRole = 'admin' | 'user';
 
@@ -48,11 +48,24 @@ type InstantConfigDoc = {
   updatedAt: string;
 };
 
+type InstantContactMessageDoc = {
+  id: string;
+  userId?: string | null;
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  status: ContactMessageStatus;
+  createdAt: string;
+  updatedAt: string;
+};
+
 type InstantQueryResult = {
   prode_users?: InstantUserDoc[];
   prode_user_predictions?: InstantUserPredictionsDoc[];
   prode_official_results?: InstantOfficialResultDoc[];
   prode_config?: InstantConfigDoc[];
+  prode_contact_messages?: InstantContactMessageDoc[];
 };
 
 let seedDbCache: ProdeDB | null = null;
@@ -130,12 +143,48 @@ function publicUser(doc: InstantUserDoc): User {
   };
 }
 
+function publicContactMessage(doc: InstantContactMessageDoc): ContactMessage {
+  return {
+    id: doc.id,
+    userId: doc.userId ?? null,
+    name: doc.name,
+    email: doc.email,
+    phone: doc.phone ?? '',
+    message: doc.message,
+    status: doc.status,
+    createdAt: doc.createdAt,
+    updatedAt: doc.updatedAt,
+  };
+}
+
 function sanitizePhone(phone: string) {
   return phone.trim().replace(/\s+/g, ' ').slice(0, 32);
 }
 
 function sanitizeBankInfo(value: string) {
   return value.trim().replace(/\s+/g, ' ').slice(0, 120);
+}
+
+function sanitizeContactMessage(value: string) {
+  return value.trim().replace(/\r\n/g, '\n').slice(0, 2000);
+}
+
+function validateContactMessageInput(input: {
+  name: string;
+  email: string;
+  phone?: string;
+  message: string;
+}) {
+  const name = sanitizeName(input.name);
+  const email = normalizeEmail(input.email);
+  const phone = sanitizePhone(input.phone ?? '');
+  const message = sanitizeContactMessage(input.message);
+
+  if (name.length < 2) throw new Error('El nombre es obligatorio');
+  if (!email) throw new Error('El email es obligatorio');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error('El email no es válido');
+  if (phone && !/^[0-9+()\-\s]{6,32}$/.test(phone)) throw new Error('El teléfono no es válido');
+  if (message.length < 10) throw new Error('La consulta debe tener al menos 10 caracteres');
 }
 
 function validateRegistrationInput(input: {
@@ -206,6 +255,12 @@ async function queryConfigOnly() {
   const db = getInstantAdminDb();
   const data = (await db.query({ prode_config: {} })) as InstantQueryResult;
   return data.prode_config ?? [];
+}
+
+async function queryContactMessagesOnly() {
+  const db = getInstantAdminDb();
+  const data = (await db.query({ prode_contact_messages: {} })) as InstantQueryResult;
+  return data.prode_contact_messages ?? [];
 }
 
 async function queryOfficialResultsOnly() {
@@ -736,6 +791,62 @@ export async function adminDeleteUser(targetUserId: string) {
   invalidateCoreStateCache();
 }
 
+export async function createContactMessage(input: {
+  userId?: string | null;
+  name: string;
+  email: string;
+  phone?: string;
+  message: string;
+}): Promise<ContactMessage> {
+  await ensureBaseData();
+  validateContactMessageInput(input);
+
+  const id = randomUUID();
+  const ts = nowIso();
+  const doc: InstantContactMessageDoc = {
+    id,
+    userId: input.userId ?? null,
+    name: sanitizeName(input.name),
+    email: normalizeEmail(input.email),
+    phone: sanitizePhone(input.phone ?? ''),
+    message: sanitizeContactMessage(input.message),
+    status: 'new',
+    createdAt: ts,
+    updatedAt: ts,
+  };
+
+  await getInstantAdminDb().transact([tx.prode_contact_messages[id].update(doc)]);
+  return publicContactMessage(doc);
+}
+
+export async function listContactMessages(): Promise<ContactMessage[]> {
+  await ensureBaseData();
+  const messages = await queryContactMessagesOnly();
+  return messages
+    .map(publicContactMessage)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+}
+
+export async function adminUpdateContactMessageStatus(
+  messageId: string,
+  status: ContactMessageStatus,
+): Promise<ContactMessage> {
+  await ensureBaseData();
+  const messages = await queryContactMessagesOnly();
+  const current = messages.find((item) => item.id === messageId);
+  if (!current) throw new Error('Consulta no encontrada');
+
+  const updatedAt = nowIso();
+  await getInstantAdminDb().transact([
+    tx.prode_contact_messages[messageId].update({ status, updatedAt }),
+  ]);
+
+  return publicContactMessage({
+    ...current,
+    status,
+    updatedAt,
+  });
+}
 export async function adminSetUserRegistrationPaymentStatus(
   targetUserId: string,
   status: 'pending' | 'approved' | 'failed',
@@ -911,6 +1022,9 @@ export async function getPredictionsScreenState(viewerToken?: string | null): Pr
     },
   };
 }
+
+
+
 
 
 
