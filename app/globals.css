@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --bg-0: #eef5ff;
   --bg-1: #e8f2ff;
   --bg-2: #fff5ea;
@@ -968,7 +968,7 @@ select {
 .landing-side {
   padding: 1rem;
   display: grid;
-  align-items: end;
+  align-items: flex-end;
   animation: fadeRise 800ms ease both;
 }
 
@@ -1587,7 +1587,7 @@ select:focus {
   display: grid;
   grid-template-columns: 1fr 1fr auto;
   gap: 0.75rem;
-  align-items: end;
+  align-items: flex-end;
 }
 
 .section-head {
@@ -1752,7 +1752,7 @@ select:focus {
 .readonly-note {
   color: var(--muted);
   display: flex;
-  align-items: end;
+  align-items: flex-end;
   min-height: 42px;
   font-size: 0.9rem;
 }
@@ -2168,7 +2168,7 @@ select:focus {
   }
 
   .landing-side {
-    align-items: start;
+    align-items: flex-start;
   }
 
   .hero {
@@ -3215,7 +3215,7 @@ textarea:focus {
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
   gap: 1rem;
-  align-items: start;
+  align-items: flex-start;
 }
 
 .contact-form-panel {
@@ -3258,7 +3258,7 @@ textarea:focus {
 
 .contact-admin-head {
   display: flex;
-  align-items: start;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 0.85rem;
 }
@@ -3350,4 +3350,69 @@ html[data-theme='dark'] .contact-status-badge.status-contacted {
 
 html[data-theme='dark'] .contact-status-badge.status-resolved {
   color: #cbf5bf;
+}
+
+.admin-alert-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.62)),
+    radial-gradient(circle at 10% 10%, rgba(89, 227, 215, 0.12), transparent 58%);
+  color: var(--text);
+  box-shadow: 0 8px 20px rgba(27, 46, 92, 0.1);
+  transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.admin-alert-link:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 176, 0, 0.45);
+  box-shadow: 0 10px 22px rgba(27, 46, 92, 0.14);
+}
+
+.admin-alert-link svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+.admin-alert-badge {
+  position: absolute;
+  top: -4px;
+  right: -3px;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 0.25rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  color: #081019;
+  font-size: 0.7rem;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 14px rgba(239, 49, 0, 0.28);
+}
+
+html[data-theme='dark'] .admin-alert-link {
+  border-color: rgba(255, 255, 255, 0.14);
+  background:
+    linear-gradient(145deg, rgba(24, 22, 34, 0.92), rgba(14, 13, 23, 0.72)),
+    radial-gradient(circle at 10% 10%, rgba(89, 227, 215, 0.12), transparent 58%);
+  color: #fff0e2;
+  box-shadow:
+    0 6px 16px rgba(4, 6, 14, 0.24),
+    0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+}
+
+html[data-theme='dark'] .admin-alert-link:hover {
+  border-color: rgba(244, 190, 31, 0.36);
+  box-shadow:
+    0 10px 22px rgba(4, 6, 14, 0.3),
+    0 0 0 1px rgba(89, 227, 215, 0.08) inset;
 }
