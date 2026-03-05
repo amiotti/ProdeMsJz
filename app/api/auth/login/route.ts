@@ -25,8 +25,9 @@ export async function POST(request: Request) {
     (await cookies()).set(getSessionCookieName(), token, getSessionCookieOptions());
     return noStoreJson({ ok: true, user });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'No se pudo iniciar sesiÃ³n';
+    const message = error instanceof Error ? error.message : 'No se pudo iniciar sesión';
     return noStoreJson({ ok: false, error: message }, { status: 401 });
   }
 }
+
 
