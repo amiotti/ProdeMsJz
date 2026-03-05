@@ -1274,7 +1274,10 @@ select {
 }
 
 .auth-screen .btn-primary {
-  background: linear-gradient(135deg, #ef3100 0%, #f4be1f 45%, #59e3d7 100%);
+  color: #061017;
+  border-color: rgba(239, 49, 0, 0.16);
+  background-image: linear-gradient(135deg, var(--accent-1), var(--accent-2) 52%, var(--accent-3));
+  background-color: transparent;
 }
 
 .auth-screen .btn:not(.btn-primary) {
@@ -1616,13 +1619,17 @@ select:focus {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent-1), var(--accent-2) 52%, var(--accent-3));
+  color: #061017;
   border-color: rgba(239, 49, 0, 0.16);
+  background-image: linear-gradient(135deg, var(--accent-1), var(--accent-2) 52%, var(--accent-3));
+  background-color: transparent;
 }
 
 .btn-danger {
-  background: linear-gradient(135deg, var(--accent-1), var(--accent-2) 52%, var(--accent-3));
+  color: #061017;
   border-color: rgba(239, 49, 0, 0.16);
+  background-image: linear-gradient(135deg, var(--accent-1), var(--accent-2) 52%, var(--accent-3));
+  background-color: transparent;
 }
 
 .btn:disabled {
@@ -3489,5 +3496,153 @@ html[data-theme='dark'] .btn:hover {
 html[data-theme='dark'] .btn-primary,
 html[data-theme='dark'] .btn-danger {
   color: #061017;
-  background: linear-gradient(135deg, var(--accent-1), var(--accent-2) 52%, var(--accent-3));
+  border-color: rgba(239, 49, 0, 0.16);
+  background-image: linear-gradient(135deg, var(--accent-1), var(--accent-2) 52%, var(--accent-3));
+  background-color: transparent;
+}
+
+
+/* Strong action-button theme override to avoid gray/transparent regressions */
+.btn.btn-primary,
+.btn.btn-danger,
+.auth-screen .btn.btn-primary,
+.auth-screen .btn.btn-danger {
+  color: #061017 !important;
+  border: 1px solid rgba(239, 49, 0, 0.22) !important;
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2) 52%, var(--accent-3)) !important;
+  box-shadow: 0 12px 24px rgba(27, 46, 92, 0.18), 0 0 0 1px rgba(255, 255, 255, 0.12) inset !important;
+}
+
+.btn.btn-primary:hover,
+.btn.btn-danger:hover,
+.auth-screen .btn.btn-primary:hover,
+.auth-screen .btn.btn-danger:hover {
+  filter: saturate(1.04) brightness(1.02);
+  border-color: rgba(255, 176, 0, 0.45) !important;
+}
+
+.btn.btn-primary:disabled,
+.btn.btn-danger:disabled,
+.auth-screen .btn.btn-primary:disabled,
+.auth-screen .btn.btn-danger:disabled {
+  color: rgba(6, 16, 23, 0.82) !important;
+  background: linear-gradient(135deg, rgba(239, 49, 0, 0.42), rgba(244, 190, 31, 0.42) 52%, rgba(89, 227, 215, 0.42)) !important;
+  border-color: rgba(239, 49, 0, 0.22) !important;
+  box-shadow: 0 8px 14px rgba(27, 46, 92, 0.14) !important;
+}
+
+.auth-screen .btn:not(.btn-primary):not(.btn-danger) {
+  background: rgba(255, 255, 255, 0.9);
+  color: #1a1f2c;
+}
+
+html[data-theme='dark'] .btn.btn-primary,
+html[data-theme='dark'] .btn.btn-danger,
+html[data-theme='dark'] .auth-screen .btn.btn-primary,
+html[data-theme='dark'] .auth-screen .btn.btn-danger {
+  color: #061017 !important;
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2) 52%, var(--accent-3)) !important;
+  border-color: rgba(239, 49, 0, 0.2) !important;
+}
+
+/* Final override: action buttons use landing-cta-primary style */
+.btn.btn-primary,
+.btn.btn-danger,
+.auth-screen .btn.btn-primary,
+.auth-screen .btn.btn-danger,
+.results-board .btn.btn-primary,
+.predictions-board .btn.btn-primary,
+.profile-form .btn.btn-primary {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 14px !important;
+  padding: 0.8rem 1rem !important;
+  font-weight: 800 !important;
+  color: #111014 !important;
+  border: 1px solid rgba(239, 49, 0, 0.16) !important;
+  background: linear-gradient(135deg, #ef3100 0%, #f4be1f 52%, #59e3d7 100%) !important;
+  box-shadow: 0 14px 28px rgba(12, 13, 20, 0.22) !important;
+  transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease, background-color 140ms ease !important;
+}
+
+.btn.btn-primary:hover,
+.btn.btn-danger:hover,
+.auth-screen .btn.btn-primary:hover,
+.auth-screen .btn.btn-danger:hover,
+.results-board .btn.btn-primary:hover,
+.predictions-board .btn.btn-primary:hover,
+.profile-form .btn.btn-primary:hover {
+  transform: translateY(-2px) !important;
+}
+
+.btn.btn-primary:disabled,
+.btn.btn-danger:disabled,
+.auth-screen .btn.btn-primary:disabled,
+.auth-screen .btn.btn-danger:disabled,
+.results-board .btn.btn-primary:disabled,
+.predictions-board .btn.btn-primary:disabled,
+.profile-form .btn.btn-primary:disabled {
+  color: rgba(17, 16, 20, 0.78) !important;
+  background: linear-gradient(135deg, rgba(239, 49, 0, 0.45) 0%, rgba(244, 190, 31, 0.45) 52%, rgba(89, 227, 215, 0.45) 100%) !important;
+  box-shadow: 0 10px 20px rgba(12, 13, 20, 0.16) !important;
+  transform: none !important;
+}
+
+/* Ensure action buttons keep CTA style in dark mode too */
+.btn,
+button.btn {
+  -webkit-appearance: none;
+  appearance: none;
+  background-clip: padding-box;
+}
+
+.session-login-btn.nav-link {
+  border-radius: 14px !important;
+  padding: 0.8rem 1rem !important;
+  font-weight: 800 !important;
+  color: #111014 !important;
+  border: 1px solid rgba(239, 49, 0, 0.16) !important;
+  background: linear-gradient(135deg, #ef3100 0%, #f4be1f 52%, #59e3d7 100%) !important;
+  box-shadow: 0 14px 28px rgba(12, 13, 20, 0.22) !important;
+}
+
+.session-login-btn.nav-link:hover {
+  transform: translateY(-2px) !important;
+}
+
+html[data-theme='dark'] .session-login-btn.nav-link,
+html[data-theme='dark'] .btn.btn-primary,
+html[data-theme='dark'] .btn.btn-danger,
+html[data-theme='dark'] .auth-screen .btn.btn-primary,
+html[data-theme='dark'] .auth-screen .btn.btn-danger,
+html[data-theme='dark'] .results-board .btn.btn-primary,
+html[data-theme='dark'] .predictions-board .btn.btn-primary,
+html[data-theme='dark'] .profile-form .btn.btn-primary {
+  color: #111014 !important;
+  border-color: rgba(239, 49, 0, 0.16) !important;
+  background: linear-gradient(135deg, #ef3100 0%, #f4be1f 52%, #59e3d7 100%) !important;
+  box-shadow: 0 14px 28px rgba(12, 13, 20, 0.28) !important;
+}
+
+/* Final edge fix: uniform border on CTA-like action buttons */
+.btn.btn-primary,
+.btn.btn-danger,
+.auth-screen .btn.btn-primary,
+.auth-screen .btn.btn-danger,
+.results-board .btn.btn-primary,
+.predictions-board .btn.btn-primary,
+.profile-form .btn.btn-primary,
+.session-login-btn.nav-link,
+html[data-theme='dark'] .btn.btn-primary,
+html[data-theme='dark'] .btn.btn-danger,
+html[data-theme='dark'] .auth-screen .btn.btn-primary,
+html[data-theme='dark'] .auth-screen .btn.btn-danger,
+html[data-theme='dark'] .results-board .btn.btn-primary,
+html[data-theme='dark'] .predictions-board .btn.btn-primary,
+html[data-theme='dark'] .profile-form .btn.btn-primary,
+html[data-theme='dark'] .session-login-btn.nav-link {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: 0 0 0 1px rgba(239, 49, 0, 0.28), 0 14px 28px rgba(12, 13, 20, 0.24) !important;
 }
