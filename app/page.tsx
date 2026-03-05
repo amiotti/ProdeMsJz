@@ -26,26 +26,26 @@ export default async function LandingPage() {
         <div className="landing-panel landing-main">
           <p className="landing-kicker">PRODE MUNDIAL FIFA 2026</p>
           <h2 className="landing-title">
-            PARTICIPA DEL <span>PRODE LBB</span> ðŸº
+            PARTICIPÁ DEL <span>PRODE LBB</span> 🍺
           </h2>
           <p className="landing-copy">
-            Registrate, pagÃ¡ la prata (no barrani) y cargÃ¡ pronÃ³sticos partido por partido. El ranking se actualiza
-            automÃ¡ticamente cuando se cargan los resultados oficiales. AsÃ­ evitamos acomodos y excusas ðŸ˜‚
+            Registrate, pagá la prata (no barrani) y cargá pronósticos partido por partido. El ranking se actualiza
+            automáticamente cuando se cargan los resultados oficiales. Así evitamos acomodos y excusas 😂
           </p>
 
           <div className="landing-cta-row">
             <Link className="landing-cta-primary" href="/login">
-              Iniciar sesiÃ³n / Registrarse
+              Iniciar sesión / Registrarse
             </Link>
             <Link className="landing-cta-secondary" href="/leaderboard">
-              Ver tabla pÃºblica
+              Ver tabla pública
             </Link>
           </div>
 
           <div className="landing-badges">
             <span className="landing-badge">Fixture completo</span>
             <span className="landing-badge">Predicciones por grupo</span>
-            <span className="landing-badge">EstadÃ­sticas</span>
+            <span className="landing-badge">Estadísticas</span>
             <span className="landing-badge">Ranking en vivo</span>
           </div>
         </div>
@@ -59,7 +59,7 @@ export default async function LandingPage() {
             </div>
             <div className="landing-mini-card">
               <span className="landing-mini-label">Modo de juego</span>
-              <strong>PredicciÃ³n editable</strong>
+              <strong>Predicción editable</strong>
               <small>hasta 1 hora antes del partido</small>
             </div>
             <div className="landing-mini-card">
@@ -73,5 +73,3 @@ export default async function LandingPage() {
     </section>
   );
 }
-
-
