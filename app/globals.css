@@ -813,6 +813,9 @@ select {
 .landing-screen {
   position: relative;
   min-height: min(78vh, 860px);
+  width: min(100%, 1240px);
+  margin-inline: auto;
+  margin-block: auto;
   border-radius: 24px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.18);
@@ -945,6 +948,7 @@ select {
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
   align-items: stretch;
+  align-content: center;
   padding: 1rem;
 }
 
@@ -1123,6 +1127,9 @@ select {
 .auth-screen {
   position: relative;
   overflow: hidden;
+  width: min(100%, 1240px);
+  margin-inline: auto;
+  margin-block: auto;
   border-radius: 22px;
   border: 1px solid rgba(255, 255, 255, 0.18);
   padding: 1rem;
@@ -2248,6 +2255,7 @@ select:focus {
   }
 
   .landing-side {
+  align-content: center;
   padding: 1rem;
   display: flex;
   flex-direction: column;
@@ -2356,8 +2364,17 @@ select:focus {
 }
 
   .landing-screen {
-    min-height: auto;
-  }
+  position: relative;
+  min-height: min(78vh, 860px);
+  width: min(100%, 1240px);
+  margin-inline: auto;
+  margin-block: auto;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 24px 44px rgba(14, 17, 28, 0.18);
+  animation: publicFrameIn 420ms ease both;
+}
 
   .landing-main,
   .landing-side {
@@ -2383,10 +2400,25 @@ select:focus {
   }
 
   .auth-screen {
-    padding: 0.75rem;
-    min-height: auto;
-    place-items: stretch;
-  }
+  position: relative;
+  overflow: hidden;
+  width: min(100%, 1240px);
+  margin-inline: auto;
+  margin-block: auto;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 1rem;
+  min-height: min(82vh, 900px);
+  background:
+    linear-gradient(115deg, rgba(8, 10, 16, 0.76), rgba(10, 13, 22, 0.6)),
+    url('/Landing.png');
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 20px 36px rgba(15, 18, 30, 0.16);
+  display: grid;
+  place-items: center;
+  animation: publicFrameIn 420ms ease both;
+}
 
   .auth-center-wrap {
     margin-top: 2.6rem;
@@ -2894,8 +2926,16 @@ html[data-theme='dark'] .public-back-btn {
 }
 
 html[data-theme='light'] .landing-screen {
-  border-color: rgba(24, 44, 86, 0.12);
-  box-shadow: 0 24px 44px rgba(21, 33, 62, 0.12);
+  position: relative;
+  min-height: min(78vh, 860px);
+  width: min(100%, 1240px);
+  margin-inline: auto;
+  margin-block: auto;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 24px 44px rgba(14, 17, 28, 0.18);
+  animation: publicFrameIn 420ms ease both;
 }
 
 html[data-theme='light'] .landing-backdrop {
@@ -2969,8 +3009,24 @@ html[data-theme='light'] .landing-mini-card small {
 }
 
 html[data-theme='dark'] .auth-screen {
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 20px 36px rgba(0, 0, 0, 0.28);
+  position: relative;
+  overflow: hidden;
+  width: min(100%, 1240px);
+  margin-inline: auto;
+  margin-block: auto;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 1rem;
+  min-height: min(82vh, 900px);
+  background:
+    linear-gradient(115deg, rgba(8, 10, 16, 0.76), rgba(10, 13, 22, 0.6)),
+    url('/Landing.png');
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 20px 36px rgba(15, 18, 30, 0.16);
+  display: grid;
+  place-items: center;
+  animation: publicFrameIn 420ms ease both;
 }
 
 html[data-theme='dark'] .auth-intro-panel h2 {
@@ -2986,13 +3042,26 @@ html[data-theme='dark'] .auth-inline-link {
 }
 
 html[data-theme='light'] .auth-screen {
-  border-color: rgba(19, 32, 56, 0.12);
-  box-shadow: 0 18px 30px rgba(18, 30, 52, 0.12);
+  position: relative;
+  overflow: hidden;
+  width: min(100%, 1240px);
+  margin-inline: auto;
+  margin-block: auto;
+  border-radius: 22px;
+  border: 1px solid rgba(24, 44, 86, 0.14);
+  padding: 1rem;
+  min-height: min(82vh, 900px);
   background:
-    linear-gradient(115deg, rgba(255, 255, 255, 0.42), rgba(245, 248, 255, 0.22)),
+    linear-gradient(120deg, rgba(245, 249, 255, 0.88), rgba(236, 243, 255, 0.78)),
+    radial-gradient(circle at 12% 14%, rgba(89, 227, 215, 0.16), transparent 38%),
+    radial-gradient(circle at 86% 22%, rgba(239, 49, 0, 0.12), transparent 34%),
     url('/Landing.png');
   background-size: cover;
   background-position: center;
+  box-shadow: 0 20px 36px rgba(18, 30, 52, 0.14);
+  display: grid;
+  place-items: center;
+  animation: publicFrameIn 420ms ease both;
 }
 
 html[data-theme='light'] .auth-bg-shade {
@@ -3180,8 +3249,16 @@ html[data-theme='dark'] .theme-toggle {
 }
 
 html[data-theme='dark'] .landing-screen {
-  border-color: rgba(255, 255, 255, 0.16);
-  box-shadow: 0 24px 44px rgba(0, 0, 0, 0.22);
+  position: relative;
+  min-height: min(78vh, 860px);
+  width: min(100%, 1240px);
+  margin-inline: auto;
+  margin-block: auto;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 24px 44px rgba(14, 17, 28, 0.18);
+  animation: publicFrameIn 420ms ease both;
 }
 
 html[data-theme='dark'] .landing-backdrop {
@@ -3774,5 +3851,8 @@ html[data-theme='dark'] .session-login-btn.nav-link {
   flex: 1 0 auto;
   width: 100%;
 }
+
+
+
 
 
