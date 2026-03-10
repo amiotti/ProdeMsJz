@@ -60,7 +60,6 @@ export async function AppShell({ children }: { children: ReactNode }) {
                 <img className="brand-logo-img brand-logo-img-dark" src="/fifa_logo_dark.jfif" alt="" loading="eager" decoding="async" />
               </div>
               <div className="brand-meta">
-                <p className="eyebrow">PRODE MUNDIAL FIFA 2026</p>
                 <h1 className="brand">Prode MSJZ</h1>
                 <p className="brand-subtitle">Predicciones, ranking y estadísticas del Mundial FIFA 2026</p>
               </div>
@@ -107,6 +106,7 @@ export async function AppShell({ children }: { children: ReactNode }) {
     </div>
   );
 }
+
 
 
 

@@ -671,13 +671,32 @@ select {
 @keyframes pageSwapIn {
   0% {
     opacity: 0;
-    transform: translateY(8px) scale(0.995);
-    filter: blur(6px);
+    transform: translateY(18px) scale(0.988);
+    filter: blur(10px);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1.002);
+    filter: blur(0);
   }
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
     filter: blur(0);
+  }
+}
+
+@keyframes routeSweep {
+  0% {
+    opacity: 0;
+    transform: translateX(-34%);
+  }
+  25% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(34%);
   }
 }
 
@@ -761,9 +780,22 @@ select {
 }
 
 .page-transition-shell {
-  animation: pageSwapIn 300ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
+  position: relative;
+  overflow: hidden;
+  animation: pageSwapIn 460ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
   transform-origin: 50% 0;
   will-change: opacity, transform, filter;
+}
+
+.route-sweep {
+  position: absolute;
+  top: 0;
+  left: -20%;
+  width: 140%;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(239, 49, 0, 0), rgba(239, 49, 0, 0.78), rgba(244, 190, 31, 0.88), rgba(89, 227, 215, 0.9), rgba(239, 49, 0, 0));
+  pointer-events: none;
+  animation: routeSweep 560ms ease-out both;
 }
 
 .site-footer {
@@ -2796,21 +2828,19 @@ select:focus {
   .landing-orb-a,
   .landing-orb-b,
   .landing-main,
-  .landing-side {
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
-  animation: fadeRise 800ms ease both;
-}
+  .landing-side,
+  .route-sweep {
+    animation: none !important;
+  }
 
   .nav-link,
   .theme-toggle,
-  .scroll-top-btn {
+  .scroll-top-btn,
+  .page-transition-shell {
     transition: none !important;
   }
 }
+
 
 html[data-theme='dark'] {
   --bg-0: #090a14;
@@ -3829,6 +3859,12 @@ html[data-theme='dark'] .session-login-btn.nav-link {
   flex: 1 0 auto;
   width: 100%;
 }
+
+
+
+
+
+
 
 
 

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
@@ -14,7 +14,9 @@ export function PageTransition({ children }: { children: ReactNode }) {
 
   return (
     <div key={pathname} className="page-transition-shell">
+      <span className="route-sweep" aria-hidden="true" />
       {children}
     </div>
   );
 }
+

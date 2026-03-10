@@ -3,7 +3,6 @@
 import { FlagBadge } from '@/components/flag-badge';
 import { TeamName } from '@/components/team-name';
 import { getState } from '@/lib/db';
-import { formatDateTimeArgentina } from '@/lib/datetime';
 import { getTeamWikipediaSummary } from '@/lib/wikipedia';
 import {
   buildTeamEditorialNotes,
@@ -14,16 +13,27 @@ import {
 } from '@/lib/worldcup26';
 
 type TeamDetailPageProps = {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 };
 
 export const dynamic = 'force-dynamic';
 
+const matchDateFormatter = new Intl.DateTimeFormat('es-AR', {
+  timeZone: 'America/Argentina/Buenos_Aires',
+  day: 'numeric',
+  month: 'numeric',
+});
+
+function formatMatchDateShort(dateIso: string) {
+  return matchDateFormatter.format(new Date(dateIso));
+}
+
 export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
+  const { slug } = await params;
   const state = await getState();
-  const team = getAllTeams().find((item) => item.slug === params.slug);
+  const team = getAllTeams().find((item) => item.slug === decodeURIComponent(slug));
 
   if (!team) notFound();
 
@@ -46,7 +56,7 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
           <div>
             <h2>{team.name}</h2>
             <p className="muted">
-              {team.confederation} Â· Grupo {group?.id ?? '-'}
+              {team.confederation} · Grupo {group?.id ?? '-'}
             </p>
           </div>
         </div>
@@ -56,7 +66,7 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
 
         <div className="detail-grid">
           <div className="detail-card">
-            <span className="detail-label">Ãndice de fuerza (app)</span>
+            <span className="detail-label">Índice de fuerza (app)</span>
             <strong>{team.fifaStrength}</strong>
           </div>
           <div className="detail-card">
@@ -80,8 +90,8 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
             </strong>
           </div>
           <div className="detail-card">
-            <span className="detail-label">CondiciÃ³n deportiva</span>
-            <strong>{team.isPlaceholder ? 'Pendiente de definiciÃ³n' : 'SelecciÃ³n confirmada'}</strong>
+            <span className="detail-label">Condición deportiva</span>
+            <strong>{team.isPlaceholder ? 'Pendiente de definición' : 'Selección confirmada'}</strong>
           </div>
           <div className="detail-card">
             <span className="detail-label">Objetivo estimado</span>
@@ -111,13 +121,13 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
         </p>
         {wiki ? (
           <p className="muted">
-            Fuente enciclopÃ©dica:{' '}
+            Fuente enciclopédica:{' '}
             <a className="inline-link" href={wiki.pageUrl} target="_blank" rel="noreferrer">
               Wikipedia
             </a>
           </p>
         ) : (
-          <p className="muted">No se pudo cargar Wikipedia en este momento; se muestra una sÃ­ntesis deportiva local.</p>
+          <p className="muted">No se pudo cargar Wikipedia en este momento; se muestra una síntesis deportiva local.</p>
         )}
       </div>
 
@@ -125,15 +135,15 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
         <h3>Noticias</h3>
         {teamNewsUrl ? (
           <p className="muted">
-            PodÃ©s seguir las Ãºltimas noticias de este equipo{' '}
+            Podés seguir las últimas noticias de este equipo{' '}
             <a className="inline-link" href={teamNewsUrl} target="_blank" rel="noreferrer">
-              aquÃ­
+              aquí
             </a>
             .
           </p>
         ) : (
           <p className="muted">
-            Esta selecciÃ³n aÃºn no tiene una pÃ¡gina oficial de noticias disponible porque su cupo todavÃ­a no estÃ¡
+            Esta selección aún no tiene una página oficial de noticias disponible porque su cupo todavía no está
             definido.
           </p>
         )}
@@ -164,7 +174,7 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
             {teamMatches.map((match) => (
               <tr key={match.id}>
                 <td className="match-code-nowrap">{match.id}</td>
-                <td>{formatDateTimeArgentina(match.kickoffAt)}</td>
+                <td>{formatMatchDateShort(match.kickoffAt)}</td>
                 <td>{match.venue ?? '-'}</td>
                 <td className="fixture-col-cell">
                   <span className="fixture-inline fixture-inline-table">
@@ -186,5 +196,9 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
     </section>
   );
 }
+
+
+
+
 
 
