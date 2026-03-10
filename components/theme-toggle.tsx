@@ -40,7 +40,9 @@ export function ThemeToggle() {
       title={theme === 'dark' ? 'Activar modo claro' : 'Activar modo oscuro'}
       aria-label={theme === 'dark' ? 'Activar modo claro' : 'Activar modo oscuro'}
     >
-      <span aria-hidden="true">{theme === 'dark' ? '☀️' : '🌙'}</span>
+      <span className="theme-toggle-icon" aria-hidden="true">
+        {theme === 'dark' ? '☀️' : '🌙'}
+      </span>
     </button>
   );
 }

@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 
 function normalizeOrigin(value: string) {
   try {
@@ -34,11 +34,15 @@ export function assertSameOriginForMutation(request: Request): NextResponse | nu
   const source = requestOrigin(request);
   const target = requestHostOrigin(request);
 
-  // Allow non-browser clients that omit Origin/Referer, but enforce same-origin when present.
-  if (!source || !target) return null;
-  if (source === target) return null;
+  if (!source || !target) {
+    return NextResponse.json({ ok: false, error: 'Origen requerido' }, { status: 403 });
+  }
 
-  return NextResponse.json({ ok: false, error: 'Origen no permitido' }, { status: 403 });
+  if (source !== target) {
+    return NextResponse.json({ ok: false, error: 'Origen no permitido' }, { status: 403 });
+  }
+
+  return null;
 }
 
 export function noStoreJson(data: unknown, init?: { status?: number; headers?: HeadersInit }) {

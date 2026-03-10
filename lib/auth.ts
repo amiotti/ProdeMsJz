@@ -3,13 +3,19 @@
 const SESSION_COOKIE = 'prode_session';
 const SESSION_IDLE_TTL_MINUTES = 15;
 
+function isProductionRuntime() {
+  return process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
+}
+
 function secret() {
-  const value = process.env.PRODE_SESSION_SECRET || process.env.INSTANTDB_ADMIN_TOKEN || 'dev-secret-change-me';
-  const isProd = process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
-  if (isProd && value === 'dev-secret-change-me') {
-    throw new Error('Falta configurar PRODE_SESSION_SECRET en producción');
+  const configured = process.env.PRODE_SESSION_SECRET?.trim();
+  if (configured) return configured;
+
+  if (isProductionRuntime()) {
+    throw new Error('Falta configurar PRODE_SESSION_SECRET en produccion');
   }
-  return value;
+
+  return 'dev-secret-change-me';
 }
 
 function b64url(input: Buffer | string) {

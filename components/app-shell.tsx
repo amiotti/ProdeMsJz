@@ -33,9 +33,7 @@ export async function AppShell({ children }: { children: ReactNode }) {
   const viewer = session ? await getUserFromSessionToken(token) : null;
   const isLoggedIn = Boolean(viewer);
   const isAdmin = viewer?.role === 'admin';
-  const newContactCount = isAdmin
-    ? await getNewContactMessagesCount()
-    : 0;
+  const newContactCount = isAdmin ? await getNewContactMessagesCount() : 0;
 
   const nav = [
     { href: '/inicio', label: 'Inicio' },
@@ -97,7 +95,12 @@ export async function AppShell({ children }: { children: ReactNode }) {
       <footer className="site-footer">
         <div className="site-footer-inner">
           <p>
-            (c) 2026 PRODE MSJZ Mundial 2026. Sitio desarrollado por A. Miotti | <Link href="/terms">T&C</Link> | <Link href="/privacy">Privacidad</Link> | <Link href="/legal">Aviso Legal</Link> | <Link href="/contact">Contacto</Link>
+            (c) 2026 PRODE MSJZ Mundial 2026. Sitio desarrollado por{' '}
+            <a href="https://github.com/amiotti/ProdeMsJz" target="_blank" rel="noreferrer">
+              A. Miotti
+            </a>{' '}
+            | <Link href="/terms">T&C</Link> | <Link href="/privacy">Privacidad</Link> | <Link href="/legal">Aviso Legal</Link> |{' '}
+            <Link href="/contact">Contacto</Link>
           </p>
         </div>
       </footer>
@@ -106,14 +109,3 @@ export async function AppShell({ children }: { children: ReactNode }) {
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-

@@ -25,9 +25,9 @@ export async function POST(request: Request) {
     (await cookies()).set(getSessionCookieName(), token, getSessionCookieOptions());
     return noStoreJson({ ok: true, user });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'No se pudo iniciar sesión';
-    return noStoreJson({ ok: false, error: message }, { status: 401 });
+    if (error instanceof Error) {
+      console.warn('auth.login.failed', { message: error.message });
+    }
+    return noStoreJson({ ok: false, error: 'Credenciales invalidas' }, { status: 401 });
   }
 }
-
-

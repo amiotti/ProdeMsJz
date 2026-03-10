@@ -1,4 +1,4 @@
-import { revalidatePath } from 'next/cache';
+﻿import { revalidatePath } from 'next/cache';
 
 import { markUserRegistrationPaymentApproved } from '@/lib/db';
 import {
@@ -15,11 +15,17 @@ function isProductionRuntime() {
   return process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
 }
 
+function normalizeIp(value: string | null) {
+  return value?.split(',')[0]?.trim() || null;
+}
+
 function getRequestAuditMeta(request: Request) {
   return {
     ip:
-      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
-      request.headers.get('x-real-ip')?.trim() ??
+      normalizeIp(request.headers.get('cf-connecting-ip')) ??
+      normalizeIp(request.headers.get('x-vercel-forwarded-for')) ??
+      normalizeIp(request.headers.get('x-forwarded-for')) ??
+      normalizeIp(request.headers.get('x-real-ip')) ??
       'unknown',
     userAgent: (request.headers.get('user-agent') ?? 'unknown').slice(0, 180),
   };
@@ -45,7 +51,14 @@ function safeEqual(a: string, b: string) {
 
 function isWebhookAuthorized(request: Request) {
   const { secret } = getGalioWebhookAuthConfig();
-  if (!secret) return true; // optional but recommended
+
+  if (!secret) {
+    const allowInsecureLocal = process.env.GALIOPAY_WEBHOOK_ALLOW_INSECURE_LOCAL === 'true';
+    if (!isProductionRuntime() && allowInsecureLocal) {
+      return { ok: true as const, reason: 'insecure_local_override' as const };
+    }
+    return { ok: false as const, reason: 'missing_secret' as const };
+  }
 
   const candidates = [
     request.headers.get('x-galio-webhook-secret') ?? '',
@@ -54,20 +67,16 @@ function isWebhookAuthorized(request: Request) {
     request.headers.get('authorization')?.replace(/^Bearer\s+/i, '') ?? '',
   ].map((v) => v.trim());
 
-  return candidates.some((value) => value && safeEqual(value, secret));
+  const match = candidates.some((value) => value && safeEqual(value, secret));
+  return { ok: match, reason: match ? 'ok' : 'invalid_secret' } as const;
 }
 
 function findPaymentId(payload: unknown): string | null {
   if (!payload || typeof payload !== 'object') return null;
 
   const obj = payload as Record<string, unknown>;
-  const direct =
-    obj.paymentId ??
-    obj.payment_id ??
-    obj.galio_payment_id ??
-    obj.id;
+  const direct = obj.paymentId ?? obj.payment_id ?? obj.galio_payment_id ?? obj.id;
   if (typeof direct === 'string' && direct.trim()) return direct.trim();
-
   if (typeof direct === 'number' && Number.isFinite(direct)) return String(direct);
 
   const data = obj.data;
@@ -84,8 +93,9 @@ function findPaymentId(payload: unknown): string | null {
 export async function POST(request: Request) {
   try {
     const auditMeta = getRequestAuditMeta(request);
-    if (!isWebhookAuthorized(request)) {
-      auditLog('warn', 'unauthorized', auditMeta);
+    const auth = isWebhookAuthorized(request);
+    if (!auth.ok) {
+      auditLog('warn', 'unauthorized', { ...auditMeta, reason: auth.reason });
       return noStoreJson({ ok: false, error: 'Webhook no autorizado' }, { status: 401 });
     }
 
@@ -155,7 +165,7 @@ export async function POST(request: Request) {
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Error procesando webhook de Galio';
     auditLog('error', 'processing_error', { message });
-    return noStoreJson({ ok: false, error: message }, { status: 400 });
+    return noStoreJson({ ok: false, error: 'No se pudo procesar el webhook' }, { status: 400 });
   }
 }
 
@@ -167,6 +177,6 @@ export async function GET() {
     ok: true,
     endpoint: 'Galio webhook',
     status: 'ready',
-    note: 'Configura esta URL en Galio Pay para notificaciones de pago.',
+    note: 'Configura GALIOPAY_WEBHOOK_SECRET para habilitar notificaciones de pago seguras.',
   });
 }
