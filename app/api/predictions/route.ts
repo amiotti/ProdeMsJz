@@ -2,7 +2,7 @@
 import { revalidatePath } from 'next/cache';
 
 import { getSessionCookieName } from '@/lib/auth';
-import { getPredictionsScreenState, getUserFromSessionToken, savePredictions } from '@/lib/db';
+import { getPredictionsScreenState, getUserFromSessionToken, savePredictions, saveTriviaPredictions } from '@/lib/db';
 import { assertSameOriginForMutation, noStoreJson } from '@/lib/security';
 
 export async function POST(request: Request) {
@@ -12,15 +12,18 @@ export async function POST(request: Request) {
 
     const body = (await request.json()) as {
       predictions?: Array<{ matchId: string; homeGoals: number; awayGoals: number }>;
+      triviaAnswers?: Array<{ questionId: string; answer: string }>;
     };
 
     const token = (await cookies()).get(getSessionCookieName())?.value ?? null;
     const user = await getUserFromSessionToken(token);
     if (!user) {
-      return noStoreJson({ ok: false, error: 'Debes iniciar sesiÃ³n para cargar predicciones' }, { status: 401 });
+      return noStoreJson({ ok: false, error: 'Debes iniciar sesion para cargar predicciones' }, { status: 401 });
     }
 
     const result = await savePredictions(user.id, body.predictions ?? []);
+    await saveTriviaPredictions(user.id, body.triviaAnswers ?? []);
+
     revalidatePath('/predictions');
     revalidatePath('/profile');
     revalidatePath('/leaderboard');
@@ -33,4 +36,3 @@ export async function POST(request: Request) {
     return noStoreJson({ ok: false, error: message }, { status: 400 });
   }
 }
-

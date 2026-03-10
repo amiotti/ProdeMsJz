@@ -60,6 +60,27 @@ export type Prediction = {
   updatedAt: string;
 };
 
+export type TriviaQuestion = {
+  id: string;
+  prompt: string;
+  answerType: 'text' | 'number';
+};
+
+export type TriviaPrediction = {
+  id: string;
+  userId: string;
+  questionId: string;
+  answer: string;
+  updatedAt: string;
+};
+
+export type TriviaOfficialResult = {
+  id: string;
+  questionId: string;
+  answer: string;
+  updatedAt: string;
+};
+
 export type ProdeDB = {
   version: number;
   pointsConfig: {
@@ -70,6 +91,9 @@ export type ProdeDB = {
   matches: Match[];
   users: User[];
   predictions: Prediction[];
+  triviaQuestions: TriviaQuestion[];
+  triviaPredictions: TriviaPrediction[];
+  triviaResults: TriviaOfficialResult[];
   updatedAt: string;
 };
 
@@ -98,5 +122,9 @@ export type StateResponse = {
     matches: number;
     matchesWithOfficialResult: number;
     predictions: number;
+  };
+  trivia: {
+    pointsPerQuestion: number;
+    cutoffAt: string | null;
   };
 };

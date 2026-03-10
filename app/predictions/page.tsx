@@ -15,14 +15,13 @@ export default async function PredictionsPage() {
   return (
     <section className="stack-lg">
       <div className="panel">
-        <h2>Predicciones por partido</h2>
+        <h2>Predicciones</h2>
         <p className="muted">
-          Inicia sesión para cargar tus pronósticos. Cada partido puede editarse hasta 1 hora antes de su inicio.
-          Los horarios se muestran en hora de Argentina.
+          Inicia sesion para cargar tus pronosticos. Cada partido puede editarse hasta 1 hora antes de su inicio,
+          y las trivias deben responderse antes de que comience la fase de llaves. Los horarios se muestran en hora de Argentina.
         </p>
       </div>
       <PredictionsBoard initialState={state} registrationAmountArs={registrationAmountArs} />
     </section>
   );
 }
-

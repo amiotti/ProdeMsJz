@@ -1,7 +1,7 @@
 ﻿import { cookies } from 'next/headers';
 
 import { getSessionCookieName } from '@/lib/auth';
-import { getResultsScreenState, getUserFromSessionToken, saveOfficialResults } from '@/lib/db';
+import { getResultsScreenState, getUserFromSessionToken, saveOfficialResults, saveOfficialTriviaResults } from '@/lib/db';
 import { assertSameOriginForMutation, noStoreJson } from '@/lib/security';
 
 export async function GET() {
@@ -23,9 +23,12 @@ export async function POST(request: Request) {
 
     const body = (await request.json()) as {
       results?: Array<{ matchId: string; home: number; away: number }>;
+      triviaResults?: Array<{ questionId: string; answer: string }>;
     };
 
     await saveOfficialResults(body.results ?? []);
+    await saveOfficialTriviaResults(body.triviaResults ?? []);
+
     const state = await getResultsScreenState(token);
     return noStoreJson({ ok: true, state });
   } catch (error) {
@@ -33,4 +36,3 @@ export async function POST(request: Request) {
     return noStoreJson({ ok: false, error: message }, { status: 400 });
   }
 }
-

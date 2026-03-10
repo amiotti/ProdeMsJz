@@ -55,6 +55,10 @@ export function createSeedDb(): ProdeDB {
     matches,
     users: [],
     predictions: [],
+    triviaQuestions: [],
+    triviaPredictions: [],
+    triviaResults: [],
     updatedAt: now,
   };
 }
+

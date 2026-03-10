@@ -1,9 +1,21 @@
-import type { LeaderboardRow, Prediction, ProdeDB, Score } from '@/lib/types';
+﻿import type { LeaderboardRow, Prediction, ProdeDB, Score } from '@/lib/types';
+
+const TRIVIA_POINTS_PER_CORRECT = 10;
 
 function outcome(score: Score): number {
   if (score.home > score.away) return 1;
   if (score.home < score.away) return -1;
   return 0;
+}
+
+function normalizeTriviaAnswer(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return '';
+  if (/^\d+$/.test(trimmed)) return String(Number(trimmed));
+  return trimmed
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
 }
 
 export function calculatePredictionPoints(
@@ -65,6 +77,18 @@ export function computeLeaderboard(db: ProdeDB): LeaderboardRow[] {
     row.scoredPredictions += 1;
   }
 
+  const triviaResultByQuestionId = new Map(db.triviaResults.map((item) => [item.questionId, item] as const));
+  for (const prediction of db.triviaPredictions) {
+    const row = rowsByUserId.get(prediction.userId);
+    if (!row) continue;
+    const official = triviaResultByQuestionId.get(prediction.questionId);
+    if (!official) continue;
+
+    if (normalizeTriviaAnswer(prediction.answer) === normalizeTriviaAnswer(official.answer)) {
+      row.totalPoints += TRIVIA_POINTS_PER_CORRECT;
+    }
+  }
+
   const rows = [...rowsByUserId.values()];
 
   rows.sort((a, b) => {
@@ -76,4 +100,3 @@ export function computeLeaderboard(db: ProdeDB): LeaderboardRow[] {
 
   return rows;
 }
-

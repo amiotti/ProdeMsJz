@@ -5,10 +5,11 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { TeamName } from '@/components/team-name';
 import { formatDateArgentinaShort, formatKickoffArgentina } from '@/lib/datetime';
-import type { Match, StateResponse } from '@/lib/types';
+import type { Match, StateResponse, TriviaQuestion } from '@/lib/types';
 import { estimateMatchProbabilities } from '@/lib/worldcup26';
 
 type DraftMap = Record<string, { home: string; away: string }>;
+type TriviaDraftMap = Record<string, string>;
 type ViewMode = 'group' | 'date';
 type MatchSection = { id: string; title: string; subtitle: string; matches: Match[]; saveLabel: string };
 type DateMatch = Match & { _meta: string };
@@ -24,6 +25,16 @@ function isPredictionEditable(kickoffAt: string, nowMs = Date.now()) {
   return nowMs < kickoffMs - 60 * 60 * 1000;
 }
 
+function normalizeTriviaInput(value: string, question: TriviaQuestion) {
+  const trimmed = value.trim();
+  if (!trimmed) return '';
+  if (question.answerType === 'number') {
+    if (!/^\d+$/.test(trimmed)) return '';
+    return String(Number(trimmed));
+  }
+  return trimmed;
+}
+
 export function PredictionsBoard({
   initialState = null,
   registrationAmountArs,
@@ -36,10 +47,12 @@ export function PredictionsBoard({
   const [saving, setSaving] = useState(false);
   const [savingMatchId, setSavingMatchId] = useState<string | null>(null);
   const [savingSectionId, setSavingSectionId] = useState<string | null>(null);
+  const [savingTrivia, setSavingTrivia] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [selectedGroupId, setSelectedGroupId] = useState('ALL');
   const [viewMode, setViewMode] = useState<ViewMode>('group');
   const [drafts, setDrafts] = useState<DraftMap>({});
+  const [triviaDrafts, setTriviaDrafts] = useState<TriviaDraftMap>({});
   const [paying, setPaying] = useState(false);
 
   async function loadState() {
@@ -69,6 +82,12 @@ export function PredictionsBoard({
       };
     }
     setDrafts(nextDrafts);
+
+    const nextTriviaDrafts: TriviaDraftMap = {};
+    for (const prediction of state.db.triviaPredictions.filter((p) => p.userId === state.viewer.user?.id)) {
+      nextTriviaDrafts[prediction.questionId] = prediction.answer;
+    }
+    setTriviaDrafts(nextTriviaDrafts);
   }, [state]);
 
   const currentUser = state?.viewer.user ?? null;
@@ -77,6 +96,19 @@ export function PredictionsBoard({
     const nowMs = Date.now();
     return new Set(state?.db.matches.filter((m) => !isPredictionEditable(m.kickoffAt, nowMs)).map((m) => m.id) ?? []);
   }, [state?.db.matches]);
+
+  const triviaQuestionById = useMemo(
+    () => new Map(state?.db.triviaQuestions.map((question) => [question.id, question] as const) ?? []),
+    [state?.db.triviaQuestions],
+  );
+
+  const triviaCutoffAt = state?.trivia.cutoffAt ?? null;
+  const triviaEditable = useMemo(() => {
+    if (!triviaCutoffAt) return false;
+    const cutoffMs = new Date(triviaCutoffAt).getTime();
+    if (!Number.isFinite(cutoffMs)) return false;
+    return Date.now() < cutoffMs;
+  }, [triviaCutoffAt]);
 
   const editableMatches = useMemo(() => {
     const nowMs = Date.now();
@@ -120,7 +152,7 @@ export function PredictionsBoard({
       sections.push(...knockoutSections);
     } else if (selectedGroupId === 'KO') {
       sections.push(...knockoutSections);
-    } else {
+    } else if (selectedGroupId !== 'TRIVIA') {
       sections.push(...groupSections.filter((section) => section.id === selectedGroupId));
     }
     return sections;
@@ -153,6 +185,10 @@ export function PredictionsBoard({
         [side]: value,
       },
     }));
+  }
+
+  function setTriviaDraft(questionId: string, value: string) {
+    setTriviaDrafts((prev) => ({ ...prev, [questionId]: value }));
   }
 
   async function savePredictions(targetMatchId?: string) {
@@ -249,6 +285,47 @@ export function PredictionsBoard({
       setMessage(error instanceof Error ? error.message : 'Error al guardar predicciones');
     } finally {
       setSavingSectionId(null);
+    }
+  }
+
+  async function saveTriviaAnswers() {
+    if (!currentUser) {
+      setMessage('Debes iniciar sesión para cargar trivias.');
+      return;
+    }
+
+    const triviaAnswers = Object.entries(triviaDrafts)
+      .map(([questionId, answer]) => {
+        const question = triviaQuestionById.get(questionId);
+        if (!question) return null;
+        const normalized = normalizeTriviaInput(answer, question);
+        if (!normalized) return null;
+        return { questionId, answer: normalized };
+      })
+      .filter((item): item is { questionId: string; answer: string } => Boolean(item));
+
+    if (triviaAnswers.length === 0) {
+      setMessage('No hay respuestas de trivia para guardar.');
+      return;
+    }
+
+    setSavingTrivia(true);
+    setMessage(null);
+    try {
+      const response = await fetch('/api/predictions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ triviaAnswers }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.ok) throw new Error(data.error || 'No se pudo guardar la trivia');
+
+      setState(data.state as StateResponse);
+      setMessage('Trivia guardada correctamente.');
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Error al guardar trivia');
+    } finally {
+      setSavingTrivia(false);
     }
   }
 
@@ -385,13 +462,14 @@ export function PredictionsBoard({
   }
 
   return (
-    <section className="stack-lg">
+    <section className="stack-lg predictions-board">
       <div className="panel toolbar-grid">
         <label>
           Filtrar grupo
           <select value={selectedGroupId} onChange={(e) => setSelectedGroupId(e.target.value)}>
             <option value="ALL">Todos</option>
             <option value="KO">Fase final</option>
+            <option value="TRIVIA">Trivia</option>
             {state.db.groups.map((group) => (
               <option key={group.id} value={group.id}>
                 {group.name}
@@ -402,7 +480,7 @@ export function PredictionsBoard({
 
         <label>
           Ver por
-          <select value={viewMode} onChange={(e) => setViewMode(e.target.value as ViewMode)}>
+          <select value={viewMode} onChange={(e) => setViewMode(e.target.value as ViewMode)} disabled={selectedGroupId === 'TRIVIA'}>
             <option value="group">Grupo / etapa</option>
             <option value="date">Fecha de partido</option>
           </select>
@@ -411,47 +489,90 @@ export function PredictionsBoard({
 
       <div className="panel">
         <p className="muted">
-          Regla de cierre: las predicciones se pueden crear o editar hasta <strong>1 hora antes</strong> del inicio de cada partido. Después del cierre ya no se muestran en esta pantalla.
+          Regla de cierre: las predicciones se pueden crear o editar hasta <strong>1 hora antes</strong> del inicio de cada partido.
+          {triviaCutoffAt ? (
+            <>
+              {' '}
+              La trivia debe completarse antes del comienzo de la fase de llaves ({formatKickoffArgentina(triviaCutoffAt)}).
+            </>
+          ) : null}
         </p>
       </div>
 
       {message ? <p className="status">{message}</p> : null}
 
-      {viewMode === 'group'
-        ? visibleSections.map((section) => (
-            <div key={section.id} className="panel stack-md">
-              <div className="section-head">
-                <h3>{section.title}</h3>
-                <div className="fixture-inline">
-                  <span>{section.matches.length} partidos pendientes</span>
-                  <button
-                    className="btn btn-primary btn-small"
-                    type="button"
-                    onClick={() => saveSectionPredictions(section.id, section.matches.map((m) => m.id))}
-                    disabled={savingSectionId === section.id || saving}
-                  >
-                    {savingSectionId === section.id ? 'Guardando...' : section.saveLabel}
-                  </button>
-                </div>
-              </div>
-
-              {section.subtitle ? <p className="muted compact-text">{section.subtitle}</p> : null}
-              <div className="match-list">{section.matches.map((match) => renderMatchCard(match))}</div>
-            </div>
-          ))
-        : visibleDateSections.map((section) => (
-            <div key={section.label} className="panel stack-md">
-              <div className="section-head">
-                <h3>{section.label}</h3>
+      {selectedGroupId === 'TRIVIA' ? (
+        <div className="panel stack-md">
+          <div className="section-head">
+            <h3>Trivia Mundial 2026</h3>
+            <span>{state.trivia.pointsPerQuestion} puntos por cada respuesta correcta</span>
+          </div>
+          <p className="muted">
+            Puedes responder la trivia en cualquier momento antes de que inicie la fase de llaves.
+            {triviaCutoffAt ? ` Cierre: ${formatKickoffArgentina(triviaCutoffAt)}.` : ''}
+          </p>
+          {!triviaEditable ? (
+            <p className="status">La trivia está cerrada porque ya comenzó la fase de llaves.</p>
+          ) : null}
+          <div className="stack-md">
+            {state.db.triviaQuestions.map((question, index) => (
+              <label key={question.id} className="stack-xs">
+                <span>
+                  {index + 1}. {question.prompt}
+                </span>
+                <input
+                  value={triviaDrafts[question.id] ?? ''}
+                  onChange={(event) => setTriviaDraft(question.id, event.target.value)}
+                  placeholder={question.answerType === 'number' ? 'Ingresa un número' : 'Escribe tu respuesta'}
+                  inputMode={question.answerType === 'number' ? 'numeric' : undefined}
+                  disabled={!triviaEditable || savingTrivia}
+                />
+              </label>
+            ))}
+          </div>
+          <div className="fixture-inline" style={{ justifyContent: 'flex-start' }}>
+            <button className="btn btn-primary" type="button" onClick={saveTriviaAnswers} disabled={!triviaEditable || savingTrivia}>
+              {savingTrivia ? 'Guardando...' : 'Guardar trivia'}
+            </button>
+          </div>
+        </div>
+      ) : viewMode === 'group' ? (
+        visibleSections.map((section) => (
+          <div key={section.id} className="panel stack-md">
+            <div className="section-head">
+              <h3>{section.title}</h3>
+              <div className="fixture-inline">
                 <span>{section.matches.length} partidos pendientes</span>
-              </div>
-              <div className="match-list">
-                {section.matches.map((match) => renderMatchCard(match, match._meta))}
+                <button
+                  className="btn btn-primary btn-small"
+                  type="button"
+                  onClick={() => saveSectionPredictions(section.id, section.matches.map((m) => m.id))}
+                  disabled={savingSectionId === section.id || saving}
+                >
+                  {savingSectionId === section.id ? 'Guardando...' : section.saveLabel}
+                </button>
               </div>
             </div>
-          ))}
 
-      {(viewMode === 'group' ? visibleSections.length === 0 : visibleDateSections.length === 0) ? (
+            {section.subtitle ? <p className="muted compact-text">{section.subtitle}</p> : null}
+            <div className="match-list">{section.matches.map((match) => renderMatchCard(match))}</div>
+          </div>
+        ))
+      ) : (
+        visibleDateSections.map((section) => (
+          <div key={section.label} className="panel stack-md">
+            <div className="section-head">
+              <h3>{section.label}</h3>
+              <span>{section.matches.length} partidos pendientes</span>
+            </div>
+            <div className="match-list">
+              {section.matches.map((match) => renderMatchCard(match, match._meta))}
+            </div>
+          </div>
+        ))
+      )}
+
+      {selectedGroupId !== 'TRIVIA' && (viewMode === 'group' ? visibleSections.length === 0 : visibleDateSections.length === 0) ? (
         <div className="panel">
           <p className="muted">No hay partidos disponibles para predecir en el filtro actual. Solo se muestran partidos cuya ventana de carga sigue abierta.</p>
         </div>
@@ -459,6 +580,3 @@ export function PredictionsBoard({
     </section>
   );
 }
-
-
-

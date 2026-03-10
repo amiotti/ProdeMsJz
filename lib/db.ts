@@ -4,7 +4,20 @@ import { hashPassword, verifyPassword, verifySession } from '@/lib/auth';
 import { getInstantAdminDb, tx } from '@/lib/instant';
 import { computeLeaderboard } from '@/lib/prode';
 import { createSeedDb } from '@/lib/seed';
-import type { ContactMessage, ContactMessageStatus, LeaderboardRow, Prediction, ProdeDB, Score, StateResponse, User } from '@/lib/types';
+import type {
+  ContactMessage,
+  ContactMessageStatus,
+  LeaderboardRow,
+  Match,
+  Prediction,
+  ProdeDB,
+  Score,
+  StateResponse,
+  TriviaOfficialResult,
+  TriviaPrediction,
+  TriviaQuestion,
+  User,
+} from '@/lib/types';
 
 type UserRole = 'admin' | 'user';
 
@@ -32,11 +45,25 @@ type InstantUserPredictionsDoc = {
   updatedAt: string;
 };
 
+type InstantUserTriviaPredictionsDoc = {
+  id: string;
+  userId: string;
+  answers: Record<string, { answer: string; updatedAt: string }>;
+  updatedAt: string;
+};
+
 type InstantOfficialResultDoc = {
   id: string;
   matchId: string;
   home: number;
   away: number;
+  updatedAt: string;
+};
+
+type InstantOfficialTriviaResultDoc = {
+  id: string;
+  questionId: string;
+  answer: string;
   updatedAt: string;
 };
 
@@ -82,7 +109,9 @@ type InstantLegalAcceptanceDoc = {
 type InstantQueryResult = {
   prode_users?: InstantUserDoc[];
   prode_user_predictions?: InstantUserPredictionsDoc[];
+  prode_user_trivia_predictions?: InstantUserTriviaPredictionsDoc[];
   prode_official_results?: InstantOfficialResultDoc[];
+  prode_official_trivia_results?: InstantOfficialTriviaResultDoc[];
   prode_config?: InstantConfigDoc[];
   prode_contact_messages?: InstantContactMessageDoc[];
 };
@@ -100,6 +129,44 @@ let coreStateCache:
     }
   | null = null;
 const CORE_STATE_TTL_MS = 30_000;
+const TRIVIA_POINTS_PER_QUESTION = 10;
+
+const TRIVIA_QUESTIONS: TriviaQuestion[] = [
+  { id: 'mvp', prompt: '¿Quién será el jugador MVP del Mundial 2026?', answerType: 'text' },
+  { id: 'champion', prompt: '¿Qué selección ganará el Mundial 2026?', answerType: 'text' },
+  { id: 'top_scorer', prompt: '¿Quién será el máximo goleador del torneo?', answerType: 'text' },
+  { id: 'golden_glove', prompt: '¿Qué arquero ganará el Guante de Oro?', answerType: 'text' },
+  { id: 'argentina_goals', prompt: '¿Cuántos goles hará Argentina?', answerType: 'number' },
+];
+
+function getTriviaCutoffAt(matches: Match[]): string | null {
+  const firstKnockoutMs = matches
+    .filter((match) => match.groupId === 'KO')
+    .map((match) => new Date(match.kickoffAt).getTime())
+    .filter((value) => Number.isFinite(value))
+    .sort((a, b) => a - b)[0];
+
+  if (!Number.isFinite(firstKnockoutMs)) return null;
+  return new Date(firstKnockoutMs).toISOString();
+}
+
+function isTriviaWindowOpen(matches: Match[], nowMs = Date.now()) {
+  const cutoffAt = getTriviaCutoffAt(matches);
+  if (!cutoffAt) return false;
+  const cutoffMs = new Date(cutoffAt).getTime();
+  if (!Number.isFinite(cutoffMs)) return false;
+  return nowMs < cutoffMs;
+}
+
+function normalizeTriviaAnswer(answer: string, answerType: TriviaQuestion['answerType']) {
+  const trimmed = answer.trim();
+  if (!trimmed) return '';
+  if (answerType === 'number') {
+    if (!/^\d+$/.test(trimmed)) return '';
+    return String(Number(trimmed));
+  }
+  return trimmed.slice(0, 120);
+}
 
 function nowIso() {
   return new Date().toISOString();
@@ -129,6 +196,9 @@ function cloneDb(db: ProdeDB): ProdeDB {
     })),
     users: db.users.map((u) => ({ ...u })),
     predictions: db.predictions.map((p) => ({ ...p })),
+    triviaQuestions: db.triviaQuestions.map((q) => ({ ...q })),
+    triviaPredictions: db.triviaPredictions.map((p) => ({ ...p })),
+    triviaResults: db.triviaResults.map((r) => ({ ...r })),
   };
 }
 
@@ -237,13 +307,17 @@ async function queryAllInstant() {
   const data = (await db.query({
     prode_users: {},
     prode_user_predictions: {},
+    prode_user_trivia_predictions: {},
     prode_official_results: {},
+    prode_official_trivia_results: {},
     prode_config: {},
   })) as InstantQueryResult;
   return {
     users: data.prode_users ?? [],
     userPredictions: data.prode_user_predictions ?? [],
+    userTriviaPredictions: data.prode_user_trivia_predictions ?? [],
     officialResults: data.prode_official_results ?? [],
+    officialTriviaResults: data.prode_official_trivia_results ?? [],
     config: data.prode_config ?? [],
   };
 }
@@ -296,12 +370,26 @@ async function queryOfficialResultsOnly() {
   return data.prode_official_results ?? [];
 }
 
+async function queryOfficialTriviaResultsOnly() {
+  const db = getInstantAdminDb();
+  const data = (await db.query({ prode_official_trivia_results: {} })) as InstantQueryResult;
+  return data.prode_official_trivia_results ?? [];
+}
+
 async function queryUserPredictionsDocByUserOnly(userId: string) {
   const db = getInstantAdminDb();
   const data = (await db.query({
     prode_user_predictions: { $: { where: { userId } } },
   })) as InstantQueryResult;
   return (data.prode_user_predictions ?? [])[0] ?? null;
+}
+
+async function queryUserTriviaPredictionsDocByUserOnly(userId: string) {
+  const db = getInstantAdminDb();
+  const data = (await db.query({
+    prode_user_trivia_predictions: { $: { where: { userId } } },
+  })) as InstantQueryResult;
+  return (data.prode_user_trivia_predictions ?? [])[0] ?? null;
 }
 
 async function queryUserLeaderboardGroupsOnly(userId: string) {
@@ -499,7 +587,21 @@ function buildStateFromInstantData(data: Awaited<ReturnType<typeof queryAllInsta
     }
   }
 
+  const triviaPredictions: TriviaPrediction[] = [];
+  for (const doc of data.userTriviaPredictions) {
+    for (const [questionId, entry] of Object.entries(doc.answers ?? {})) {
+      triviaPredictions.push({
+        id: `${doc.id}:${questionId}`,
+        userId: doc.userId,
+        questionId,
+        answer: entry.answer,
+        updatedAt: entry.updatedAt,
+      });
+    }
+  }
+
   const officialByMatchId = new Map(data.officialResults.map((r) => [r.matchId, r] as const));
+  const officialTriviaByQuestionId = new Map(data.officialTriviaResults.map((r) => [r.questionId, r] as const));
 
   const pointsDoc = data.config.find((c) => c.key === 'points');
 
@@ -507,6 +609,17 @@ function buildStateFromInstantData(data: Awaited<ReturnType<typeof queryAllInsta
     ...seed,
     users,
     predictions,
+    triviaQuestions: TRIVIA_QUESTIONS.map((question) => ({ ...question })),
+    triviaPredictions,
+    triviaResults: TRIVIA_QUESTIONS.map((question) => {
+      const official = officialTriviaByQuestionId.get(question.id);
+      return {
+        id: official?.id ?? `official-trivia-${question.id}`,
+        questionId: question.id,
+        answer: official?.answer ?? '',
+        updatedAt: official?.updatedAt ?? '',
+      };
+    }).filter((item) => item.answer),
     pointsConfig: pointsDoc
       ? { exactScore: pointsDoc.exactScore, correctOutcome: pointsDoc.correctOutcome }
       : seed.pointsConfig,
@@ -521,15 +634,30 @@ function buildStateFromInstantData(data: Awaited<ReturnType<typeof queryAllInsta
   };
 }
 
-function applyOfficialResultsToSeed(officialResults: InstantOfficialResultDoc[]): ProdeDB {
+function applyOfficialResultsToSeed(
+  officialResults: InstantOfficialResultDoc[],
+  officialTriviaResults: InstantOfficialTriviaResultDoc[] = [],
+): ProdeDB {
   const seed = getSeedDbTemplate();
   const officialByMatchId = new Map(officialResults.map((r) => [r.matchId, r] as const));
+  const officialTriviaByQuestionId = new Map(officialTriviaResults.map((r) => [r.questionId, r] as const));
   return {
     ...seed,
     pointsConfig: { ...seed.pointsConfig },
     groups: seed.groups.map((g) => ({ ...g, teams: [...g.teams] })),
     users: [],
     predictions: [],
+    triviaQuestions: TRIVIA_QUESTIONS.map((question) => ({ ...question })),
+    triviaPredictions: [],
+    triviaResults: TRIVIA_QUESTIONS.map((question) => {
+      const official = officialTriviaByQuestionId.get(question.id);
+      return {
+        id: official?.id ?? `official-trivia-${question.id}`,
+        questionId: question.id,
+        answer: official?.answer ?? '',
+        updatedAt: official?.updatedAt ?? '',
+      };
+    }).filter((item) => item.answer),
     matches: seed.matches.map((m) => {
       const r = officialByMatchId.get(m.id);
       return {
@@ -775,6 +903,61 @@ export async function savePredictions(
   return { lockedMatches };
 }
 
+export async function saveTriviaPredictions(
+  userId: string,
+  items: Array<{ questionId: string; answer: string }>,
+) {
+  await ensureBaseData();
+  if (!Array.isArray(items)) throw new Error('Formato de trivias inválido');
+  if (items.length > TRIVIA_QUESTIONS.length) throw new Error('Demasiadas respuestas de trivia en una sola solicitud');
+
+  const userDoc = await queryUserByIdOnly(userId);
+  const user = userDoc ? publicUser(userDoc) : null;
+  if (!user) throw new Error('Usuario no encontrado');
+  if (user.role === 'admin') throw new Error('El administrador no puede cargar trivias');
+  if (user.registrationPaymentStatus !== 'approved') {
+    throw new Error('Debes tener el pago de inscripción aprobado para cargar trivias');
+  }
+
+  const seed = getSeedDbTemplate();
+  if (!isTriviaWindowOpen(seed.matches)) {
+    throw new Error('La trivia ya está cerrada: debía completarse antes del inicio de la fase de llaves');
+  }
+
+  const questionById = new Map(TRIVIA_QUESTIONS.map((question) => [question.id, question] as const));
+  const existingUserTriviaDoc = await queryUserTriviaPredictionsDocByUserOnly(userId);
+  const answersMap: Record<string, { answer: string; updatedAt: string }> = {
+    ...(existingUserTriviaDoc?.answers ?? {}),
+  };
+
+  const ts = nowIso();
+  let changed = false;
+  for (const item of items) {
+    const question = questionById.get(item.questionId);
+    if (!question) continue;
+    const normalized = normalizeTriviaAnswer(item.answer, question.answerType);
+    if (!normalized) continue;
+
+    answersMap[item.questionId] = {
+      answer: normalized,
+      updatedAt: ts,
+    };
+    changed = true;
+  }
+
+  if (changed) {
+    const id = existingUserTriviaDoc?.id ?? randomUUID();
+    await getInstantAdminDb().transact([
+      tx.prode_user_trivia_predictions[id].update({
+        id,
+        userId,
+        answers: answersMap,
+        updatedAt: ts,
+      }),
+    ]);
+    invalidateCoreStateCache();
+  }
+}
 export async function saveOfficialResults(items: Array<{ matchId: string; home: number; away: number }>) {
   await ensureBaseData();
   if (!Array.isArray(items)) throw new Error('Formato de resultados inválido');
@@ -812,6 +995,40 @@ export async function saveOfficialResults(items: Array<{ matchId: string; home: 
   return;
 }
 
+export async function saveOfficialTriviaResults(items: Array<{ questionId: string; answer: string }>) {
+  await ensureBaseData();
+  if (!Array.isArray(items)) throw new Error('Formato de resultados de trivia inválido');
+  if (items.length > TRIVIA_QUESTIONS.length) throw new Error('Demasiadas respuestas oficiales de trivia en una sola solicitud');
+
+  const validQuestions = new Map(TRIVIA_QUESTIONS.map((question) => [question.id, question] as const));
+  const current = await queryAllInstant();
+  const byQuestionId = new Map(current.officialTriviaResults.map((result) => [result.questionId, result] as const));
+  const ts = nowIso();
+  const operations: any[] = [];
+
+  for (const item of items) {
+    const question = validQuestions.get(item.questionId);
+    if (!question) continue;
+    const normalized = normalizeTriviaAnswer(item.answer, question.answerType);
+    if (!normalized) continue;
+
+    const existing = byQuestionId.get(item.questionId);
+    const id = existing?.id ?? randomUUID();
+    operations.push(
+      tx.prode_official_trivia_results[id].update({
+        id,
+        questionId: item.questionId,
+        answer: normalized,
+        updatedAt: ts,
+      }),
+    );
+  }
+
+  if (operations.length > 0) {
+    await getInstantAdminDb().transact(operations);
+    invalidateCoreStateCache();
+  }
+}
 export async function deleteUserAccount(userId: string) {
   await ensureBaseData();
   const current = await queryAllInstant();
@@ -823,6 +1040,10 @@ export async function deleteUserAccount(userId: string) {
   const userPredDoc = current.userPredictions.find((p) => p.userId === userId);
   if (userPredDoc) {
     operations.push(tx.prode_user_predictions[userPredDoc.id].delete());
+  }
+  const userTriviaPredDoc = current.userTriviaPredictions.find((p) => p.userId === userId);
+  if (userTriviaPredDoc) {
+    operations.push(tx.prode_user_trivia_predictions[userTriviaPredDoc.id].delete());
   }
   const userGroups = await queryUserLeaderboardGroupsOnly(userId);
   for (const group of userGroups) {
@@ -851,6 +1072,10 @@ export async function adminDeleteUser(targetUserId: string) {
   const userPredDoc = current.userPredictions.find((p) => p.userId === targetUserId);
   if (userPredDoc) {
     operations.push(tx.prode_user_predictions[userPredDoc.id].delete());
+  }
+  const userTriviaPredDoc = current.userTriviaPredictions.find((p) => p.userId === targetUserId);
+  if (userTriviaPredDoc) {
+    operations.push(tx.prode_user_trivia_predictions[userTriviaPredDoc.id].delete());
   }
   const userGroups = await queryUserLeaderboardGroupsOnly(targetUserId);
   for (const group of userGroups) {
@@ -999,6 +1224,10 @@ export async function getState(viewerToken?: string | null): Promise<StateRespon
       isAdmin: viewerUser?.role === 'admin',
     },
     summary: core.summary,
+    trivia: {
+      pointsPerQuestion: TRIVIA_POINTS_PER_QUESTION,
+      cutoffAt: getTriviaCutoffAt(db.matches),
+    },
   };
 }
 
@@ -1028,8 +1257,11 @@ export async function getLeaderboardPageState() {
 
 export async function getResultsScreenState(viewerToken?: string | null): Promise<StateResponse> {
   await ensureBaseData();
-  const officialResults = await queryOfficialResultsOnly();
-  const db = applyOfficialResultsToSeed(officialResults);
+  const [officialResults, officialTriviaResults] = await Promise.all([
+    queryOfficialResultsOnly(),
+    queryOfficialTriviaResultsOnly(),
+  ]);
+  const db = applyOfficialResultsToSeed(officialResults, officialTriviaResults);
   const session = verifySession(viewerToken ?? null);
 
   return {
@@ -1046,6 +1278,10 @@ export async function getResultsScreenState(viewerToken?: string | null): Promis
       matchesWithOfficialResult: db.matches.filter((m) => m.officialResult).length,
       predictions: 0,
     },
+    trivia: {
+      pointsPerQuestion: TRIVIA_POINTS_PER_QUESTION,
+      cutoffAt: getTriviaCutoffAt(db.matches),
+    },
   };
 }
 
@@ -1053,13 +1289,16 @@ export async function getPredictionsScreenState(viewerToken?: string | null): Pr
   await ensureBaseData();
   const session = verifySession(viewerToken ?? null);
   const officialResultsPromise = queryOfficialResultsOnly();
+  const officialTriviaResultsPromise = queryOfficialTriviaResultsOnly();
 
   let viewerUser: User | null = null;
   let userPredictions: Prediction[] = [];
+  let userTriviaPredictions: TriviaPrediction[] = [];
   if (session) {
-    const [userDoc, userPredictionsDoc] = await Promise.all([
+    const [userDoc, userPredictionsDoc, userTriviaPredictionsDoc] = await Promise.all([
       queryUserByIdOnly(session.userId),
       queryUserPredictionsDocByUserOnly(session.userId),
+      queryUserTriviaPredictionsDocByUserOnly(session.userId),
     ]);
     if (userDoc && userDoc.role === session.role) {
       viewerUser = publicUser(userDoc);
@@ -1073,13 +1312,26 @@ export async function getPredictionsScreenState(viewerToken?: string | null): Pr
           updatedAt: entry.updatedAt,
         }));
       }
+      if (userTriviaPredictionsDoc) {
+        userTriviaPredictions = Object.entries(userTriviaPredictionsDoc.answers ?? {}).map(([questionId, entry]) => ({
+          id: `${userTriviaPredictionsDoc.id}:${questionId}`,
+          userId: session.userId,
+          questionId,
+          answer: entry.answer,
+          updatedAt: entry.updatedAt,
+        }));
+      }
     }
   }
 
-  const officialResults = await officialResultsPromise;
-  const db = applyOfficialResultsToSeed(officialResults);
+  const [officialResults, officialTriviaResults] = await Promise.all([
+    officialResultsPromise,
+    officialTriviaResultsPromise,
+  ]);
+  const db = applyOfficialResultsToSeed(officialResults, officialTriviaResults);
   db.users = viewerUser ? [viewerUser] : [];
   db.predictions = userPredictions;
+  db.triviaPredictions = userTriviaPredictions;
 
   return {
     db,
@@ -1094,6 +1346,10 @@ export async function getPredictionsScreenState(viewerToken?: string | null): Pr
       matches: db.matches.length,
       matchesWithOfficialResult: db.matches.filter((m) => m.officialResult).length,
       predictions: db.predictions.length,
+    },
+    trivia: {
+      pointsPerQuestion: TRIVIA_POINTS_PER_QUESTION,
+      cutoffAt: getTriviaCutoffAt(db.matches),
     },
   };
 }
@@ -1176,6 +1432,20 @@ export async function deleteUserLeaderboardGroup(userId: string, groupId: string
     tx.prode_user_leaderboard_groups[groupId].delete(),
   ]);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
