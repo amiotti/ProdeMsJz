@@ -63,12 +63,9 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
   useEffect(() => {
     if (!isCreateModalOpen) return;
     const prevOverflow = document.body.style.overflow;
-    const prevTouchAction = document.body.style.touchAction;
     document.body.style.overflow = 'hidden';
-    document.body.style.touchAction = 'none';
     return () => {
       document.body.style.overflow = prevOverflow;
-      document.body.style.touchAction = prevTouchAction;
     };
   }, [isCreateModalOpen]);
   useEffect(() => {
@@ -306,8 +303,7 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
             padding: '1rem',
             background: isDarkTheme ? 'rgba(8, 13, 24, 0.58)' : 'rgba(34, 44, 66, 0.34)',
             backdropFilter: 'blur(2px)',
-            overscrollBehavior: 'contain',
-            touchAction: 'none'
+            overscrollBehavior: 'contain'
           }}
         >
           <div
@@ -417,6 +413,7 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
     </>
   );
 }
+
 
 
 
