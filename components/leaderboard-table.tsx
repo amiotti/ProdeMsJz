@@ -61,6 +61,17 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
   }, [activeGroupId, groups]);
 
   useEffect(() => {
+    if (!isCreateModalOpen) return;
+    const prevOverflow = document.body.style.overflow;
+    const prevTouchAction = document.body.style.touchAction;
+    document.body.style.overflow = 'hidden';
+    document.body.style.touchAction = 'none';
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      document.body.style.touchAction = prevTouchAction;
+    };
+  }, [isCreateModalOpen]);
+  useEffect(() => {
     if (!isLoggedIn) {
       setGroups([]);
       setGroupsError(null);
@@ -294,7 +305,9 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
             placeItems: 'center',
             padding: '1rem',
             background: isDarkTheme ? 'rgba(8, 13, 24, 0.58)' : 'rgba(34, 44, 66, 0.34)',
-            backdropFilter: 'blur(2px)'
+            backdropFilter: 'blur(2px)',
+            overscrollBehavior: 'contain',
+            touchAction: 'none'
           }}
         >
           <div
@@ -303,6 +316,7 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
               width: 'min(560px, 100%)',
               maxHeight: '90vh',
               overflow: 'hidden',
+              touchAction: 'pan-y',
               background: isDarkTheme ? 'rgba(22, 18, 31, 0.97)' : 'rgba(248, 251, 255, 0.98)',
               border: isDarkTheme ? '1px solid rgba(255, 255, 255, 0.16)' : '1px solid rgba(24, 44, 86, 0.22)',
               boxShadow: '0 20px 44px rgba(16, 24, 40, 0.32)'
@@ -339,6 +353,8 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
                 padding: '0.55rem',
                 maxHeight: '44vh',
                 overflow: 'auto',
+                overscrollBehavior: 'contain',
+                WebkitOverflowScrolling: 'touch',
                 background: isDarkTheme ? 'rgba(12, 11, 20, 0.74)' : 'rgba(255, 255, 255, 0.96)'
               }}
             >
@@ -401,6 +417,9 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
     </>
   );
 }
+
+
+
 
 
 

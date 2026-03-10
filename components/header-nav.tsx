@@ -103,10 +103,10 @@ export function HeaderNav({ items }: { items: NavItem[] }) {
       </nav>
 
       <details className="mobile-nav" ref={detailsRef}>
-        <summary className="mobile-nav-trigger" aria-label="Abrir menÃº de secciones">
+        <summary className="mobile-nav-trigger" aria-label="Abrir menú de secciones">
           <span className="mobile-nav-trigger-left">
             <span className="mobile-nav-trigger-icon" aria-hidden="true">
-              â˜°
+              ☰
             </span>
             <span>{currentLabel}</span>
           </span>
@@ -123,8 +123,8 @@ export function HeaderNav({ items }: { items: NavItem[] }) {
             <button
               className="mobile-nav-action mobile-nav-action-logout"
               type="button"
-              aria-label="Cerrar sesiÃ³n"
-              title="Cerrar sesiÃ³n"
+              aria-label="Cerrar sesión"
+              title="Cerrar sesión"
               onClick={logout}
               disabled={loggingOut}
             >
@@ -153,5 +153,6 @@ export function HeaderNav({ items }: { items: NavItem[] }) {
     </>
   );
 }
+
 
 

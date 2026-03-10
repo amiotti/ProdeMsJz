@@ -60,7 +60,7 @@ export async function AppShell({ children }: { children: ReactNode }) {
                 <img className="brand-logo-img brand-logo-img-dark" src="/fifa_logo_dark.jfif" alt="" loading="eager" decoding="async" />
               </div>
               <div className="brand-meta">
-                <p className="eyebrow">PRODE MUNDIAL</p>
+                <p className="eyebrow">PRODE MUNDIAL USA | MEX | CAN</p>
                 <h1 className="brand">Prode MSJZ</h1>
                 <p className="brand-subtitle">Predicciones, ranking y estadísticas del Mundial FIFA 2026</p>
               </div>
@@ -97,9 +97,7 @@ export async function AppShell({ children }: { children: ReactNode }) {
 
       <footer className="site-footer">
         <div className="site-footer-inner">
-          <p>(c) {new Date().getFullYear()}  PRODE Mundial 2026. Sitio web desarrollado por{' '}<a href="https://github.com/amiotti/ProdeAmigos" target="_blank" rel="noreferrer">
-            Agustin Miotti
-          </a>.</p>
+          <p>(c) {new Date().getFullYear()} PRODE Mundial 2026. Sitio web desarrollado por Agustin Miotti.</p>
 
           <p><Link href="/terms">Términos y condiciones</Link></p>
           <p><Link href="/privacy">Privacidad</Link></p>
@@ -112,6 +110,8 @@ export async function AppShell({ children }: { children: ReactNode }) {
     </div>
   );
 }
+
+
 
 
 

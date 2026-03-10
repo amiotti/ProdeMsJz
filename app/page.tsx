@@ -26,7 +26,8 @@ export default async function LandingPage() {
         <div className="landing-panel landing-main">
           <p className="landing-kicker">PRODE MUNDIAL FIFA 2026</p>
           <h2 className="landing-title">
-            PARTICIPÁ DEL <span>PRODE MSJZ</span> 🏆
+            PARTICIPÁ DEL <span>PRODE MSJZ</span>
+            <img className="landing-title-icon" src="/world-cup.png" alt="Copa" />
           </h2>
           <p className="landing-copy">
             Registrate, pagá la inscripción y cargá tus pronósticos partido por partido. El ranking se actualiza
@@ -78,6 +79,7 @@ export default async function LandingPage() {
     </section>
   );
 }
+
 
 
 
