@@ -296,7 +296,7 @@ function validateRegistrationInput(input: {
   if (!bankInfo) throw new Error('El CBU/CVU o Alias es obligatorio');
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error('El email no es valido');
   if (email.length > 120) throw new Error('El email es demasiado largo');
-  if (!/^[0-9+()\-\s]{6,32}$/.test(phone)) throw new Error('El telefono no es valido');
+  if (!/^[0-9+()\-\s./]{6,32}$/.test(phone)) throw new Error('El telefono no es valido');
   if (bankInfo.length < 6) throw new Error('El CBU/CVU o Alias no es valido');
   if (!input.password || input.password.length < 8) throw new Error('La contrasena debe tener al menos 8 caracteres');
   if (input.password.length > 128) throw new Error('La contrasena es demasiado larga');
@@ -820,7 +820,7 @@ export async function updateUserProfile(
   if (!lastName) throw new Error('El apellido es obligatorio');
   if (!phone) throw new Error('El tel?fono es obligatorio');
   if (!bankInfo) throw new Error('El CBU/CVU o Alias es obligatorio');
-  if (!/^[0-9+()\-\s]{6,32}$/.test(phone)) throw new Error('El telefono no es valido');
+  if (!/^[0-9+()\-\s./]{6,32}$/.test(phone)) throw new Error('El telefono no es valido');
 
   const patch: Partial<InstantUserDoc> = {
     firstName,
@@ -958,16 +958,31 @@ export async function saveTriviaPredictions(
     invalidateCoreStateCache();
   }
 }
-export async function saveOfficialResults(items: Array<{ matchId: string; home: number; away: number }>) {
+export async function saveOfficialResults(
+  items: Array<{ matchId: string; home: number; away: number }>,
+  clearMatchIds: string[] = [],
+) {
   await ensureBaseData();
-  if (!Array.isArray(items)) throw new Error('Formato de resultados inválido');
+  if (!Array.isArray(items)) throw new Error('Formato de resultados inv?lido');
+  if (!Array.isArray(clearMatchIds)) throw new Error('Formato de limpieza de resultados inv?lido');
   if (items.length > 120) throw new Error('Demasiados resultados en una sola solicitud');
+  if (clearMatchIds.length > 120) throw new Error('Demasiadas limpiezas en una sola solicitud');
+
   const base = getSeedDbTemplate();
   const validMatchIds = new Set(base.matches.map((m) => m.id));
   const current = await queryAllInstant();
   const byMatchId = new Map(current.officialResults.map((r) => [r.matchId, r] as const));
+  const updateIds = new Set(items.map((item) => item.matchId));
   const ts = nowIso();
   const operations: any[] = [];
+
+  for (const matchId of clearMatchIds) {
+    if (!validMatchIds.has(matchId)) continue;
+    if (updateIds.has(matchId)) continue;
+    const existing = byMatchId.get(matchId);
+    if (!existing) continue;
+    operations.push(tx.prode_official_results[existing.id].delete());
+  }
 
   for (const item of items) {
     if (!validMatchIds.has(item.matchId)) continue;
@@ -995,16 +1010,30 @@ export async function saveOfficialResults(items: Array<{ matchId: string; home: 
   return;
 }
 
-export async function saveOfficialTriviaResults(items: Array<{ questionId: string; answer: string }>) {
+export async function saveOfficialTriviaResults(
+  items: Array<{ questionId: string; answer: string }>,
+  clearQuestionIds: string[] = [],
+) {
   await ensureBaseData();
-  if (!Array.isArray(items)) throw new Error('Formato de resultados de trivia inválido');
+  if (!Array.isArray(items)) throw new Error('Formato de resultados de trivia inv?lido');
+  if (!Array.isArray(clearQuestionIds)) throw new Error('Formato de limpieza de trivia inv?lido');
   if (items.length > TRIVIA_QUESTIONS.length) throw new Error('Demasiadas respuestas oficiales de trivia en una sola solicitud');
+  if (clearQuestionIds.length > TRIVIA_QUESTIONS.length) throw new Error('Demasiadas limpiezas de trivia en una sola solicitud');
 
   const validQuestions = new Map(TRIVIA_QUESTIONS.map((question) => [question.id, question] as const));
   const current = await queryAllInstant();
   const byQuestionId = new Map(current.officialTriviaResults.map((result) => [result.questionId, result] as const));
+  const updateIds = new Set(items.map((item) => item.questionId));
   const ts = nowIso();
   const operations: any[] = [];
+
+  for (const questionId of clearQuestionIds) {
+    if (!validQuestions.has(questionId)) continue;
+    if (updateIds.has(questionId)) continue;
+    const existing = byQuestionId.get(questionId);
+    if (!existing) continue;
+    operations.push(tx.prode_official_trivia_results[existing.id].delete());
+  }
 
   for (const item of items) {
     const question = validQuestions.get(item.questionId);
@@ -1432,6 +1461,7 @@ export async function deleteUserLeaderboardGroup(userId: string, groupId: string
     tx.prode_user_leaderboard_groups[groupId].delete(),
   ]);
 }
+
 
 
 

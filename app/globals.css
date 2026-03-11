@@ -4010,3 +4010,111 @@ html[data-theme='dark'] .admin-alert-badge {
   }
 }
 
+
+/* Compare picker mobile fit fix */
+.compare-picker-backdrop {
+  overflow-y: auto;
+}
+
+.compare-picker-modal {
+  max-height: min(82dvh, 720px);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.compare-picker-list {
+  max-height: min(44dvh, 380px);
+}
+
+@media (max-width: 760px) {
+  .compare-picker-backdrop {
+    place-items: start center;
+    align-content: start;
+    padding: max(0.5rem, env(safe-area-inset-top)) 0.5rem max(0.5rem, env(safe-area-inset-bottom));
+  }
+
+  .compare-picker-modal {
+    width: 100%;
+    max-width: 560px;
+    max-height: calc(100dvh - 1rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    padding: 0.8rem;
+  }
+
+  .compare-picker-list {
+    max-height: min(38dvh, 320px);
+  }
+
+  .compare-picker-actions {
+    flex-wrap: wrap;
+  }
+}
+
+/* Header / back button / mobile fit refinements */
+.brand-logo-img-light {
+  inset: 0.15rem;
+  width: calc(100% - 0.3rem);
+  height: calc(100% - 0.3rem);
+}
+
+.public-back-btn,
+.legal-back-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  border: 1px solid rgba(17, 33, 68, 0.18);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(248, 251, 255, 0.82)),
+    radial-gradient(circle at 20% 20%, rgba(89, 227, 215, 0.18), transparent 58%);
+  color: #1b2640;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  font-size: 1.22rem;
+  line-height: 1;
+  text-align: center;
+  box-shadow: 0 8px 18px rgba(18, 28, 52, 0.12);
+}
+
+.public-back-btn:hover,
+.legal-back-btn:hover {
+  border-color: rgba(89, 227, 215, 0.35);
+  transform: translateY(-1px);
+}
+
+.legal-back-row {
+  display: flex;
+  justify-content: flex-start;
+}
+
+html[data-theme='dark'] .public-back-btn,
+html[data-theme='dark'] .legal-back-btn {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background:
+    linear-gradient(145deg, rgba(18, 19, 28, 0.86), rgba(12, 13, 20, 0.68)),
+    radial-gradient(circle at 20% 20%, rgba(89, 227, 215, 0.14), transparent 58%);
+  color: #fff7ef;
+  box-shadow: 0 10px 22px rgba(12, 16, 28, 0.2);
+}
+
+@media (max-width: 760px) {
+  .topbar {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    padding-left: 0.65rem;
+    padding-right: 0.65rem;
+  }
+}
+
+/* Mobile leaderboard scroll stability */
+@media (max-width: 760px) {
+  body {
+    background-attachment: scroll, scroll, scroll, scroll, scroll, scroll;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    overflow-y: visible;
+    overscroll-behavior-y: contain;
+  }
+}

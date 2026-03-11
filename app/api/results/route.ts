@@ -24,10 +24,12 @@ export async function POST(request: Request) {
     const body = (await request.json()) as {
       results?: Array<{ matchId: string; home: number; away: number }>;
       triviaResults?: Array<{ questionId: string; answer: string }>;
+      clearMatchIds?: string[];
+      clearTriviaQuestionIds?: string[];
     };
 
-    await saveOfficialResults(body.results ?? []);
-    await saveOfficialTriviaResults(body.triviaResults ?? []);
+    await saveOfficialResults(body.results ?? [], body.clearMatchIds ?? []);
+    await saveOfficialTriviaResults(body.triviaResults ?? [], body.clearTriviaQuestionIds ?? []);
 
     const state = await getResultsScreenState(token);
     return noStoreJson({ ok: true, state });

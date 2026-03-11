@@ -30,6 +30,12 @@ export function ProfileForm({ user }: { user: User }) {
       });
       const data = await response.json();
       if (!response.ok || !data.ok) throw new Error(data.error || 'No se pudo actualizar el perfil');
+      if (data.user) {
+        setFirstName(data.user.firstName ?? firstName);
+        setLastName(data.user.lastName ?? lastName);
+        setPhone(data.user.phone ?? phone);
+        setBankInfo(data.user.bankInfo ?? bankInfo);
+      }
       setPassword('');
       setStatus('Perfil actualizado');
       setEditing(false);
@@ -72,11 +78,11 @@ export function ProfileForm({ user }: { user: User }) {
         <div className="detail-grid">
           <div className="detail-card">
             <span className="detail-label">Nombre</span>
-            <strong>{user.firstName}</strong>
+            <strong>{firstName}</strong>
           </div>
           <div className="detail-card">
             <span className="detail-label">Apellido</span>
-            <strong>{user.lastName}</strong>
+            <strong>{lastName}</strong>
           </div>
           <div className="detail-card">
             <span className="detail-label">Email</span>
@@ -84,11 +90,11 @@ export function ProfileForm({ user }: { user: User }) {
           </div>
           <div className="detail-card">
             <span className="detail-label">Teléfono</span>
-            <strong>{user.phone}</strong>
+            <strong>{phone}</strong>
           </div>
           <div className="detail-card">
             <span className="detail-label">CBU/CVU o Alias</span>
-            <strong>{user.bankInfo}</strong>
+            <strong>{bankInfo}</strong>
           </div>
           <div className="detail-card">
             <span className="detail-label">Rol</span>
@@ -153,3 +159,6 @@ export function ProfileForm({ user }: { user: User }) {
     </section>
   );
 }
+
+
+

@@ -116,6 +116,7 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
   const [state, setState] = useState<StateResponse | null>(initialState);
   const [loading, setLoading] = useState(!initialState);
   const [saving, setSaving] = useState(false);
+  const [savingMatchId, setSavingMatchId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<DraftMap>({});
   const [triviaDrafts, setTriviaDrafts] = useState<TriviaDraftMap>({});
@@ -175,7 +176,11 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
 
   const visibleMatches = useMemo(() => {
     if (!state) return [] as Match[];
-    const matches = state.db.matches.filter((m) => selectedGroupId === 'ALL' || m.groupId === selectedGroupId);
+    const matches = state.db.matches.filter((m) => {
+      const groupOk = selectedGroupId === 'ALL' || m.groupId === selectedGroupId;
+      const officialOk = state.viewer.isAdmin || Boolean(m.officialResult);
+      return groupOk && officialOk;
+    });
     return matches.sort((a, b) => {
       if (sortMode === 'group') {
         if (a.groupId !== b.groupId) return getGroupSortOrder(a.groupId) - getGroupSortOrder(b.groupId);
@@ -194,6 +199,18 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
     () => state?.db.groups.filter((g) => selectedGroupId === 'ALL' || g.id === selectedGroupId) ?? [],
     [state, selectedGroupId],
   );
+  
+
+  const visibleTriviaQuestions = useMemo(() => {
+    if (!state) return [] as StateResponse['db']['triviaQuestions'];
+    if (state.viewer.isAdmin) return state.db.triviaQuestions;
+
+    const answeredQuestionIds = new Set(
+      state.db.triviaResults.filter((item) => item.answer.trim() !== '').map((item) => item.questionId),
+    );
+
+    return state.db.triviaQuestions.filter((question) => answeredQuestionIds.has(question.id));
+  }, [state]);
 
   function setDraft(matchId: string, side: 'home' | 'away', value: string) {
     if (!state?.viewer.isAdmin) return;
@@ -221,6 +238,10 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
       .filter(([, score]) => score.home !== '' && score.away !== '')
       .map(([matchId, score]) => ({ matchId, home: Number(score.home), away: Number(score.away) }));
 
+    const clearMatchIds = Object.entries(drafts)
+      .filter(([, score]) => score.home === '' && score.away === '')
+      .map(([matchId]) => matchId);
+
     const triviaResults = Object.entries(triviaDrafts)
       .map(([questionId, answer]) => {
         const question = triviaQuestionById.get(questionId);
@@ -235,13 +256,17 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
       })
       .filter((item): item is { questionId: string; answer: string } => Boolean(item));
 
+    const clearTriviaQuestionIds = Object.entries(triviaDrafts)
+      .filter(([, answer]) => answer.trim() === '')
+      .map(([questionId]) => questionId);
+
     setSaving(true);
     setMessage(null);
     try {
       const response = await fetch('/api/results', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ results, triviaResults }),
+        body: JSON.stringify({ results, triviaResults, clearMatchIds, clearTriviaQuestionIds }),
       });
       const data = await response.json();
       if (!response.ok || !data.ok) throw new Error(data.error || 'No se pudo guardar');
@@ -251,6 +276,47 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
       setMessage(error instanceof Error ? error.message : 'Error al guardar resultados');
     } finally {
       setSaving(false);
+    }
+  }
+
+
+  async function saveSingleResult(matchId: string) {
+    if (!state?.viewer.isAdmin) return;
+    const draft = drafts[matchId] ?? { home: '', away: '' };
+    const match = state.db.matches.find((item) => item.id === matchId) ?? null;
+    const shouldClear = draft.home === '' && draft.away === '';
+
+    if ((draft.home === '' || draft.away === '') && !shouldClear) {
+      setMessage('Completa ambos goles o vac?a ambos para borrar el resultado del partido.');
+      return;
+    }
+
+    if (shouldClear && !match?.officialResult) {
+      setMessage('Ese partido no tiene resultado oficial cargado para borrar.');
+      return;
+    }
+
+    setSavingMatchId(matchId);
+    setMessage(null);
+    try {
+      const response = await fetch('/api/results', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          results: shouldClear ? [] : [{ matchId, home: Number(draft.home), away: Number(draft.away) }],
+          triviaResults: [],
+          clearMatchIds: shouldClear ? [matchId] : [],
+          clearTriviaQuestionIds: [],
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.ok) throw new Error(data.error || 'No se pudo guardar');
+      setState(data.state as StateResponse);
+      setMessage(shouldClear ? 'Resultado oficial eliminado.' : 'Resultado oficial guardado.');
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Error al guardar el resultado');
+    } finally {
+      setSavingMatchId(null);
     }
   }
 
@@ -266,6 +332,7 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
           <select value={selectedGroupId} onChange={(e) => setSelectedGroupId(e.target.value)}>
             <option value="ALL">Todos</option>
             <option value="KO">Fase final</option>
+            <option value="TRIVIA">Trivia</option>
             {state.db.groups.map((group) => (
               <option key={group.id} value={group.id}>
                 {group.name}
@@ -276,7 +343,7 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
 
         <label>
           Ordenar por
-          <select value={sortMode} onChange={(e) => setSortMode(e.target.value as ResultsSortMode)}>
+          <select value={sortMode} onChange={(e) => setSortMode(e.target.value as ResultsSortMode)} disabled={selectedGroupId === 'TRIVIA'}>
             <option value="date">Fecha</option>
             <option value="group">Grupo / etapa</option>
           </select>
@@ -311,35 +378,7 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
       {message ? <p className="status">{message}</p> : null}
 
       {viewMode === 'results' ? (
-        <>
-          <div className="panel match-list">
-            {visibleMatches.map((match) => {
-              const draft = drafts[match.id] ?? { home: '', away: '' };
-              const readOnly = !state.viewer.isAdmin;
-              const meta = match.groupId === 'KO' ? match.stage ?? 'Fase final' : `Grupo ${match.groupId} - Fecha ${match.matchday}`;
-
-              return (
-                <div className="match-card" key={match.id}>
-                  <div>
-                    <p className="match-meta">{meta} - {formatKickoffArgentina(match.kickoffAt)}</p>
-                    {match.venue ? <p className="match-meta">Sede: {match.venue}</p> : null}
-                    <div className="fixture-row">
-                      <TeamName teamName={match.homeTeam} linkToTeam />
-                      <span className="vs">vs</span>
-                      <TeamName teamName={match.awayTeam} linkToTeam />
-                    </div>
-                  </div>
-
-                  <div className={`score-inputs${readOnly ? ' is-locked' : ''}`}>
-                    <input value={draft.home} onChange={(e) => setDraft(match.id, 'home', e.target.value)} disabled={readOnly} />
-                    <span className="score-divider">-</span>
-                    <input value={draft.away} onChange={(e) => setDraft(match.id, 'away', e.target.value)} disabled={readOnly} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
+        selectedGroupId === 'TRIVIA' ? (
           <div className="panel stack-md">
             <div className="section-head">
               <h3>Resultados oficiales de Trivia</h3>
@@ -347,7 +386,7 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
             </div>
             <p className="muted">Carga las respuestas correctas para calcular el puntaje final de Trivia en la tabla general.</p>
             <div className="stack-md">
-              {state.db.triviaQuestions.map((question, index) => (
+              {visibleTriviaQuestions.map((question, index) => (
                 <label key={question.id} className="stack-xs">
                   <span>
                     {index + 1}. {question.prompt}
@@ -363,7 +402,193 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
               ))}
             </div>
           </div>
-        </>
+        ) : selectedGroupId === 'ALL' ? (
+          <>
+            <div className="panel stack-md">
+              <div className="section-head">
+                <h3>Fase de grupos</h3>
+                <span>{visibleMatches.filter((match) => match.groupId !== 'KO').length} partidos</span>
+              </div>
+              <div className="match-list">
+                {visibleMatches.filter((match) => match.groupId !== 'KO').map((match) => {
+                  const draft = drafts[match.id] ?? { home: '', away: '' };
+                  const readOnly = !state.viewer.isAdmin;
+                  const meta = `Grupo ${match.groupId} - Fecha ${match.matchday}`;
+
+                  return (
+                    <div className="match-card" key={match.id}>
+                      <div>
+                        <p className="match-meta">{meta} - {formatKickoffArgentina(match.kickoffAt)}</p>
+                        {match.venue ? <p className="match-meta">Sede: {match.venue}</p> : null}
+                        <div className="fixture-row">
+                          <TeamName teamName={match.homeTeam} linkToTeam />
+                          <span className="vs">vs</span>
+                          <TeamName teamName={match.awayTeam} linkToTeam />
+                        </div>
+                      </div>
+
+                      <div className={`score-inputs${readOnly ? ' is-locked' : ''}`}>
+                        <input value={draft.home} onChange={(e) => setDraft(match.id, 'home', e.target.value)} disabled={readOnly || savingMatchId === match.id} />
+                        <span className="score-divider">-</span>
+                        <input value={draft.away} onChange={(e) => setDraft(match.id, 'away', e.target.value)} disabled={readOnly || savingMatchId === match.id} />
+                      </div>
+                      {state.viewer.isAdmin ? (
+                        <div className="cta-row" style={{ marginTop: '0.45rem' }}>
+                          <button
+                            className="btn btn-primary btn-small"
+                            type="button"
+                            onClick={() => saveSingleResult(match.id)}
+                            disabled={savingMatchId === match.id || ((draft.home === '' || draft.away === '') && !(draft.home === '' && draft.away === '' && Boolean(match.officialResult)))}
+                          >
+                            {savingMatchId === match.id ? 'Guardando...' : 'Guardar partido'}
+                          </button>
+                        </div>
+                      ) : null}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="panel stack-md">
+              <div className="section-head">
+                <h3>Resultados oficiales de Trivia</h3>
+                <span>{state.trivia.pointsPerQuestion} puntos por acierto</span>
+              </div>
+              <p className="muted">Carga las respuestas correctas para calcular el puntaje final de Trivia en la tabla general.</p>
+              <div className="stack-md">
+                {visibleTriviaQuestions.map((question, index) => (
+                  <label key={question.id} className="stack-xs">
+                    <span>
+                      {index + 1}. {question.prompt}
+                    </span>
+                    <input
+                      value={triviaDrafts[question.id] ?? ''}
+                      onChange={(event) => setTriviaDraft(question.id, event.target.value)}
+                      placeholder={question.answerType === 'number' ? 'Respuesta numérica' : 'Respuesta oficial'}
+                      inputMode={question.answerType === 'number' ? 'numeric' : undefined}
+                      disabled={!state.viewer.isAdmin}
+                    />
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div className="panel stack-md">
+              <div className="section-head">
+                <h3>Fase final</h3>
+                <span>{visibleMatches.filter((match) => match.groupId === 'KO').length} partidos</span>
+              </div>
+              <div className="match-list">
+                {visibleMatches.filter((match) => match.groupId === 'KO').map((match) => {
+                  const draft = drafts[match.id] ?? { home: '', away: '' };
+                  const readOnly = !state.viewer.isAdmin;
+                  const meta = match.stage ?? 'Fase final';
+
+                  return (
+                    <div className="match-card" key={match.id}>
+                      <div>
+                        <p className="match-meta">{meta} - {formatKickoffArgentina(match.kickoffAt)}</p>
+                        {match.venue ? <p className="match-meta">Sede: {match.venue}</p> : null}
+                        <div className="fixture-row">
+                          <TeamName teamName={match.homeTeam} linkToTeam />
+                          <span className="vs">vs</span>
+                          <TeamName teamName={match.awayTeam} linkToTeam />
+                        </div>
+                      </div>
+
+                      <div className={`score-inputs${readOnly ? ' is-locked' : ''}`}>
+                        <input value={draft.home} onChange={(e) => setDraft(match.id, 'home', e.target.value)} disabled={readOnly || savingMatchId === match.id} />
+                        <span className="score-divider">-</span>
+                        <input value={draft.away} onChange={(e) => setDraft(match.id, 'away', e.target.value)} disabled={readOnly || savingMatchId === match.id} />
+                      </div>
+                      {state.viewer.isAdmin ? (
+                        <div className="cta-row" style={{ marginTop: '0.45rem' }}>
+                          <button
+                            className="btn btn-primary btn-small"
+                            type="button"
+                            onClick={() => saveSingleResult(match.id)}
+                            disabled={savingMatchId === match.id || draft.home === '' || draft.away === ''}
+                          >
+                            {savingMatchId === match.id ? 'Guardando...' : 'Guardar partido'}
+                          </button>
+                        </div>
+                      ) : null}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="panel match-list">
+              {visibleMatches.map((match) => {
+                const draft = drafts[match.id] ?? { home: '', away: '' };
+                const readOnly = !state.viewer.isAdmin;
+                const meta = match.groupId === 'KO' ? match.stage ?? 'Fase final' : `Grupo ${match.groupId} - Fecha ${match.matchday}`;
+
+                return (
+                  <div className="match-card" key={match.id}>
+                    <div>
+                      <p className="match-meta">{meta} - {formatKickoffArgentina(match.kickoffAt)}</p>
+                      {match.venue ? <p className="match-meta">Sede: {match.venue}</p> : null}
+                      <div className="fixture-row">
+                        <TeamName teamName={match.homeTeam} linkToTeam />
+                        <span className="vs">vs</span>
+                        <TeamName teamName={match.awayTeam} linkToTeam />
+                      </div>
+                    </div>
+
+                    <div className={`score-inputs${readOnly ? ' is-locked' : ''}`}>
+                      <input value={draft.home} onChange={(e) => setDraft(match.id, 'home', e.target.value)} disabled={readOnly || savingMatchId === match.id} />
+                      <span className="score-divider">-</span>
+                      <input value={draft.away} onChange={(e) => setDraft(match.id, 'away', e.target.value)} disabled={readOnly || savingMatchId === match.id} />
+                    </div>
+                    {state.viewer.isAdmin ? (
+                      <div className="cta-row" style={{ marginTop: '0.45rem' }}>
+                        <button
+                          className="btn btn-primary btn-small"
+                          type="button"
+                          onClick={() => saveSingleResult(match.id)}
+                          disabled={savingMatchId === match.id || draft.home === '' || draft.away === ''}
+                        >
+                          {savingMatchId === match.id ? 'Guardando...' : 'Guardar partido'}
+                        </button>
+                      </div>
+                    ) : null}
+                  </div>
+                );
+              })}
+            </div>
+
+            {selectedGroupId !== 'KO' ? (
+              <div className="panel stack-md">
+                <div className="section-head">
+                  <h3>Resultados oficiales de Trivia</h3>
+                  <span>{state.trivia.pointsPerQuestion} puntos por acierto</span>
+                </div>
+                <p className="muted">Carga las respuestas correctas para calcular el puntaje final de Trivia en la tabla general.</p>
+                <div className="stack-md">
+                  {visibleTriviaQuestions.map((question, index) => (
+                    <label key={question.id} className="stack-xs">
+                      <span>
+                        {index + 1}. {question.prompt}
+                      </span>
+                      <input
+                        value={triviaDrafts[question.id] ?? ''}
+                        onChange={(event) => setTriviaDraft(question.id, event.target.value)}
+                        placeholder={question.answerType === 'number' ? 'Respuesta numérica' : 'Respuesta oficial'}
+                        inputMode={question.answerType === 'number' ? 'numeric' : undefined}
+                        disabled={!state.viewer.isAdmin}
+                      />
+                    </label>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </>
+        )
       ) : selectedGroupId === 'KO' ? (
         <div className="panel">
           <p className="muted">La tabla de posiciones aplica solo a la fase de grupos.</p>
@@ -422,3 +647,9 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
     </section>
   );
 }
+
+
+
+
+
+

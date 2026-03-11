@@ -40,7 +40,7 @@ export async function AppShell({ children }: { children: ReactNode }) {
     { href: '/calendar', label: 'Calendario' },
     { href: '/teams', label: 'Selecciones' },
     { href: '/rules', label: 'Reglas' },
-    { href: '/predictions', label: 'Predicciones' },
+    ...(isAdmin ? [] : [{ href: '/predictions', label: 'Predicciones' }]),
     { href: '/results', label: 'Resultados Oficiales' },
     { href: '/leaderboard', label: 'Tabla' },
     { href: '/stats', label: 'Estadísticas' },
@@ -110,3 +110,5 @@ export async function AppShell({ children }: { children: ReactNode }) {
     </div>
   );
 }
+
+

@@ -1,4 +1,4 @@
-import { getState } from '@/lib/db';
+﻿import { getState } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,6 +21,7 @@ export default async function RulesPage() {
         <ol className="rules-list">
           <li>Registrate / iniciá sesión con tu cuenta.</li>
           <li>Entrá en `Predicciones` y cargá resultados partido por partido.</li>
+          <li>Respondé la `Trivia` dentro de `Predicciones` antes del inicio de la fase de llaves.</li>
           <li>Podés editar cada predicción hasta 1 hora antes del inicio de ese partido.</li>
           <li>Cuando se cargan resultados oficiales, la tabla se recalcula automáticamente.</li>
         </ol>
@@ -47,6 +48,10 @@ export default async function RulesPage() {
             <span className="detail-label">Pronóstico incorrecto</span>
             <strong>0 puntos</strong>
           </div>
+          <div className="detail-card">
+            <span className="detail-label">Trivia correcta</span>
+            <strong>10 puntos</strong>
+          </div>
         </div>
         <p className="muted">
           “Acierto de signo” significa acertar ganador/empate/perdedor aunque no coincida el marcador exacto.
@@ -54,6 +59,10 @@ export default async function RulesPage() {
         <p className="muted">
           Si acertás la cantidad de goles del local o del visitante (uno de los dos), sumás <strong>5 puntos</strong>.
           Ese puntaje puede combinarse con el acierto de signo.
+        </p>
+        <p className="muted">
+          Cada pregunta de trivia suma <strong>10 puntos</strong> si coincide con el resultado oficial cargado por
+          admin.
         </p>
       </div>
 
@@ -91,6 +100,11 @@ export default async function RulesPage() {
                 <td>Argentina 2 - 1 México</td>
                 <td>0</td>
               </tr>
+              <tr>
+                <td>Trivia: MVP = Messi</td>
+                <td>Trivia oficial: MVP = Messi</td>
+                <td>10 (trivia correcta)</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -100,7 +114,7 @@ export default async function RulesPage() {
         <h3>Tabla de posiciones</h3>
         <p className="muted">La tabla ordena a los usuarios con estos criterios de desempate:</p>
         <ol className="rules-list">
-          <li>Mayor puntaje total.</li>
+          <li>Mayor puntaje total (partidos + trivias).</li>
           <li>Mayor cantidad de resultados exactos.</li>
           <li>Mayor cantidad de aciertos de signo.</li>
           <li>Orden alfabético por nombre.</li>
@@ -113,9 +127,9 @@ export default async function RulesPage() {
           <li>El calendario muestra el fixture completo del Mundial 2026.</li>
           <li>Las probabilidades de `Predicciones` son estimaciones internas de la app (no cuotas).</li>
           <li>La carga de resultados oficiales se realiza desde `Resultados Oficiales`.</li>
+          <li>La trivia se puede responder hasta el cierre de la fase de grupos; luego queda bloqueada.</li>
         </ul>
       </div>
     </section>
   );
 }
-

@@ -1,4 +1,5 @@
 ﻿import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 
 import { PredictionsBoard } from '@/components/predictions-board';
 import { getSessionCookieName } from '@/lib/auth';
@@ -11,6 +12,10 @@ export default async function PredictionsPage() {
   const token = (await cookies()).get(getSessionCookieName())?.value ?? null;
   const state = await getPredictionsScreenState(token);
   const registrationAmountArs = getRegistrationAmountArs();
+
+  if (state.viewer.user?.role === 'admin') {
+    redirect('/results');
+  }
 
   return (
     <section className="stack-lg">
@@ -25,3 +30,5 @@ export default async function PredictionsPage() {
     </section>
   );
 }
+
+
