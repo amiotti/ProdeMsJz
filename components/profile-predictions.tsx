@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useMemo, useState } from 'react';
 
@@ -66,6 +66,16 @@ export function ProfilePredictions({
       });
   }, [state, userId]);
 
+  const triviaRows = useMemo(() => {
+    return state.db.triviaPredictions
+      .filter((p) => p.userId === userId)
+      .map((p) => {
+        const question = state.db.triviaQuestions.find((q) => q.id === p.questionId);
+        return { prediction: p, question };
+      })
+      .sort((a, b) => a.prediction.questionId.localeCompare(b.prediction.questionId, 'es'));
+  }, [state, userId]);
+
   async function downloadPdf() {
     setDownloading(true);
     setError(null);
@@ -97,7 +107,7 @@ export function ProfilePredictions({
       <div className="section-head">
         <h3>Mis predicciones guardadas</h3>
         <div className="cta-row">
-          <span>{predictionRows.length} registradas</span>
+          <span>{predictionRows.length} partidos + {triviaRows.length} trivias</span>
           <button className="btn btn-small" type="button" onClick={downloadPdf} disabled={downloading || predictionRows.length === 0}>
             {downloading ? 'Generando PDF...' : 'Descargar PDF'}
           </button>
@@ -105,8 +115,9 @@ export function ProfilePredictions({
       </div>
       {loading ? <p className="muted">Actualizando predicciones...</p> : null}
       {error ? <p className="status">{error}</p> : null}
+
       {predictionRows.length === 0 ? (
-        <p className="muted">Todavía no tienes predicciones guardadas.</p>
+        <p className="muted">Todavia no tienes predicciones de partidos guardadas.</p>
       ) : (
         <div className="match-list">
           {predictionRows.map(({ prediction, match }) => (
@@ -121,23 +132,43 @@ export function ProfilePredictions({
                     <TeamName teamName={match.awayTeam} linkToTeam />
                   </div>
                 ) : (
-                  <p className="muted">No se encontró el fixture actual de esta predicción, pero el registro guardado sigue disponible.</p>
+                  <p className="muted">No se encontro el fixture actual de esta prediccion, pero el registro guardado sigue disponible.</p>
                 )}
                 {match?.officialResult ? (
                   <p className="official-result">Resultado oficial: {match.officialResult.home} - {match.officialResult.away}</p>
                 ) : null}
               </div>
               <div className="score-inputs is-locked">
-                <input value={String(prediction.homeGoals)} disabled aria-label={`Goles pronosticados local`} />
+                <input value={String(prediction.homeGoals)} disabled aria-label="Goles pronosticados local" />
                 <span className="score-divider">-</span>
-                <input value={String(prediction.awayGoals)} disabled aria-label={`Goles pronosticados visitante`} />
+                <input value={String(prediction.awayGoals)} disabled aria-label="Goles pronosticados visitante" />
                 <span className="chip">Guardada</span>
               </div>
             </div>
           ))}
         </div>
       )}
+
+      <div className="stack-sm">
+        <h4>Mis trivias guardadas</h4>
+        {triviaRows.length === 0 ? (
+          <p className="muted">Todavia no tienes respuestas de trivia guardadas.</p>
+        ) : (
+          <div className="match-list">
+            {triviaRows.map(({ prediction, question }) => (
+              <div key={prediction.id} className="match-card">
+                <div>
+                  <p className="match-meta">{question?.prompt ?? prediction.questionId}</p>
+                  <p className="muted">Respuesta guardada: <strong>{prediction.answer}</strong></p>
+                </div>
+                <div className="score-inputs is-locked">
+                  <span className="chip">Guardada</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
-

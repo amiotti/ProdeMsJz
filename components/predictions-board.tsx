@@ -173,6 +173,16 @@ export function PredictionsBoard({
     return [...byDate.values()];
   }, [visibleSections]);
 
+  const firstKnockoutSectionIndex = useMemo(
+    () => visibleSections.findIndex((section) => section.id.startsWith('KO-')),
+    [visibleSections],
+  );
+
+  const firstKnockoutDateIndex = useMemo(
+    () => visibleDateSections.findIndex((section) => section.matches.some((match) => match.groupId === 'KO')),
+    [visibleDateSections],
+  );
+
   function setDraft(matchId: string, side: 'home' | 'away', value: string) {
     if (lockedMatchIds.has(matchId)) return;
     if (value && !/^\d+$/.test(value)) return;
@@ -349,6 +359,45 @@ export function PredictionsBoard({
     }
   }
 
+  function renderTriviaPanel(key: string) {
+    return (
+      <div key={key} className="panel stack-md">
+        <div className="section-head">
+          <h3>Trivia Mundial 2026</h3>
+          <span>{state?.trivia.pointsPerQuestion ?? 10} puntos por cada respuesta correcta</span>
+        </div>
+        <p className="muted">
+          Puedes responder la trivia en cualquier momento antes de que inicie la fase de llaves.
+          {triviaCutoffAt ? ` Cierre: ${formatKickoffArgentina(triviaCutoffAt)}.` : ''}
+        </p>
+        {!triviaEditable ? (
+          <p className="status">La trivia está cerrada porque ya comenzó la fase de llaves.</p>
+        ) : null}
+        <div className="stack-md">
+          {state?.db.triviaQuestions.map((question, index) => (
+            <label key={question.id} className="stack-xs">
+              <span>
+                {index + 1}. {question.prompt}
+              </span>
+              <input
+                value={triviaDrafts[question.id] ?? ''}
+                onChange={(event) => setTriviaDraft(question.id, event.target.value)}
+                placeholder={question.answerType === 'number' ? 'Ingresa un número' : 'Escribe tu respuesta'}
+                inputMode={question.answerType === 'number' ? 'numeric' : undefined}
+                disabled={!triviaEditable || savingTrivia}
+              />
+            </label>
+          ))}
+        </div>
+        <div className="fixture-inline" style={{ justifyContent: 'flex-start' }}>
+          <button className="btn btn-primary" type="button" onClick={saveTriviaAnswers} disabled={!triviaEditable || savingTrivia}>
+            {savingTrivia ? 'Guardando...' : 'Guardar trivia'}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   function renderMatchCard(match: Match, extraMeta?: string) {
     const draft = drafts[match.id] ?? { home: '', away: '' };
     const kickoff = formatKickoffArgentina(match.kickoffAt);
@@ -502,74 +551,55 @@ export function PredictionsBoard({
       {message ? <p className="status">{message}</p> : null}
 
       {selectedGroupId === 'TRIVIA' ? (
-        <div className="panel stack-md">
-          <div className="section-head">
-            <h3>Trivia Mundial 2026</h3>
-            <span>{state.trivia.pointsPerQuestion} puntos por cada respuesta correcta</span>
-          </div>
-          <p className="muted">
-            Puedes responder la trivia en cualquier momento antes de que inicie la fase de llaves.
-            {triviaCutoffAt ? ` Cierre: ${formatKickoffArgentina(triviaCutoffAt)}.` : ''}
-          </p>
-          {!triviaEditable ? (
-            <p className="status">La trivia está cerrada porque ya comenzó la fase de llaves.</p>
-          ) : null}
-          <div className="stack-md">
-            {state.db.triviaQuestions.map((question, index) => (
-              <label key={question.id} className="stack-xs">
-                <span>
-                  {index + 1}. {question.prompt}
-                </span>
-                <input
-                  value={triviaDrafts[question.id] ?? ''}
-                  onChange={(event) => setTriviaDraft(question.id, event.target.value)}
-                  placeholder={question.answerType === 'number' ? 'Ingresa un número' : 'Escribe tu respuesta'}
-                  inputMode={question.answerType === 'number' ? 'numeric' : undefined}
-                  disabled={!triviaEditable || savingTrivia}
-                />
-              </label>
-            ))}
-          </div>
-          <div className="fixture-inline" style={{ justifyContent: 'flex-start' }}>
-            <button className="btn btn-primary" type="button" onClick={saveTriviaAnswers} disabled={!triviaEditable || savingTrivia}>
-              {savingTrivia ? 'Guardando...' : 'Guardar trivia'}
-            </button>
-          </div>
-        </div>
+        renderTriviaPanel('trivia-only')
       ) : viewMode === 'group' ? (
-        visibleSections.map((section) => (
-          <div key={section.id} className="panel stack-md">
-            <div className="section-head">
-              <h3>{section.title}</h3>
-              <div className="fixture-inline">
-                <span>{section.matches.length} partidos pendientes</span>
-                <button
-                  className="btn btn-primary btn-small"
-                  type="button"
-                  onClick={() => saveSectionPredictions(section.id, section.matches.map((m) => m.id))}
-                  disabled={savingSectionId === section.id || saving}
-                >
-                  {savingSectionId === section.id ? 'Guardando...' : section.saveLabel}
-                </button>
+        visibleSections.flatMap((section, index) => {
+          const nodes = [];
+          if (selectedGroupId === 'ALL' && index === firstKnockoutSectionIndex) {
+            nodes.push(renderTriviaPanel('trivia-between-group-and-ko'));
+          }
+          nodes.push(
+            <div key={section.id} className="panel stack-md">
+              <div className="section-head">
+                <h3>{section.title}</h3>
+                <div className="fixture-inline">
+                  <span>{section.matches.length} partidos pendientes</span>
+                  <button
+                    className="btn btn-primary btn-small"
+                    type="button"
+                    onClick={() => saveSectionPredictions(section.id, section.matches.map((m) => m.id))}
+                    disabled={savingSectionId === section.id || saving}
+                  >
+                    {savingSectionId === section.id ? 'Guardando...' : section.saveLabel}
+                  </button>
+                </div>
               </div>
-            </div>
 
-            {section.subtitle ? <p className="muted compact-text">{section.subtitle}</p> : null}
-            <div className="match-list">{section.matches.map((match) => renderMatchCard(match))}</div>
-          </div>
-        ))
+              {section.subtitle ? <p className="muted compact-text">{section.subtitle}</p> : null}
+              <div className="match-list">{section.matches.map((match) => renderMatchCard(match))}</div>
+            </div>,
+          );
+          return nodes;
+        })
       ) : (
-        visibleDateSections.map((section) => (
-          <div key={section.label} className="panel stack-md">
-            <div className="section-head">
-              <h3>{section.label}</h3>
-              <span>{section.matches.length} partidos pendientes</span>
-            </div>
-            <div className="match-list">
-              {section.matches.map((match) => renderMatchCard(match, match._meta))}
-            </div>
-          </div>
-        ))
+        visibleDateSections.flatMap((section, index) => {
+          const nodes = [];
+          if (selectedGroupId === 'ALL' && index === firstKnockoutDateIndex) {
+            nodes.push(renderTriviaPanel('trivia-between-group-and-ko-date'));
+          }
+          nodes.push(
+            <div key={section.label} className="panel stack-md">
+              <div className="section-head">
+                <h3>{section.label}</h3>
+                <span>{section.matches.length} partidos pendientes</span>
+              </div>
+              <div className="match-list">
+                {section.matches.map((match) => renderMatchCard(match, match._meta))}
+              </div>
+            </div>,
+          );
+          return nodes;
+        })
       )}
 
       {selectedGroupId !== 'TRIVIA' && (viewMode === 'group' ? visibleSections.length === 0 : visibleDateSections.length === 0) ? (
@@ -580,3 +610,6 @@ export function PredictionsBoard({
     </section>
   );
 }
+
+
+
