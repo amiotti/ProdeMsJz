@@ -46,7 +46,7 @@ body {
     radial-gradient(circle at 89% 10%, rgba(239, 49, 0, 0.2), transparent 36%),
     radial-gradient(circle at 82% 78%, rgba(155, 217, 16, 0.16), transparent 38%),
     radial-gradient(circle at 18% 82%, rgba(85, 32, 217, 0.13), transparent 38%),
-    url('https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=2200&q=80');
+    url('/fifa%202026%20wp_colors.jpg');
   background-size: auto, auto, auto, auto, auto, cover;
   background-position: center, 0 0, 0 0, 0 0, 0 0, center center;
   background-attachment: fixed, fixed, fixed, fixed, fixed, fixed;
@@ -55,17 +55,7 @@ body {
 }
 
 body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.2;
-  background-image:
-    radial-gradient(circle at 0 100%, transparent 60px, rgba(239, 49, 0, 0.55) 61px 92px, transparent 93px),
-    radial-gradient(circle at 100% 0, transparent 70px, rgba(85, 32, 217, 0.5) 71px 104px, transparent 105px),
-    linear-gradient(90deg, rgba(89, 227, 215, 0.18) 0 4%, transparent 4% 14%, rgba(155, 217, 16, 0.18) 14% 18%, transparent 18% 100%);
-  background-size: 420px 260px, 480px 300px, 100% 100%;
-  background-position: 0 0, 100% 0, 0 0;
+  content: none;
 }
 
 body::after {
@@ -938,7 +928,7 @@ select {
     linear-gradient(110deg, rgba(5, 8, 15, 0.74) 8%, rgba(8, 11, 19, 0.58) 42%, rgba(10, 12, 18, 0.35) 72%),
     radial-gradient(circle at 22% 18%, rgba(89, 227, 215, 0.16), transparent 42%),
     radial-gradient(circle at 78% 82%, rgba(239, 49, 0, 0.16), transparent 46%),
-    url('/Landing.png');
+    url('/fifa%202026%20wp_colors.jpg');
   background-size: auto, auto, auto, cover;
   background-position: center, center, center, center;
   background-repeat: no-repeat;
@@ -1880,9 +1870,17 @@ select:focus {
   padding: 0.55rem;
 }
 
-.score-inputs.is-locked input {
-  opacity: 0.75;
-  cursor: not-allowed;
+
+
+.score-inputs .chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: max-content;
+  min-width: max-content;
+  white-space: nowrap;
+  line-height: 1;
+  padding: 0.36rem 0.7rem;
 }
 
 .readonly-note {
@@ -2883,7 +2881,7 @@ html[data-theme='dark'] body {
     radial-gradient(circle at 89% 10%, rgba(239, 49, 0, 0.22), transparent 36%),
     radial-gradient(circle at 82% 78%, rgba(155, 217, 16, 0.16), transparent 38%),
     radial-gradient(circle at 18% 82%, rgba(85, 32, 217, 0.16), transparent 38%),
-    url('https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=2200&q=80');
+    url('/fifa%202026%20wp_colors.jpg');
   background-size: auto, auto, auto, auto, auto, cover;
   background-position: center, 0 0, 0 0, 0 0, 0 0, center center;
   background-attachment: fixed, fixed, fixed, fixed, fixed, fixed;
@@ -2971,7 +2969,7 @@ html[data-theme='light'] .landing-backdrop {
     linear-gradient(110deg, rgba(255, 255, 255, 0.5) 8%, rgba(245, 249, 255, 0.38) 42%, rgba(240, 245, 255, 0.2) 72%),
     radial-gradient(circle at 22% 18%, rgba(89, 227, 215, 0.14), transparent 42%),
     radial-gradient(circle at 78% 82%, rgba(239, 49, 0, 0.12), transparent 46%),
-    url('/Landing.png');
+    url('/fifa%202026%20wp_colors.jpg');
   background-size: auto, auto, auto, cover;
   background-position: center, center, center, center;
   background-repeat: no-repeat;
@@ -3294,7 +3292,7 @@ html[data-theme='dark'] .landing-backdrop {
     linear-gradient(110deg, rgba(5, 8, 15, 0.74) 8%, rgba(8, 11, 19, 0.58) 42%, rgba(10, 12, 18, 0.35) 72%),
     radial-gradient(circle at 22% 18%, rgba(89, 227, 215, 0.16), transparent 42%),
     radial-gradient(circle at 78% 82%, rgba(239, 49, 0, 0.16), transparent 46%),
-    url('/Landing.png');
+    url('/fifa%202026%20wp_colors.jpg');
   background-size: auto, auto, auto, cover;
   background-position: center, center, center, center;
   background-repeat: no-repeat;
@@ -3932,3 +3930,5 @@ html[data-theme='dark'] .admin-alert-badge {
   color: #ffffff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
+
+
