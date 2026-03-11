@@ -2349,12 +2349,21 @@ select:focus {
 @media (max-width: 760px) {
   body {
     background-attachment: scroll, scroll, scroll, scroll, scroll, scroll;
+    background-position: center top, 0 0, 0 0, 0 0, 0 0, center top;
+    background-size: auto, auto, auto, auto, auto, cover;
   }
 
   body::before,
   body::after {
-    opacity: 0.14;
+    opacity: 0.1;
     position: absolute;
+  }
+
+  .eyebrow,
+  .landing-kicker {
+    font-size: 0.58rem;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
   }
 
   .container {
@@ -3931,4 +3940,73 @@ html[data-theme='dark'] .admin-alert-badge {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
+
+
+.compare-picker-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(6, 8, 14, 0.52);
+  backdrop-filter: blur(4px);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.compare-picker-modal {
+  width: min(640px, 100%);
+  max-height: min(82vh, 720px);
+  overflow: hidden;
+}
+
+.compare-picker-list {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.55rem;
+  max-height: min(46vh, 420px);
+  overflow: auto;
+  display: grid;
+  gap: 0.42rem;
+}
+
+.compare-picker-item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.45rem 0.55rem;
+}
+
+.compare-picker-item input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+}
+
+.compare-picker-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.55rem;
+}
+
+@media (max-width: 760px) {
+  .compare-picker-modal {
+    width: min(96vw, 560px);
+    max-height: 86vh;
+    padding: 0.8rem;
+  }
+
+  .compare-picker-list {
+    max-height: 42vh;
+  }
+
+  .compare-picker-item {
+    padding: 0.55rem;
+  }
+
+  .compare-picker-actions {
+    justify-content: space-between;
+  }
+}
 
