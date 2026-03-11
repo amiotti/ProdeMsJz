@@ -19,6 +19,17 @@ function sortMatches(a: Match, b: Match) {
   return new Date(a.kickoffAt).getTime() - new Date(b.kickoffAt).getTime();
 }
 
+function buildDateSections(matches: DateMatch[]) {
+  const ordered = [...matches].sort(sortMatches);
+  const byDate = new Map<string, DateSection>();
+  for (const match of ordered) {
+    const dateKey = formatDateArgentinaShort(match.kickoffAt);
+    if (!byDate.has(dateKey)) byDate.set(dateKey, { label: dateKey, matches: [] });
+    byDate.get(dateKey)!.matches.push(match);
+  }
+  return [...byDate.values()];
+}
+
 function isPredictionEditable(kickoffAt: string, nowMs = Date.now()) {
   const kickoffMs = new Date(kickoffAt).getTime();
   if (!Number.isFinite(kickoffMs)) return false;
@@ -162,15 +173,7 @@ export function PredictionsBoard({
     const flat: DateMatch[] = visibleSections.flatMap((section) =>
       section.matches.map((match) => ({ ...match, _meta: section.title })),
     );
-    flat.sort(sortMatches);
-
-    const byDate = new Map<string, DateSection>();
-    for (const match of flat) {
-      const dateKey = formatDateArgentinaShort(match.kickoffAt);
-      if (!byDate.has(dateKey)) byDate.set(dateKey, { label: dateKey, matches: [] });
-      byDate.get(dateKey)!.matches.push(match);
-    }
-    return [...byDate.values()];
+    return buildDateSections(flat);
   }, [visibleSections]);
 
   const firstKnockoutSectionIndex = useMemo(
@@ -178,10 +181,17 @@ export function PredictionsBoard({
     [visibleSections],
   );
 
-  const firstKnockoutDateIndex = useMemo(
-    () => visibleDateSections.findIndex((section) => section.matches.some((match) => match.groupId === 'KO')),
-    [visibleDateSections],
-  );
+  const dateSectionsByPhase = useMemo(() => {
+    const flat: DateMatch[] = visibleSections.flatMap((section) =>
+      section.matches.map((match) => ({ ...match, _meta: section.title })),
+    );
+    const groupMatches = flat.filter((match) => match.groupId !== 'KO');
+    const knockoutMatches = flat.filter((match) => match.groupId === 'KO');
+    return {
+      group: buildDateSections(groupMatches),
+      knockout: buildDateSections(knockoutMatches),
+    };
+  }, [visibleSections]);
 
   function setDraft(matchId: string, side: 'home' | 'away', value: string) {
     if (lockedMatchIds.has(matchId)) return;
@@ -582,12 +592,34 @@ export function PredictionsBoard({
           return nodes;
         })
       ) : (
-        visibleDateSections.flatMap((section, index) => {
-          const nodes = [];
-          if (selectedGroupId === 'ALL' && index === firstKnockoutDateIndex) {
-            nodes.push(renderTriviaPanel('trivia-between-group-and-ko-date'));
-          }
-          nodes.push(
+        selectedGroupId === 'ALL' ? (
+          <>
+            {dateSectionsByPhase.group.map((section) => (
+              <div key={`group-${section.label}`} className="panel stack-md">
+                <div className="section-head">
+                  <h3>{section.label}</h3>
+                  <span>{section.matches.length} partidos pendientes</span>
+                </div>
+                <div className="match-list">
+                  {section.matches.map((match) => renderMatchCard(match, match._meta))}
+                </div>
+              </div>
+            ))}
+            {renderTriviaPanel('trivia-between-group-and-ko-date')}
+            {dateSectionsByPhase.knockout.map((section) => (
+              <div key={`ko-${section.label}`} className="panel stack-md">
+                <div className="section-head">
+                  <h3>{section.label}</h3>
+                  <span>{section.matches.length} partidos pendientes</span>
+                </div>
+                <div className="match-list">
+                  {section.matches.map((match) => renderMatchCard(match, match._meta))}
+                </div>
+              </div>
+            ))}
+          </>
+        ) : (
+          visibleDateSections.map((section) => (
             <div key={section.label} className="panel stack-md">
               <div className="section-head">
                 <h3>{section.label}</h3>
@@ -596,10 +628,9 @@ export function PredictionsBoard({
               <div className="match-list">
                 {section.matches.map((match) => renderMatchCard(match, match._meta))}
               </div>
-            </div>,
-          );
-          return nodes;
-        })
+            </div>
+          ))
+        )
       )}
 
       {selectedGroupId !== 'TRIVIA' && (viewMode === 'group' ? visibleSections.length === 0 : visibleDateSections.length === 0) ? (
@@ -610,6 +641,10 @@ export function PredictionsBoard({
     </section>
   );
 }
+
+
+
+
 
 
 
