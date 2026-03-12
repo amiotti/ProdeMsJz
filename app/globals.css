@@ -190,15 +190,16 @@ select {
 }
 
 .brand-logo-img {
-  width: calc(100% - 0.6rem);
-  height: calc(100% - 0.6rem);
-  object-fit: contain;
+  width: calc(100% + 0.7rem);
+  height: calc(100% + 0.7rem);
+  object-fit: cover;
   display: block;
   position: absolute;
-  inset: 0.3rem;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 0 0 1px rgba(17, 33, 68, 0.08) inset;
+  inset: -0.35rem;
+  border-radius: 15px;
+  background: transparent;
+  box-shadow: none;
+  transform: scale(1.12);
 }
 
 .brand-logo-img-dark {
@@ -3241,12 +3242,10 @@ html[data-theme='dark'] .mobile-nav-link.is-active {
 
 html[data-theme='dark'] .session-badge {
   background:
-    linear-gradient(145deg, rgba(18, 17, 29, 0.92), rgba(11, 10, 18, 0.72)),
-    radial-gradient(circle at 18% 18%, rgba(89, 227, 215, 0.12), transparent 58%);
-  border-color: rgba(255, 255, 255, 0.12);
-  box-shadow:
-    0 10px 24px rgba(4, 6, 14, 0.28),
-    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+    linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.015)),
+    radial-gradient(circle at 10% 10%, rgba(89, 227, 215, 0.14), transparent 58%);
+  color: #fff0e2;
+  border-color: rgba(255, 255, 255, 0.14);
 }
 
 html[data-theme='dark'] .session-icon-btn {

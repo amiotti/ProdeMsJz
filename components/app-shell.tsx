@@ -54,8 +54,7 @@ export async function AppShell({ children }: { children: ReactNode }) {
           <div className="topbar-main">
             <div className="brand-wrap">
               <div className="brand-logo-panel" aria-hidden="true">
-                <img className="brand-logo-img brand-logo-img-light" src="/fifa_logo_light.png" alt="" loading="eager" decoding="async" />
-                <img className="brand-logo-img brand-logo-img-dark" src="/fifa_logo_dark.jfif" alt="" loading="eager" decoding="async" />
+                <img className="brand-logo-img" src="/profile.jpeg" alt="" loading="eager" decoding="async" />
               </div>
               <div className="brand-meta">
                 <p className="eyebrow">Mundial 2026 USA | MEX | CAN</p>
