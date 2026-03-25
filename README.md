@@ -346,3 +346,36 @@ Motivos:
 GitHub:
 - https://github.com/amiotti/ProdeAmigos
 
+
+## Configuracion TaloPay (local y produccion)
+
+### Variables minimas
+
+- `TALOPAY_USER_ID`
+- `TALOPAY_CLIENT_ID`
+- `TALOPAY_CLIENT_SECRET`
+- `TALOPAY_API_BASE_LOCAL` / `TALOPAY_API_BASE_PROD`
+- `TALOPAY_REGISTRATION_AMOUNT_ARS`
+- `TALOPAY_CURRENCY_ID=ARS`
+- `TALOPAY_REGISTRATION_TITLE`
+- `TALOPAY_WEBHOOK_SECRET` (recomendado)
+
+### Webhook publico
+
+La app arma el `webhook_url` automaticamente al crear el pago:
+
+- si existe `TALOPAY_WEBHOOK_BASE_URL[_LOCAL/_PROD]`, usa ese valor;
+- si no existe, usa `APP_BASE_URL[_LOCAL/_PROD]`.
+
+Para local, `localhost` no es alcanzable por Talo. Debes usar una URL publica:
+
+1. Levantar app local (`npm run dev`)
+2. Exponer con tunel (por ejemplo `ngrok http 3000`)
+3. Setear `TALOPAY_WEBHOOK_BASE_URL_LOCAL=https://<tu-subdominio-ngrok>`
+4. Reiniciar la app
+
+### Endpoint webhook
+
+- `POST /api/payments/talo/webhook`
+
+Si configuraste `TALOPAY_WEBHOOK_SECRET`, la URL enviada a Talo incluye `?token=<secret>`.

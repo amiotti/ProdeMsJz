@@ -75,10 +75,30 @@ function runtimeEnv(baseName: string, fallback?: string) {
   return String(fallbackValue).trim();
 }
 
+function runtimeEnvOptional(baseName: string) {
+  const scopedName = `${baseName}_${isProductionEnv() ? 'PROD' : 'LOCAL'}`;
+  const scopedValue = process.env[scopedName];
+  if (scopedValue && scopedValue.trim()) return scopedValue.trim();
+  const base = process.env[baseName];
+  if (base && base.trim()) return base.trim();
+  return '';
+}
+
+function stripTrailingSlash(value: string) {
+  return value.replace(/\/+$/, '');
+}
+
 function getTaloConfig() {
+  const appBaseUrl = stripTrailingSlash(runtimeEnv('APP_BASE_URL', 'http://localhost:3000'));
+  const webhookBaseUrl = stripTrailingSlash(runtimeEnvOptional('TALOPAY_WEBHOOK_BASE_URL') || appBaseUrl);
+  if (isProductionEnv() && /localhost|127\.0\.0\.1/i.test(webhookBaseUrl)) {
+    throw new Error('TALOPAY_WEBHOOK_BASE_URL en produccion no puede apuntar a localhost');
+  }
+
   return {
     apiBase: runtimeEnv('TALOPAY_API_BASE', 'https://api.talo.com.ar'),
-    appBaseUrl: runtimeEnv('APP_BASE_URL', 'http://localhost:3000'),
+    appBaseUrl,
+    webhookBaseUrl,
     userId: runtimeEnv('TALOPAY_USER_ID'),
     clientId: runtimeEnv('TALOPAY_CLIENT_ID'),
     clientSecret: runtimeEnv('TALOPAY_CLIENT_SECRET'),
@@ -189,8 +209,8 @@ export function extractUserIdFromTaloRegistrationExternalId(externalId: string |
 
 function buildWebhookUrl() {
   const cfg = getTaloConfig();
-  if (!cfg.webhookSecret) return `${cfg.appBaseUrl}/api/payments/talo/webhook`;
-  return `${cfg.appBaseUrl}/api/payments/talo/webhook?token=${encodeURIComponent(cfg.webhookSecret)}`;
+  if (!cfg.webhookSecret) return `${cfg.webhookBaseUrl}/api/payments/talo/webhook`;
+  return `${cfg.webhookBaseUrl}/api/payments/talo/webhook?token=${encodeURIComponent(cfg.webhookSecret)}`;
 }
 
 export async function createTaloRegistrationPaymentLink(input: {

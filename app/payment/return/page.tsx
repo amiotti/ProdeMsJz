@@ -13,6 +13,14 @@ function firstParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
 
+function getPendingPaymentIdFromReceipt(receipt: string | null | undefined) {
+  const value = String(receipt ?? '').trim();
+  const prefix = 'talo_pending:';
+  if (!value.startsWith(prefix)) return null;
+  const id = value.slice(prefix.length).trim();
+  return id || null;
+}
+
 function getText(status: string | undefined) {
   if (status === 'pending') {
     return {
@@ -42,12 +50,13 @@ export default async function PaymentReturnPage({ searchParams }: PaymentReturnP
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const status = firstParam(resolvedSearchParams?.status);
   const provider = firstParam(resolvedSearchParams?.provider);
-  const taloPaymentId =
+  const taloPaymentIdFromQuery =
     firstParam(resolvedSearchParams?.payment_id) ??
     firstParam(resolvedSearchParams?.talo_payment_id) ??
     firstParam(resolvedSearchParams?.id);
   const token = (await cookies()).get(getSessionCookieName())?.value ?? null;
   const sessionUser = await getUserFromSessionToken(token);
+  const taloPaymentId = taloPaymentIdFromQuery ?? getPendingPaymentIdFromReceipt(sessionUser?.registrationPaymentReceipt);
 
   let approvedNow = false;
   let taloPaymentStatus: string | null = null;

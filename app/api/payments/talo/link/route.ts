@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 
 import { getSessionCookieName } from '@/lib/auth';
-import { getUserFromSessionToken } from '@/lib/db';
+import { getUserFromSessionToken, markUserRegistrationPaymentPending } from '@/lib/db';
 import { checkRateLimit, getClientIdentifier } from '@/lib/rate-limit';
 import { assertSameOriginForMutation, noStoreJson } from '@/lib/security';
 import { createTaloRegistrationPaymentLink } from '@/lib/talopay';
@@ -35,6 +35,10 @@ export async function POST(request: Request) {
       lastName: user.lastName,
       email: user.email,
     });
+
+    if (result.paymentId) {
+      await markUserRegistrationPaymentPending(user.id, result.paymentId);
+    }
 
     return noStoreJson({ ok: true, url: result.url, paymentId: result.paymentId });
   } catch (error) {

@@ -1234,6 +1234,32 @@ export async function markUserRegistrationPaymentApproved(userId: string, receip
   });
 }
 
+export async function markUserRegistrationPaymentPending(userId: string, paymentId?: string | null) {
+  await ensureBaseData();
+  const user = await queryUserByIdOnly(userId);
+  if (!user) throw new Error('Usuario no encontrado');
+  if (user.role === 'admin') return publicUser(user);
+  if (user.registrationPaymentStatus === 'approved') return publicUser(user);
+
+  const ts = nowIso();
+  const pendingReceipt = paymentId ? `talo_pending:${paymentId}` : user.registrationPaymentReceipt ?? null;
+  await getInstantAdminDb().transact([
+    tx.prode_users[userId].update({
+      registrationPaymentStatus: 'pending',
+      registrationPaymentReceipt: pendingReceipt,
+      updatedAt: ts,
+    }),
+  ]);
+  invalidateCoreStateCache();
+
+  return publicUser({
+    ...user,
+    registrationPaymentStatus: 'pending',
+    registrationPaymentReceipt: pendingReceipt,
+    updatedAt: ts,
+  });
+}
+
 export async function getState(viewerToken?: string | null): Promise<StateResponse> {
   await ensureBaseData();
   const core = await getCoreStateSnapshot();
