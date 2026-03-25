@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 
 import { getSessionCookieName } from '@/lib/auth';
 import { getUserFromSessionToken, markUserRegistrationPaymentApproved } from '@/lib/db';
-import { getGalioPayment, isGalioApprovedStatus, isValidGalioRegistrationPaymentForUser } from '@/lib/galiopay';
+import { getTaloPayment, isTaloApprovedStatus, isValidTaloRegistrationPaymentForUser } from '@/lib/talopay';
 
 type PaymentReturnPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -29,7 +29,7 @@ function getText(status: string | undefined) {
   if (status === 'success' || status === 'approved') {
     return {
       title: 'Retorno de pago',
-      description: 'Se recibiÃ³ la confirmaciÃ³n del checkout. Validaremos el pago con Galio antes de aprobar la inscripciÃ³n.',
+      description: 'Se recibio la confirmacion del checkout. Validaremos el pago con Talo antes de aprobar la inscripcion.',
     };
   }
   return {
@@ -42,35 +42,38 @@ export default async function PaymentReturnPage({ searchParams }: PaymentReturnP
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const status = firstParam(resolvedSearchParams?.status);
   const provider = firstParam(resolvedSearchParams?.provider);
-  const galioPaymentId = firstParam(resolvedSearchParams?.galio_payment_id);
+  const taloPaymentId =
+    firstParam(resolvedSearchParams?.payment_id) ??
+    firstParam(resolvedSearchParams?.talo_payment_id) ??
+    firstParam(resolvedSearchParams?.id);
   const token = (await cookies()).get(getSessionCookieName())?.value ?? null;
   const sessionUser = await getUserFromSessionToken(token);
 
   let approvedNow = false;
-  let galioPaymentStatus: string | null = null;
-  let galioPaymentFetchError = false;
+  let taloPaymentStatus: string | null = null;
+  let taloPaymentFetchError = false;
   let validatedPayment = false;
 
-  if (galioPaymentId && sessionUser && sessionUser.role !== 'admin') {
+  if (taloPaymentId && sessionUser && sessionUser.role !== 'admin') {
     try {
-      const payment = await getGalioPayment(galioPaymentId);
-      galioPaymentStatus = payment.status ?? null;
-      validatedPayment = isValidGalioRegistrationPaymentForUser(payment, sessionUser.id);
+      const payment = await getTaloPayment(taloPaymentId);
+      taloPaymentStatus = payment.payment_status ?? payment.status ?? null;
+      validatedPayment = isValidTaloRegistrationPaymentForUser(payment, sessionUser.id);
 
       if (validatedPayment) {
         const before = sessionUser.registrationPaymentStatus;
-        const updated = await markUserRegistrationPaymentApproved(sessionUser.id, galioPaymentId);
+        const updated = await markUserRegistrationPaymentApproved(sessionUser.id, taloPaymentId);
         approvedNow = before !== 'approved' && updated.registrationPaymentStatus === 'approved';
       }
     } catch {
-      galioPaymentFetchError = true;
+      taloPaymentFetchError = true;
     }
   }
 
   const queryLooksApproved = status === 'success' || status === 'approved';
-  const officialApproved = validatedPayment && isGalioApprovedStatus(galioPaymentStatus);
+  const officialApproved = validatedPayment && isTaloApprovedStatus(taloPaymentStatus);
   const text = getText(status);
-  const receiptNumber = galioPaymentId ?? null;
+  const receiptNumber = taloPaymentId ?? null;
   const shouldShowLogin = !sessionUser;
 
   return (
@@ -79,40 +82,38 @@ export default async function PaymentReturnPage({ searchParams }: PaymentReturnP
         <h2>{officialApproved ? 'Pago aprobado' : text.title}</h2>
         <p className="muted">
           {officialApproved
-            ? 'La inscripciÃ³n fue validada correctamente contra Galio Pay. Ya puedes continuar en la app.'
+            ? 'La inscripcion fue validada correctamente contra Talo Pay. Ya puedes continuar en la app.'
             : text.description}
         </p>
 
         {approvedNow ? <p className="status">Pago aprobado y asociado a tu usuario.</p> : null}
         {receiptNumber ? (
           <p className="muted">
-            NÂ° de comprobante: <strong>{receiptNumber}</strong>
+            Nro de comprobante: <strong>{receiptNumber}</strong>
           </p>
         ) : null}
 
         {sessionUser && sessionUser.role !== 'admin' ? (
           <p className="muted">
-            Estado de inscripciÃ³n actual:{' '}
+            Estado de inscripcion actual:{' '}
             <strong>
               {officialApproved || sessionUser.registrationPaymentStatus === 'approved' ? 'approved' : sessionUser.registrationPaymentStatus ?? 'pending'}
             </strong>
           </p>
         ) : null}
 
-        {provider === 'galio' && queryLooksApproved && !officialApproved ? (
-          <p className="status">
-            El retorno indica pago exitoso, pero la inscripciÃ³n no se aprobarÃ¡ hasta validar el pago en Galio Pay.
-          </p>
+        {provider === 'talo' && queryLooksApproved && !officialApproved ? (
+          <p className="status">El retorno indica pago exitoso, pero la inscripcion no se aprobara hasta validar el pago en Talo Pay.</p>
         ) : null}
 
-        {provider === 'galio' && galioPaymentFetchError ? (
-          <p className="status">No pudimos validar el pago automÃ¡ticamente con Galio. Revisa el estado e intenta nuevamente.</p>
+        {provider === 'talo' && taloPaymentFetchError ? (
+          <p className="status">No pudimos validar el pago automaticamente con Talo. Revisa el estado e intenta nuevamente.</p>
         ) : null}
 
         <div className="cta-row">
           {shouldShowLogin ? (
             <Link className="cta-link" href="/login">
-              Iniciar sesiÃ³n
+              Iniciar sesion
             </Link>
           ) : null}
           <Link className="cta-link" href="/profile">
@@ -126,6 +127,3 @@ export default async function PaymentReturnPage({ searchParams }: PaymentReturnP
     </section>
   );
 }
-
-
-

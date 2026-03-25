@@ -353,14 +353,14 @@ export function PredictionsBoard({
     setPaying(true);
     setMessage(null);
     try {
-      const response = await fetch('/api/payments/galio/link', {
+      const response = await fetch('/api/payments/talo/link', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });
       const data = await response.json();
       if (!response.ok || !data.ok) throw new Error(data.error || 'No se pudo generar el pago');
       const redirectUrl = data.url as string | undefined;
-      if (!redirectUrl) throw new Error('GalioPay no devolvió URL de checkout');
+      if (!redirectUrl) throw new Error('TaloPay no devolvio URL de checkout');
       window.location.href = redirectUrl;
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'No se pudo iniciar el pago');
@@ -506,7 +506,7 @@ export function PredictionsBoard({
         </p>
         <div className="cta-row">
           <button className="btn btn-primary" type="button" onClick={startRegistrationPayment} disabled={paying}>
-            {paying ? 'Redirigiendo a GalioPay...' : 'Pagar inscripción'}
+            {paying ? 'Redirigiendo a TaloPay...' : 'Pagar inscripción'}
           </button>
           <Link className="cta-link" href="/payment/return">
             Revisar estado del pago

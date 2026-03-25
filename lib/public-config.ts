@@ -8,6 +8,6 @@
 }
 
 export function getRegistrationAmountArs() {
-  const value = Number(runtimeEnv('GALIOPAY_REGISTRATION_AMOUNT_ARS', '20000'));
+  const value = Number(runtimeEnv('TALOPAY_REGISTRATION_AMOUNT_ARS', '20000'));
   return Number.isFinite(value) ? value : 20000;
 }
