@@ -219,8 +219,16 @@ export async function createTaloRegistrationPaymentLink(input: {
   lastName?: string;
   email?: string;
   dni?: string;
+  appBaseUrl?: string;
+  webhookBaseUrl?: string;
 }) {
   const cfg = getTaloConfig();
+  const appBaseUrl = input.appBaseUrl ? stripTrailingSlash(input.appBaseUrl) : cfg.appBaseUrl;
+  const webhookBaseUrl = input.webhookBaseUrl ? stripTrailingSlash(input.webhookBaseUrl) : cfg.webhookBaseUrl;
+  const webhookUrl = cfg.webhookSecret
+    ? `${webhookBaseUrl}/api/payments/talo/webhook?token=${encodeURIComponent(cfg.webhookSecret)}`
+    : `${webhookBaseUrl}/api/payments/talo/webhook`;
+
   const payload: TaloCreatePaymentRequest = {
     price: {
       currency: cfg.currencyId,
@@ -228,8 +236,8 @@ export async function createTaloRegistrationPaymentLink(input: {
     },
     user_id: cfg.userId,
     payment_options: ['transfer'],
-    webhook_url: buildWebhookUrl(),
-    redirect_url: `${cfg.appBaseUrl}/payment/return?provider=talo&status=success`,
+    webhook_url: webhookUrl,
+    redirect_url: `${appBaseUrl}/payment/return?provider=talo&status=success`,
     external_id: registrationExternalIdForUser(input.userId),
     motive: cfg.title,
     client_data: {

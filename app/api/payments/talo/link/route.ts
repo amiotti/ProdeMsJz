@@ -8,6 +8,15 @@ import { createTaloRegistrationPaymentLink } from '@/lib/talopay';
 
 export const dynamic = 'force-dynamic';
 
+function getRequestOrigin(request: Request) {
+  const forwardedProto = request.headers.get('x-forwarded-proto')?.trim();
+  const forwardedHost = request.headers.get('x-forwarded-host')?.trim();
+  const host = forwardedHost || request.headers.get('host')?.trim();
+  const proto = forwardedProto || (host?.includes('localhost') ? 'http' : 'https');
+  if (!host) return null;
+  return `${proto}://${host}`;
+}
+
 export async function POST(request: Request) {
   try {
     const originError = assertSameOriginForMutation(request);
@@ -29,11 +38,14 @@ export async function POST(request: Request) {
       return noStoreJson({ ok: false, error: 'Demasiados intentos de generar pagos. Intenta mas tarde.' }, { status: 429 });
     }
 
+    const requestOrigin = getRequestOrigin(request);
     const result = await createTaloRegistrationPaymentLink({
       userId: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
+      appBaseUrl: requestOrigin ?? undefined,
+      webhookBaseUrl: requestOrigin ?? undefined,
     });
 
     if (result.paymentId) {
