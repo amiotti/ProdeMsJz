@@ -441,7 +441,7 @@ export function PredictionsBoard({
           ) : null}
         </div>
 
-        <div className="score-inputs">
+        <div className="score-inputs score-inputs-with-action">
           <input
             inputMode="numeric"
             value={draft.home}

@@ -1893,6 +1893,20 @@ select:focus {
   padding: 0.36rem 0.7rem;
 }
 
+.predictions-board .score-inputs.score-inputs-with-action {
+  grid-template-columns: 52px 14px 52px auto;
+  width: auto;
+}
+
+.predictions-board .score-inputs.score-inputs-with-action .btn.btn-primary.btn-small {
+  padding: 0.48rem 0.72rem !important;
+  border-radius: 10px !important;
+  min-height: 2.05rem;
+  font-size: 0.8rem;
+  line-height: 1.05;
+  box-shadow: 0 0 0 1px rgba(239, 49, 0, 0.22), 0 10px 20px rgba(12, 13, 20, 0.2) !important;
+}
+
 .readonly-note {
   color: var(--muted);
   display: flex;
@@ -2529,6 +2543,11 @@ select:focus {
   .score-inputs {
     width: max-content;
     gap: 0.35rem;
+  }
+
+  .predictions-board .score-inputs.score-inputs-with-action {
+    grid-template-columns: 3rem 12px 3rem auto;
+    width: 100%;
   }
 
   .score-inputs input {
