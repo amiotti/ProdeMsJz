@@ -48,6 +48,25 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
   }, []);
 
   useEffect(() => {
+    if (!isCreateModalOpen) return;
+    const body = document.body;
+    const html = document.documentElement;
+    const prevBodyOverflow = body.style.overflow;
+    const prevBodyOverscroll = body.style.overscrollBehaviorY;
+    const prevHtmlOverscroll = html.style.overscrollBehaviorY;
+
+    body.style.overflow = 'hidden';
+    body.style.overscrollBehaviorY = 'none';
+    html.style.overscrollBehaviorY = 'none';
+
+    return () => {
+      body.style.overflow = prevBodyOverflow;
+      body.style.overscrollBehaviorY = prevBodyOverscroll;
+      html.style.overscrollBehaviorY = prevHtmlOverscroll;
+    };
+  }, [isCreateModalOpen]);
+
+  useEffect(() => {
     const next: Record<string, boolean> = {};
     for (const row of rows) next[row.userId] = false;
     setDraftSelectedUserIds(next);
@@ -297,7 +316,7 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
             backdropFilter: 'blur(2px)',
             overflowY: 'auto',
             WebkitOverflowScrolling: 'touch',
-            overscrollBehavior: 'auto',
+            overscrollBehavior: 'contain',
             touchAction: 'pan-y'
           }}
         >
@@ -345,7 +364,7 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
                 padding: '0.55rem',
                 maxHeight: 'min(38vh, 340px)',
                 overflow: 'auto',
-                overscrollBehavior: 'auto',
+                overscrollBehavior: 'contain',
                 WebkitOverflowScrolling: 'touch',
                 touchAction: 'pan-y',
                 background: isDarkTheme ? 'rgba(12, 11, 20, 0.74)' : 'rgba(255, 255, 255, 0.96)'
