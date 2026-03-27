@@ -48,7 +48,7 @@ export async function AppShell({ children }: { children: ReactNode }) {
   ];
 
   return (
-    <div className="app-bg">
+    <div className={`app-bg ${isLoggedIn ? 'is-authenticated' : 'is-public'}`}>
       {isLoggedIn ? (
         <header className="topbar">
           <div className="topbar-main">

@@ -38,9 +38,6 @@ export default async function LandingPage() {
             <Link className="landing-cta-primary" href="/login">
               Iniciar sesión / Registrarse
             </Link>
-            <Link className="landing-cta-secondary" href="/leaderboard">
-              Ver tabla pública
-            </Link>
           </div>
 
           <div className="landing-badges">
