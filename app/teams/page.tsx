@@ -4,7 +4,7 @@ import { FlagBadge } from '@/components/flag-badge';
 import { getState } from '@/lib/db';
 import { buildTeamProdeSummary, buildTeamSportFacts, getAllTeams } from '@/lib/worldcup26';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 export default async function TeamsPage() {
   const state = await getState();
@@ -70,4 +70,3 @@ export default async function TeamsPage() {
     </section>
   );
 }
-

@@ -383,7 +383,16 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
               ) : null}
             </div>
 
-            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div
+              style={{
+                display: 'flex',
+                gap: '0.5rem',
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                paddingRight: '0.2rem'
+              }}
+            >
               <span className="muted">{selectedCount} usuario(s) seleccionado(s)</span>
               <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                 <button type="button" className="btn btn-small" onClick={closeCreateModal}>

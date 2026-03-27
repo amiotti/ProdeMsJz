@@ -8,8 +8,8 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import '@/app/globals.css';
 import { AppShell } from '@/components/app-shell';
 
-const bodyFont = Noto_Sans({ subsets: ['latin'], variable: '--font-body' });
-const titleFont = Oswald({ subsets: ['latin'], weight: ['500', '700'], variable: '--font-title' });
+const bodyFont = Noto_Sans({ subsets: ['latin'], variable: '--font-body', display: 'optional' });
+const titleFont = Oswald({ subsets: ['latin'], weight: ['500', '700'], variable: '--font-title', display: 'optional' });
 
 export const metadata: Metadata = {
   title: 'PRODE Mundial 2026',

@@ -2,7 +2,7 @@
 import { getState } from '@/lib/db';
 import { formatKickoffArgentina } from '@/lib/datetime';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 export default async function CalendarPage() {
   const state = await getState();

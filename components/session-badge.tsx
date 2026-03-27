@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import type { User } from '@/lib/types';
@@ -52,7 +52,6 @@ function LogoutIcon() {
 }
 
 export function SessionBadge({ initialData }: { initialData: SessionBadgeData }) {
-  const pathname = usePathname();
   const router = useRouter();
   const [data, setData] = useState<SessionBadgeData>(initialData);
   const [loggingOut, setLoggingOut] = useState(false);
@@ -66,22 +65,6 @@ export function SessionBadge({ initialData }: { initialData: SessionBadgeData })
       setData((prev) => prev);
     }
   }
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const response = await fetch('/api/auth/me', { cache: 'no-store' });
-        const json = (await response.json()) as SessionBadgeData;
-        if (!cancelled) setData(json);
-      } catch {
-        if (!cancelled) setData((prev) => prev);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [pathname]);
 
   useEffect(() => {
     function onAuthChanged() {

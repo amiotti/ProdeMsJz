@@ -11,8 +11,11 @@ export function FlagBadge({ teamName, size = 'sm' }: FlagBadgeProps) {
 
   return (
     <span className={size === 'lg' ? 'flag-pill flag-pill-lg' : 'flag-pill'} aria-hidden="true">
-      {src ? <img className="flag-img" src={src} alt="" loading="lazy" decoding="async" /> : <span>{label}</span>}
+      {src ? (
+        <img className="flag-img" src={src} alt="" width={28} height={28} loading="lazy" decoding="async" />
+      ) : (
+        <span>{label}</span>
+      )}
     </span>
   );
 }
-

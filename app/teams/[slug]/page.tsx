@@ -18,7 +18,7 @@ type TeamDetailPageProps = {
   }>;
 };
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 const matchDateFormatter = new Intl.DateTimeFormat('es-AR', {
   timeZone: 'America/Argentina/Buenos_Aires',

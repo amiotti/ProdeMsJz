@@ -120,6 +120,14 @@ let seedDbCache: ProdeDB | null = null;
 let ensureBaseDataInFlight: Promise<void> | null = null;
 let ensureBaseDataLastRunAt = 0;
 let legacyPredictionsCleanupAttempted = false;
+const USER_CACHE_TTL_MS = 60_000;
+const BASE_DATA_CHECK_TTL_MS = 300_000;
+const FAST_QUERY_TTL_MS = 30_000;
+let userByIdCache = new Map<string, { expiresAt: number; user: User | null }>();
+let usersOnlyCache: { expiresAt: number; rows: InstantUserDoc[] } | null = null;
+let configOnlyCache: { expiresAt: number; rows: InstantConfigDoc[] } | null = null;
+let officialResultsOnlyCache: { expiresAt: number; rows: InstantOfficialResultDoc[] } | null = null;
+let officialTriviaResultsOnlyCache: { expiresAt: number; rows: InstantOfficialTriviaResultDoc[] } | null = null;
 let coreStateCache:
   | {
       expiresAt: number;
@@ -204,6 +212,11 @@ function cloneDb(db: ProdeDB): ProdeDB {
 
 function invalidateCoreStateCache() {
   coreStateCache = null;
+  userByIdCache.clear();
+  usersOnlyCache = null;
+  configOnlyCache = null;
+  officialResultsOnlyCache = null;
+  officialTriviaResultsOnlyCache = null;
 }
 
 function normalizeEmail(email: string) {
@@ -323,9 +336,14 @@ async function queryAllInstant() {
 }
 
 async function queryUsersOnly() {
+  if (usersOnlyCache && usersOnlyCache.expiresAt > Date.now()) {
+    return usersOnlyCache.rows;
+  }
   const db = getInstantAdminDb();
   const data = (await db.query({ prode_users: {} })) as InstantQueryResult;
-  return data.prode_users ?? [];
+  const rows = data.prode_users ?? [];
+  usersOnlyCache = { expiresAt: Date.now() + FAST_QUERY_TTL_MS, rows };
+  return rows;
 }
 
 async function queryUserByIdOnly(userId: string) {
@@ -345,9 +363,14 @@ async function queryUserByEmailOnly(email: string) {
 }
 
 async function queryConfigOnly() {
+  if (configOnlyCache && configOnlyCache.expiresAt > Date.now()) {
+    return configOnlyCache.rows;
+  }
   const db = getInstantAdminDb();
   const data = (await db.query({ prode_config: {} })) as InstantQueryResult;
-  return data.prode_config ?? [];
+  const rows = data.prode_config ?? [];
+  configOnlyCache = { expiresAt: Date.now() + FAST_QUERY_TTL_MS, rows };
+  return rows;
 }
 
 async function queryContactMessagesOnly() {
@@ -365,15 +388,25 @@ async function queryNewContactMessagesCountOnly() {
 }
 
 async function queryOfficialResultsOnly() {
+  if (officialResultsOnlyCache && officialResultsOnlyCache.expiresAt > Date.now()) {
+    return officialResultsOnlyCache.rows;
+  }
   const db = getInstantAdminDb();
   const data = (await db.query({ prode_official_results: {} })) as InstantQueryResult;
-  return data.prode_official_results ?? [];
+  const rows = data.prode_official_results ?? [];
+  officialResultsOnlyCache = { expiresAt: Date.now() + FAST_QUERY_TTL_MS, rows };
+  return rows;
 }
 
 async function queryOfficialTriviaResultsOnly() {
+  if (officialTriviaResultsOnlyCache && officialTriviaResultsOnlyCache.expiresAt > Date.now()) {
+    return officialTriviaResultsOnlyCache.rows;
+  }
   const db = getInstantAdminDb();
   const data = (await db.query({ prode_official_trivia_results: {} })) as InstantQueryResult;
-  return data.prode_official_trivia_results ?? [];
+  const rows = data.prode_official_trivia_results ?? [];
+  officialTriviaResultsOnlyCache = { expiresAt: Date.now() + FAST_QUERY_TTL_MS, rows };
+  return rows;
 }
 
 async function queryUserPredictionsDocByUserOnly(userId: string) {
@@ -551,7 +584,7 @@ async function cleanupLegacyPredictions() {
 
 async function ensureBaseData() {
   const now = Date.now();
-  if (now - ensureBaseDataLastRunAt < 15_000) return;
+  if (now - ensureBaseDataLastRunAt < BASE_DATA_CHECK_TTL_MS) return;
   if (ensureBaseDataInFlight) return ensureBaseDataInFlight;
 
   ensureBaseDataInFlight = (async () => {
@@ -790,8 +823,12 @@ export async function loginUser(input: { email: string; password: string }): Pro
 
 export async function getUserById(userId: string): Promise<User | null> {
   await ensureBaseData();
+  const cached = userByIdCache.get(userId);
+  if (cached && cached.expiresAt > Date.now()) return cached.user;
   const found = await queryUserByIdOnly(userId);
-  return found ? publicUser(found) : null;
+  const user = found ? publicUser(found) : null;
+  userByIdCache.set(userId, { expiresAt: Date.now() + USER_CACHE_TTL_MS, user });
+  return user;
 }
 
 export async function getUserFromSessionToken(token: string | undefined | null): Promise<User | null> {
