@@ -4,6 +4,7 @@ import { hashPassword, verifyPassword, verifySession } from '@/lib/auth';
 import { getInstantAdminDb, tx } from '@/lib/instant';
 import { computeLeaderboard } from '@/lib/prode';
 import { createSeedDb } from '@/lib/seed';
+import { getTaloPayment, isValidTaloRegistrationPaymentForUser } from '@/lib/talopay';
 import type {
   ContactMessage,
   ContactMessageStatus,
@@ -265,6 +266,14 @@ function sanitizePhone(phone: string) {
 
 function sanitizeBankInfo(value: string) {
   return value.trim().replace(/\s+/g, ' ').slice(0, 120);
+}
+
+function getPendingTaloPaymentId(receipt: string | null | undefined) {
+  const value = String(receipt ?? '').trim();
+  const prefix = 'talo_pending:';
+  if (!value.startsWith(prefix)) return null;
+  const id = value.slice(prefix.length).trim();
+  return id || null;
 }
 
 function sanitizeContactMessage(value: string) {
@@ -831,6 +840,49 @@ export async function getUserById(userId: string): Promise<User | null> {
   return user;
 }
 
+export async function resetPasswordWithRecoveryData(input: {
+  email: string;
+  phone: string;
+  bankInfo: string;
+  newPassword: string;
+}) {
+  await ensureBaseData();
+  const email = normalizeEmail(input.email);
+  const phone = sanitizePhone(input.phone);
+  const bankInfo = sanitizeBankInfo(input.bankInfo).toLowerCase();
+  const password = String(input.newPassword ?? '');
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw new Error('Datos de recuperación inválidos');
+  }
+  if (!phone || !/^[0-9+()\-\s./]{6,32}$/.test(phone)) {
+    throw new Error('Datos de recuperación inválidos');
+  }
+  if (!bankInfo || bankInfo.length < 6) {
+    throw new Error('Datos de recuperación inválidos');
+  }
+  if (password.length < 8 || password.length > 128) {
+    throw new Error('La contraseña debe tener entre 8 y 128 caracteres');
+  }
+
+  const user = await queryUserByEmailOnly(email);
+  if (!user) throw new Error('Datos de recuperación inválidos');
+
+  const storedPhone = sanitizePhone(user.phone);
+  const storedBankInfo = sanitizeBankInfo(user.bankInfo ?? '').toLowerCase();
+  if (storedPhone !== phone || storedBankInfo !== bankInfo) {
+    throw new Error('Datos de recuperación inválidos');
+  }
+
+  await getInstantAdminDb().transact([
+    tx.prode_users[user.id].update({
+      passwordHash: hashPassword(password),
+      updatedAt: nowIso(),
+    }),
+  ]);
+  invalidateCoreStateCache();
+}
+
 export async function getUserFromSessionToken(token: string | undefined | null): Promise<User | null> {
   const session = verifySession(token);
   if (!session) return null;
@@ -1394,6 +1446,19 @@ export async function getPredictionsScreenState(viewerToken?: string | null): Pr
     ]);
     if (userDoc && userDoc.role === session.role) {
       viewerUser = publicUser(userDoc);
+      if (viewerUser.role !== 'admin' && viewerUser.registrationPaymentStatus !== 'approved') {
+        const pendingPaymentId = getPendingTaloPaymentId(viewerUser.registrationPaymentReceipt);
+        if (pendingPaymentId) {
+          try {
+            const payment = await getTaloPayment(pendingPaymentId);
+            if (isValidTaloRegistrationPaymentForUser(payment, viewerUser.id)) {
+              viewerUser = await markUserRegistrationPaymentApproved(viewerUser.id, pendingPaymentId);
+            }
+          } catch {
+            // noop: mantenemos estado pendiente si Talo no confirma.
+          }
+        }
+      }
       if (userPredictionsDoc) {
         userPredictions = Object.entries(userPredictionsDoc.predictions ?? {}).map(([matchId, entry]) => ({
           id: `${userPredictionsDoc.id}:${matchId}`,

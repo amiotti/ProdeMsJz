@@ -1,13 +1,14 @@
 ﻿import { revalidatePath } from 'next/cache';
 
 import { markUserRegistrationPaymentApproved } from '@/lib/db';
+import { checkRateLimit, getClientIdentifier } from '@/lib/rate-limit';
 import {
   extractUserIdFromGalioRegistrationReferenceId,
   getGalioPayment,
   getGalioWebhookAuthConfig,
   isValidGalioRegistrationPaymentForUser,
 } from '@/lib/galiopay';
-import { noStoreJson } from '@/lib/security';
+import { noStoreJson, parseJsonBody } from '@/lib/security';
 
 export const dynamic = 'force-dynamic';
 
@@ -98,13 +99,15 @@ export async function POST(request: Request) {
       auditLog('warn', 'unauthorized', { ...auditMeta, reason: auth.reason });
       return noStoreJson({ ok: false, error: 'Webhook no autorizado' }, { status: 401 });
     }
-
-    let payload: unknown = null;
-    try {
-      payload = await request.json();
-    } catch {
-      payload = null;
+    const ip = getClientIdentifier(request);
+    const rate = checkRateLimit(`webhook:galio:${ip}`, { limit: 300, windowMs: 60 * 1000 });
+    if (!rate.ok) {
+      auditLog('warn', 'rate_limited', { ...auditMeta, reason: 'too_many_requests' });
+      return noStoreJson({ ok: false, error: 'Rate limit excedido' }, { status: 429 });
     }
+
+    const parsed = await parseJsonBody<Record<string, unknown>>(request, { maxBytes: 64 * 1024 });
+    const payload: unknown = parsed.ok ? parsed.data : null;
 
     const paymentId = findPaymentId(payload);
     if (!paymentId) {

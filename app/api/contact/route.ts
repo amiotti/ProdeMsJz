@@ -3,7 +3,7 @@
 import { getSessionCookieName } from '@/lib/auth';
 import { adminUpdateContactMessageStatus, createContactMessage, getUserFromSessionToken, listContactMessages } from '@/lib/db';
 import { checkRateLimit, getClientIdentifier } from '@/lib/rate-limit';
-import { assertSameOriginForMutation, noStoreJson } from '@/lib/security';
+import { assertSameOriginForMutation, noStoreJson, parseJsonBody } from '@/lib/security';
 import type { ContactMessageStatus } from '@/lib/types';
 
 async function requireAdmin() {
@@ -34,12 +34,14 @@ export async function POST(request: Request) {
 
     const token = (await cookies()).get(getSessionCookieName())?.value ?? null;
     const user = await getUserFromSessionToken(token);
-    const body = (await request.json()) as {
+    const parsed = await parseJsonBody<{
       name?: string;
       email?: string;
       phone?: string;
       message?: string;
-    };
+    }>(request, { maxBytes: 16 * 1024 });
+    if (!parsed.ok) return parsed.response;
+    const body = parsed.data;
 
     const message = await createContactMessage({
       userId: user?.id ?? null,
@@ -63,8 +65,13 @@ export async function PATCH(request: Request) {
 
     const admin = await requireAdmin();
     if (!admin) return noStoreJson({ ok: false, error: 'Solo admin' }, { status: 403 });
+    const ip = getClientIdentifier(request);
+    const adminRate = checkRateLimit(`contact:admin:patch:${admin.id}:${ip}`, { limit: 120, windowMs: 10 * 60 * 1000 });
+    if (!adminRate.ok) return noStoreJson({ ok: false, error: 'Demasiadas acciones. Intenta mas tarde.' }, { status: 429 });
 
-    const body = (await request.json()) as { messageId?: string; status?: ContactMessageStatus };
+    const parsed = await parseJsonBody<{ messageId?: string; status?: ContactMessageStatus }>(request, { maxBytes: 8 * 1024 });
+    if (!parsed.ok) return parsed.response;
+    const body = parsed.data;
     if (!body.messageId) return noStoreJson({ ok: false, error: 'Falta messageId' }, { status: 400 });
     if (!body.status || !['new', 'contacted', 'resolved'].includes(body.status)) {
       return noStoreJson({ ok: false, error: 'Estado inválido' }, { status: 400 });
@@ -78,4 +85,3 @@ export async function PATCH(request: Request) {
     return noStoreJson({ ok: false, error: message }, { status: 400 });
   }
 }
-

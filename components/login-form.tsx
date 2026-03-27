@@ -1,6 +1,7 @@
 ﻿'use client';
 
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useState } from 'react';
 
 export function LoginForm() {
@@ -49,6 +50,12 @@ export function LoginForm() {
         Contraseña
         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
       </label>
+      <p className="muted auth-inline-link-row">
+        ¿Olvidaste tu contraseña?{' '}
+        <Link className="inline-link auth-inline-link" href="/forgot-password">
+          Restablecer
+        </Link>
+      </p>
       <button className="btn btn-primary" type="submit" disabled={loading}>
         {loading ? 'Ingresando...' : 'Ingresar'}
       </button>

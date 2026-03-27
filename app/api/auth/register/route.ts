@@ -3,14 +3,14 @@
 import { getSessionCookieName, getSessionCookieOptions, signSession } from '@/lib/auth';
 import { createUser } from '@/lib/db';
 import { checkRateLimit, getClientIdentifier } from '@/lib/rate-limit';
-import { assertSameOriginForMutation, noStoreJson } from '@/lib/security';
+import { assertSameOriginForMutation, noStoreJson, parseJsonBody } from '@/lib/security';
 
 export async function POST(request: Request) {
   try {
     const originError = assertSameOriginForMutation(request);
     if (originError) return originError;
 
-    const body = (await request.json()) as {
+    const parsed = await parseJsonBody<{
       firstName?: string;
       lastName?: string;
       email?: string;
@@ -20,7 +20,9 @@ export async function POST(request: Request) {
       acceptedTerms?: boolean;
       acceptedPrivacy?: boolean;
       declaredAdult?: boolean;
-    };
+    }>(request, { maxBytes: 12 * 1024 });
+    if (!parsed.ok) return parsed.response;
+    const body = parsed.data;
 
     if (!body.acceptedTerms) {
       return noStoreJson({ ok: false, error: 'Debes aceptar los Terminos y Condiciones' }, { status: 400 });
@@ -34,7 +36,9 @@ export async function POST(request: Request) {
 
     const ip = getClientIdentifier(request);
     const ipRate = checkRateLimit(`auth:register:ip:${ip}`, { limit: 10, windowMs: 30 * 60 * 1000 });
-    if (!ipRate.ok) {
+    const email = String(body.email ?? '').trim().toLowerCase();
+    const emailRate = checkRateLimit(`auth:register:email:${email || 'empty'}`, { limit: 5, windowMs: 30 * 60 * 1000 });
+    if (!ipRate.ok || !emailRate.ok) {
       return noStoreJson({ ok: false, error: 'Demasiados registros desde este origen. Intenta mas tarde.' }, { status: 429 });
     }
 

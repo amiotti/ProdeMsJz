@@ -3,14 +3,16 @@
 import { getSessionCookieName, getSessionCookieOptions, signSession } from '@/lib/auth';
 import { loginUser } from '@/lib/db';
 import { checkRateLimit, getClientIdentifier } from '@/lib/rate-limit';
-import { assertSameOriginForMutation, noStoreJson } from '@/lib/security';
+import { assertSameOriginForMutation, noStoreJson, parseJsonBody } from '@/lib/security';
 
 export async function POST(request: Request) {
   try {
     const originError = assertSameOriginForMutation(request);
     if (originError) return originError;
 
-    const body = (await request.json()) as { email?: string; password?: string };
+    const parsed = await parseJsonBody<{ email?: string; password?: string }>(request, { maxBytes: 8 * 1024 });
+    if (!parsed.ok) return parsed.response;
+    const body = parsed.data;
     const email = String(body.email ?? '').trim().toLowerCase();
 
     const ip = getClientIdentifier(request);

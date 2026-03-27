@@ -6,6 +6,7 @@ type Bucket = {
 };
 
 const buckets = new Map<string, Bucket>();
+const MAX_BUCKETS = 10000;
 
 function nowMs() {
   return Date.now();
@@ -15,6 +16,20 @@ function cleanupExpired() {
   const now = nowMs();
   for (const [key, bucket] of buckets) {
     if (bucket.resetAt <= now) buckets.delete(key);
+  }
+}
+
+function enforceBucketCap() {
+  if (buckets.size <= MAX_BUCKETS) return;
+  cleanupExpired();
+  if (buckets.size <= MAX_BUCKETS) return;
+
+  const toDelete = buckets.size - MAX_BUCKETS;
+  let deleted = 0;
+  for (const key of buckets.keys()) {
+    buckets.delete(key);
+    deleted += 1;
+    if (deleted >= toDelete) break;
   }
 }
 
@@ -48,6 +63,7 @@ export function getClientIdentifier(request: Request) {
 
 export function checkRateLimit(key: string, options: { limit: number; windowMs: number }) {
   cleanupExpired();
+  enforceBucketCap();
   const now = nowMs();
   const bucket = buckets.get(key);
 

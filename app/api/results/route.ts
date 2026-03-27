@@ -2,7 +2,8 @@
 
 import { getSessionCookieName } from '@/lib/auth';
 import { getResultsScreenState, getUserFromSessionToken, saveOfficialResults, saveOfficialTriviaResults } from '@/lib/db';
-import { assertSameOriginForMutation, noStoreJson } from '@/lib/security';
+import { checkRateLimit, getClientIdentifier } from '@/lib/rate-limit';
+import { assertSameOriginForMutation, noStoreJson, parseJsonBody } from '@/lib/security';
 
 export async function GET() {
   const token = (await cookies()).get(getSessionCookieName())?.value ?? null;
@@ -21,12 +22,17 @@ export async function POST(request: Request) {
       return noStoreJson({ ok: false, error: 'Solo el administrador puede cargar resultados oficiales' }, { status: 403 });
     }
 
-    const body = (await request.json()) as {
+    const parsed = await parseJsonBody<{
       results?: Array<{ matchId: string; home: number; away: number }>;
       triviaResults?: Array<{ questionId: string; answer: string }>;
       clearMatchIds?: string[];
       clearTriviaQuestionIds?: string[];
-    };
+    }>(request, { maxBytes: 64 * 1024 });
+    if (!parsed.ok) return parsed.response;
+    const body = parsed.data;
+    const ip = getClientIdentifier(request);
+    const rate = checkRateLimit(`results:admin:${user.id}:${ip}`, { limit: 120, windowMs: 10 * 60 * 1000 });
+    if (!rate.ok) return noStoreJson({ ok: false, error: 'Demasiadas acciones. Intenta mas tarde.' }, { status: 429 });
 
     await saveOfficialResults(body.results ?? [], body.clearMatchIds ?? []);
     await saveOfficialTriviaResults(body.triviaResults ?? [], body.clearTriviaQuestionIds ?? []);
