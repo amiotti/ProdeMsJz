@@ -70,6 +70,9 @@ export default function TermsPage() {
           la organización.
         </p>
         <p className="muted">
+          Los pagos de inscripción se procesan mediante Talo Pay como proveedor tecnológico de cobro.
+        </p>
+        <p className="muted">
           El pago de inscripción corresponde principalmente al acceso al servicio digital prestado por la Plataforma.
         </p>
         <p className="muted">

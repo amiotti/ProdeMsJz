@@ -2363,10 +2363,10 @@ select:focus {
     pointer-events: none;
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(239, 245, 255, 0.88)),
-      url('/fifa%202026%20wp_colors.jpg');
+      url('/movil_desktop.jpg');
     background-repeat: no-repeat, no-repeat;
     background-position: center top, center top;
-    background-size: auto, contain;
+    background-size: auto, cover;
   }
 
   body::before,
@@ -4114,10 +4114,10 @@ html[data-theme='dark'] .legal-back-btn {
   .app-bg.is-authenticated::before {
     background:
       linear-gradient(180deg, rgba(7, 8, 15, 0.8), rgba(9, 10, 18, 0.86)),
-      url('/fifa%202026%20wp_colors.jpg');
+      url('/movil_desktop.jpg');
     background-repeat: no-repeat, no-repeat;
     background-position: center top, center top;
-    background-size: auto, contain;
+    background-size: auto, cover;
   }
 
   .topbar {

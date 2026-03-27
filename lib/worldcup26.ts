@@ -186,7 +186,8 @@ const TEAM_CATALOG: TeamInfo[] = [
     flag: 'PO',
     confederation: 'UEFA',
     fifaStrength: 1710,
-    shortDescription: 'Plaza pendiente del repechaje UEFA (ruta D).',
+    shortDescription: 'Plaza pendiente del repechaje UEFA (ruta D), con final ya definida.',
+    notes: 'Final UEFA D (31/03): 🇨🇿 Chequia vs 🇩🇰 Dinamarca. Semifinales del 26/03: Dinamarca 4-0 Macedonia del Norte y Chequia 2-2 Irlanda (4-3 penales).',
     isPlaceholder: true,
   },
   {
@@ -223,7 +224,8 @@ const TEAM_CATALOG: TeamInfo[] = [
     flag: 'PO',
     confederation: 'UEFA',
     fifaStrength: 1730,
-    shortDescription: 'Plaza pendiente del repechaje UEFA (ruta A).',
+    shortDescription: 'Plaza pendiente del repechaje UEFA (ruta A), con final ya definida.',
+    notes: 'Final UEFA A (31/03): 🇧🇦 Bosnia y Herzegovina vs 🇮🇹 Italia. Semifinales del 26/03: Italia 2-0 Irlanda del Norte y Bosnia 1-1 Gales (4-2 penales).',
     isPlaceholder: true,
   },
   {
@@ -296,7 +298,8 @@ const TEAM_CATALOG: TeamInfo[] = [
     flag: 'PO',
     confederation: 'UEFA',
     fifaStrength: 1720,
-    shortDescription: 'Plaza pendiente del repechaje UEFA (ruta C).',
+    shortDescription: 'Plaza pendiente del repechaje UEFA (ruta C), con final ya definida.',
+    notes: 'Final UEFA C (31/03): 🇽🇰 Kosovo vs 🇹🇷 Turquia. Semifinales del 26/03: Turquia 1-0 Rumania y Kosovo 4-3 Eslovaquia.',
     isPlaceholder: true,
   },
   {
@@ -369,7 +372,8 @@ const TEAM_CATALOG: TeamInfo[] = [
     flag: 'PO',
     confederation: 'UEFA',
     fifaStrength: 1725,
-    shortDescription: 'Plaza pendiente del repechaje UEFA (ruta B).',
+    shortDescription: 'Plaza pendiente del repechaje UEFA (ruta B), con final ya definida.',
+    notes: 'Final UEFA B (31/03): 🇸🇪 Suecia vs 🇵🇱 Polonia. Semifinales del 26/03: Suecia 3-1 Ucrania y Polonia 2-1 Albania.',
     isPlaceholder: true,
   },
   {
@@ -478,8 +482,8 @@ const TEAM_CATALOG: TeamInfo[] = [
     flag: 'PO',
     confederation: 'Intercontinental',
     fifaStrength: 1665,
-    shortDescription: 'Plaza pendiente del repechaje intercontinental (ruta 2).',
-    notes: 'Posibles candidatos segun llave publicada: Iraq / Bolivia / Surinam.',
+    shortDescription: 'Plaza pendiente del repechaje intercontinental (ruta 2), con final ya definida.',
+    notes: 'Final intercontinental ruta 2 (31/03): 🇮🇶 Irak vs 🇧🇴 Bolivia. Semifinal del 26/03: Bolivia 2-1 Surinam.',
     isPlaceholder: true,
   },
   {
@@ -552,8 +556,8 @@ const TEAM_CATALOG: TeamInfo[] = [
     flag: 'PO',
     confederation: 'Intercontinental',
     fifaStrength: 1675,
-    shortDescription: 'Plaza pendiente del repechaje intercontinental (ruta 1).',
-    notes: 'Posibles candidatos segun llave publicada: RD Congo / Jamaica / Nueva Caledonia.',
+    shortDescription: 'Plaza pendiente del repechaje intercontinental (ruta 1), con final ya definida.',
+    notes: 'Final intercontinental ruta 1 (31/03): 🇨🇩 RD Congo vs 🇯🇲 Jamaica. Semifinal del 26/03: Jamaica 1-0 Nueva Caledonia.',
     isPlaceholder: true,
   },
   {
@@ -1316,9 +1320,6 @@ export function buildCalendarFixtures(
 
   return fixtures.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 }
-
-
-
 
 
 

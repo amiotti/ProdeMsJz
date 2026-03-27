@@ -20,6 +20,7 @@ export default async function RulesPage() {
         <h3>Cómo participar</h3>
         <ol className="rules-list">
           <li>Registrate / iniciá sesión con tu cuenta.</li>
+          <li>Realizá la inscripción a través de Talo Pay para habilitar la carga de predicciones.</li>
           <li>Entrá en `Predicciones` y cargá resultados partido por partido.</li>
           <li>Respondé la `Trivia` dentro de `Predicciones` antes del inicio de la fase de llaves.</li>
           <li>Podés editar cada predicción hasta 1 hora antes del inicio de ese partido.</li>

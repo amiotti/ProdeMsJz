@@ -51,9 +51,9 @@ export default async function LandingPage() {
         <div className="landing-panel landing-side">
           <div className="landing-card-stack">
             <div className="landing-mini-card">
-              <span className="landing-mini-label">Top 5 premios</span>
-              <strong>$2.000.000 / $500.000</strong>
-              <small>y premios especiales</small>
+              <span className="landing-mini-label">Top 10 premios</span>
+              <strong>Premiación extendida</strong>
+              <small>Habrá premios para el Top 10 de participantes con mayor puntuación.</small>
             </div>
             <div className="landing-mini-card">
               <span className="landing-mini-label">Modo de juego</span>

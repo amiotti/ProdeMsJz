@@ -33,6 +33,7 @@ export default function LegalPage() {
           <li>administración del torneo</li>
           <li>soporte operativo</li>
         </ul>
+        <p className="muted">El procesamiento del pago de inscripción se realiza a través de Talo Pay.</p>
 
         <p className="muted">Está prohibido utilizar la Plataforma para aceptar apuestas, intermediar apuestas entre terceros o captar fondos vinculados a juegos de azar.</p>
         <p className="muted">La organización podrá suspender cuentas que utilicen el servicio con fines contrarios a la ley o al presente aviso legal.</p>
