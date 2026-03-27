@@ -48,6 +48,31 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
   }, []);
 
   useEffect(() => {
+    if (!isCreateModalOpen) return;
+    const body = document.body;
+    const scrollY = window.scrollY;
+    const prev = {
+      overflow: body.style.overflow,
+      position: body.style.position,
+      top: body.style.top,
+      width: body.style.width,
+    };
+
+    body.style.overflow = 'hidden';
+    body.style.position = 'fixed';
+    body.style.top = `-${scrollY}px`;
+    body.style.width = '100%';
+
+    return () => {
+      body.style.overflow = prev.overflow;
+      body.style.position = prev.position;
+      body.style.top = prev.top;
+      body.style.width = prev.width;
+      window.scrollTo({ top: scrollY, left: 0, behavior: 'auto' });
+    };
+  }, [isCreateModalOpen]);
+
+  useEffect(() => {
     const next: Record<string, boolean> = {};
     for (const row of rows) next[row.userId] = false;
     setDraftSelectedUserIds(next);
@@ -295,7 +320,9 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
             background: isDarkTheme ? 'rgba(8, 13, 24, 0.58)' : 'rgba(34, 44, 66, 0.34)',
             backdropFilter: 'blur(2px)',
             overflowY: 'auto',
-            WebkitOverflowScrolling: 'touch'
+            WebkitOverflowScrolling: 'touch',
+            overscrollBehavior: 'contain',
+            touchAction: 'pan-y'
           }}
         >
           <div
@@ -305,6 +332,7 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
               maxHeight: '90vh',
               overflow: 'hidden',
               touchAction: 'pan-y',
+              overscrollBehavior: 'contain',
               background: isDarkTheme ? 'rgba(22, 18, 31, 0.97)' : 'rgba(248, 251, 255, 0.98)',
               border: isDarkTheme ? '1px solid rgba(255, 255, 255, 0.16)' : '1px solid rgba(24, 44, 86, 0.22)',
               boxShadow: '0 20px 44px rgba(16, 24, 40, 0.32)'
@@ -343,6 +371,7 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
                 overflow: 'auto',
                 overscrollBehavior: 'contain',
                 WebkitOverflowScrolling: 'touch',
+                touchAction: 'pan-y',
                 background: isDarkTheme ? 'rgba(12, 11, 20, 0.74)' : 'rgba(255, 255, 255, 0.96)'
               }}
             >

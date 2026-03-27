@@ -9,7 +9,7 @@ import { SessionBadge } from '@/components/session-badge';
 import { SessionIdleGuard } from '@/components/session-idle-guard';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { getSessionCookieName, verifySession } from '@/lib/auth';
-import { getNewContactMessagesCount, getUserFromSessionToken } from '@/lib/db';
+import { getNewContactMessagesCount } from '@/lib/db';
 
 function BellIcon() {
   return (
@@ -30,9 +30,8 @@ function BellIcon() {
 export async function AppShell({ children }: { children: ReactNode }) {
   const token = (await cookies()).get(getSessionCookieName())?.value ?? null;
   const session = verifySession(token);
-  const viewer = session ? await getUserFromSessionToken(token) : null;
-  const isLoggedIn = Boolean(viewer);
-  const isAdmin = viewer?.role === 'admin';
+  const isLoggedIn = Boolean(session);
+  const isAdmin = session?.role === 'admin';
   const newContactCount = isAdmin ? await getNewContactMessagesCount() : 0;
 
   const nav = [
@@ -82,9 +81,9 @@ export async function AppShell({ children }: { children: ReactNode }) {
               <SessionBadge
                 initialData={{
                   ok: true,
-                  isAuthenticated: Boolean(viewer),
+                  isAuthenticated: isLoggedIn,
                   isAdmin: Boolean(isAdmin),
-                  user: viewer,
+                  user: null,
                 }}
               />
             </div>

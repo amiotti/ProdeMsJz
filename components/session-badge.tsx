@@ -85,7 +85,7 @@ export function SessionBadge({ initialData }: { initialData: SessionBadgeData })
     }
   }
 
-  if (!data.isAuthenticated || !data.user) {
+  if (!data.isAuthenticated) {
     return (
       <div className="session-badge session-badge-loggedout">
         <Link className="nav-link session-login-btn" href="/login">
