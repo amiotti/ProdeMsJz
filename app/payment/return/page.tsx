@@ -70,6 +70,7 @@ export default async function PaymentReturnPage({ searchParams }: PaymentReturnP
       validatedPayment = isValidTaloRegistrationPaymentForUser(payment, sessionUser.id, {
         expectedPaymentId: taloPaymentId,
         allowMissingExternalIdForExpectedPaymentId: true,
+        allowAmountMismatch: true,
       });
 
       if (validatedPayment) {

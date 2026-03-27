@@ -371,7 +371,7 @@ export async function getTaloPayment(paymentId: string) {
 
 export function isTaloApprovedStatus(status: string | null | undefined) {
   const normalized = (status ?? '').trim().toUpperCase();
-  return ['SUCCESS', 'SUCCEEDED', 'SUCCESSFUL', 'OVERPAID', 'UNDERPAID', 'APPROVED', 'PAID', 'COMPLETED', 'CONFIRMED'].includes(normalized);
+  return ['SUCCESS', 'SUCCEEDED', 'SUCCESSFUL', 'OVERPAID', 'APPROVED', 'PAID', 'COMPLETED', 'CONFIRMED'].includes(normalized);
 }
 
 export function isValidTaloRegistrationPaymentForUser(
@@ -380,6 +380,7 @@ export function isValidTaloRegistrationPaymentForUser(
   options?: {
     expectedPaymentId?: string | null;
     allowMissingExternalIdForExpectedPaymentId?: boolean;
+    allowAmountMismatch?: boolean;
   },
 ) {
   if (!payment) return false;
@@ -401,7 +402,9 @@ export function isValidTaloRegistrationPaymentForUser(
   const amount = extractPaymentAmount(payment);
 
   const currencyOk = !currency || currency === normalizeCurrency(cfg.currencyId);
-  const amountOk = !Number.isFinite(amount) || Math.abs(amount - Number(cfg.amount)) < 0.01;
+  const strictAmountOk = Number.isFinite(amount) && Math.abs(amount - Number(cfg.amount)) < 0.01;
+  const fallbackAmountOk = Number.isFinite(amount) && amount > 0;
+  const amountOk = strictAmountOk || (Boolean(options?.allowAmountMismatch) && fallbackAmountOk);
 
   return referenceOk && currencyOk && amountOk;
 }

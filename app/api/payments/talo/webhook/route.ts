@@ -130,7 +130,9 @@ export async function POST(request: Request) {
       return noStoreJson({ ok: true, ignored: true, reason: 'external_id no corresponde a inscripcion PRODE' });
     }
 
-    const valid = isValidTaloRegistrationPaymentForUser(payment, userId);
+    const valid = isValidTaloRegistrationPaymentForUser(payment, userId, {
+      allowAmountMismatch: true,
+    });
     if (!valid) {
       auditLog('warn', 'invalid_payment_for_user', {
         ...auditMeta,

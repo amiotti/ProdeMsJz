@@ -46,6 +46,7 @@ export async function POST(request: Request) {
     const valid = isValidTaloRegistrationPaymentForUser(payment, user.id, {
       expectedPaymentId: paymentId,
       allowMissingExternalIdForExpectedPaymentId: true,
+      allowAmountMismatch: true,
     });
     if (!valid) {
       return noStoreJson(
@@ -72,4 +73,3 @@ export async function POST(request: Request) {
     return noStoreJson({ ok: false, error: message }, { status: 400 });
   }
 }
-
