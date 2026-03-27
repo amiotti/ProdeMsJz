@@ -65,6 +65,7 @@ export function PredictionsBoard({
   const [drafts, setDrafts] = useState<DraftMap>({});
   const [triviaDrafts, setTriviaDrafts] = useState<TriviaDraftMap>({});
   const [paying, setPaying] = useState(false);
+  const [syncingPayment, setSyncingPayment] = useState(false);
 
   async function loadState() {
     setLoading(true);
@@ -369,6 +370,28 @@ export function PredictionsBoard({
     }
   }
 
+  async function syncRegistrationPaymentStatus() {
+    setSyncingPayment(true);
+    setMessage(null);
+    try {
+      const response = await fetch('/api/payments/talo/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.ok) {
+        throw new Error(data.error || 'No se pudo sincronizar el pago');
+      }
+      await loadState();
+      setMessage('Pago verificado correctamente. Ya puedes cargar predicciones.');
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'No se pudo sincronizar el pago');
+    } finally {
+      setSyncingPayment(false);
+    }
+  }
+
   function renderTriviaPanel(key: string) {
     return (
       <div key={key} className="panel stack-md">
@@ -507,6 +530,9 @@ export function PredictionsBoard({
         <div className="cta-row">
           <button className="btn btn-primary" type="button" onClick={startRegistrationPayment} disabled={paying}>
             {paying ? 'Redirigiendo a TaloPay...' : 'Pagar inscripción'}
+          </button>
+          <button className="btn" type="button" onClick={syncRegistrationPaymentStatus} disabled={syncingPayment || paying}>
+            {syncingPayment ? 'Sincronizando...' : 'Sincronizar estado con Talo'}
           </button>
           <Link className="cta-link" href="/payment/return">
             Revisar estado del pago

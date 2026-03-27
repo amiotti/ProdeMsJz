@@ -118,7 +118,9 @@ export async function POST(request: Request) {
     }
 
     const payment = await getTaloPayment(paymentId);
-    const userId = extractUserIdFromTaloRegistrationExternalId(payment.external_id);
+    const userId = extractUserIdFromTaloRegistrationExternalId(
+      payment.external_id ?? payment.externalId ?? payment.reference_id ?? payment.referenceId,
+    );
     if (!userId) {
       auditLog('info', 'ignored_non_prode_reference', {
         ...auditMeta,

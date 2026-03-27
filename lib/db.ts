@@ -1451,7 +1451,12 @@ export async function getPredictionsScreenState(viewerToken?: string | null): Pr
         if (pendingPaymentId) {
           try {
             const payment = await getTaloPayment(pendingPaymentId);
-            if (isValidTaloRegistrationPaymentForUser(payment, viewerUser.id)) {
+            if (
+              isValidTaloRegistrationPaymentForUser(payment, viewerUser.id, {
+                expectedPaymentId: pendingPaymentId,
+                allowMissingExternalIdForExpectedPaymentId: true,
+              })
+            ) {
               viewerUser = await markUserRegistrationPaymentApproved(viewerUser.id, pendingPaymentId);
             }
           } catch {

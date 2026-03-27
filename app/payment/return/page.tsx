@@ -67,7 +67,10 @@ export default async function PaymentReturnPage({ searchParams }: PaymentReturnP
     try {
       const payment = await getTaloPayment(taloPaymentId);
       taloPaymentStatus = payment.payment_status ?? payment.status ?? null;
-      validatedPayment = isValidTaloRegistrationPaymentForUser(payment, sessionUser.id);
+      validatedPayment = isValidTaloRegistrationPaymentForUser(payment, sessionUser.id, {
+        expectedPaymentId: taloPaymentId,
+        allowMissingExternalIdForExpectedPaymentId: true,
+      });
 
       if (validatedPayment) {
         const before = sessionUser.registrationPaymentStatus;
