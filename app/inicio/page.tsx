@@ -5,7 +5,6 @@ import { TeamName } from '@/components/team-name';
 import { getSessionCookieName, verifySession } from '@/lib/auth';
 import { formatDateTimeArgentina } from '@/lib/datetime';
 import { getHomePageState } from '@/lib/db';
-import { getRegistrationAmountArs } from '@/lib/public-config';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,19 +12,6 @@ export default async function InicioPage() {
   const token = (await cookies()).get(getSessionCookieName())?.value ?? null;
   const session = verifySession(token);
   const state = await getHomePageState();
-  const registrationAmountArs = getRegistrationAmountArs();
-  const paidParticipants = state.paidParticipants;
-  const prizePool = paidParticipants * registrationAmountArs;
-  const prizes = [
-    { place: '1°' as const, pct: 20 },
-    { place: '2°' as const, pct: 15 },
-    { place: '3°' as const, pct: 10 },
-    { place: '4°' as const, pct: 5 },
-    { place: '5°' as const, pct: 1 },
-  ].map((item) => ({
-    place: item.place,
-    amount: Math.round((prizePool * item.pct) / 100),
-  }));
 
   const totalMatches = state.summary.matches;
   const resultsLoaded = state.summary.matchesWithOfficialResult;
@@ -43,18 +29,11 @@ export default async function InicioPage() {
           <h2 className="hero-title">PRODE Mundial 2026</h2>
           <p className="muted">
             Registro de participantes, predicciones por partido, resultados oficiales y tabla de posiciones para el
-            torneo de 48 selecciones. Los premios del Top 5 se actualizan automáticamente según la cantidad de
-            inscriptos con pago aprobado.
+            torneo de 48 selecciones.
           </p>
           <div className="panel prizes-panel">
-            <h3>Premios Top 5</h3>
-            <ol className="rules-list">
-              {prizes.map((prize) => (
-                <li key={prize.place}>
-                  {prize.place} premio: ${prize.amount.toLocaleString('es-AR')}
-                </li>
-              ))}
-            </ol>
+            <h3>Premios Top 10</h3>
+            <p className="muted">Habrá premios para el Top 10 de participantes con mayor puntuación.</p>
           </div>
           <div className="cta-row">
             {!session ? (
@@ -124,10 +103,7 @@ export default async function InicioPage() {
 
       <div className="panel stack-md">
         <h3>Grupos (zonas) y equipos</h3>
-        <p className="muted">
-          Grupos cargados con selecciones definidas tras el sorteo, incluyendo plazas de repechaje donde todavía no
-          hay ganador confirmado.
-        </p>
+        <p className="muted">Grupos cargados con selecciones definidas tras el sorteo.</p>
         <div className="group-grid">
           {state.groups.map((group) => (
             <div key={group.id} className="group-card">
@@ -146,4 +122,3 @@ export default async function InicioPage() {
     </section>
   );
 }
-

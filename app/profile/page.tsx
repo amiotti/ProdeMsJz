@@ -42,10 +42,9 @@ export default async function ProfilePage() {
         </p>
       </div>
       <ProfileForm user={user} />
-      <ProfilePredictions initialState={predictionsState} userId={user.id} />
+      {user.role !== 'admin' ? <ProfilePredictions initialState={predictionsState} userId={user.id} /> : null}
     </section>
   );
 }
-
 
 

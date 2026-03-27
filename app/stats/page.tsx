@@ -706,7 +706,7 @@ function UserStatsDashboard({ state, user }: { state: StateResponse; user: User 
           <div className="detail-card">
             <span className="detail-label">Probabilidad de ganar</span>
             <strong>{userProb}%</strong>
-            <span className="muted compact-text">Modelo simple de simulación (Monte Carlo)</span>
+            <span className="muted compact-text">Estimación en base a partidos pendientes.</span>
           </div>
           <div className="detail-card">
             <span className="detail-label">Posiciones ganadas</span>
@@ -756,10 +756,6 @@ function UserStatsDashboard({ state, user }: { state: StateResponse; user: User 
             <span>Top 8 (simulación)</span>
           </div>
           <HorizontalBars percent data={montecarlo} />
-          <p className="muted">
-            Simulacion simple Monte Carlo usando predicciones cargadas en partidos pendientes. Sirve como indicador, no
-            como garantia. Iteraciones adaptativas usadas: {monteCarloIterations}.
-          </p>
         </div>
       </div>
 
@@ -817,6 +813,5 @@ export default async function StatsPage() {
 
   return <UserStatsDashboard state={state} user={state.viewer.user} />;
 }
-
 
 
