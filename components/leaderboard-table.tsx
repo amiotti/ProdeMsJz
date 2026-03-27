@@ -48,25 +48,6 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
   }, []);
 
   useEffect(() => {
-    if (!isCreateModalOpen) return;
-    const body = document.body;
-    const html = document.documentElement;
-    const prevBodyOverflow = body.style.overflow;
-    const prevBodyOverscroll = body.style.overscrollBehaviorY;
-    const prevHtmlOverscroll = html.style.overscrollBehaviorY;
-
-    body.style.overflow = 'hidden';
-    body.style.overscrollBehaviorY = 'none';
-    html.style.overscrollBehaviorY = 'none';
-
-    return () => {
-      body.style.overflow = prevBodyOverflow;
-      body.style.overscrollBehaviorY = prevBodyOverscroll;
-      html.style.overscrollBehaviorY = prevHtmlOverscroll;
-    };
-  }, [isCreateModalOpen]);
-
-  useEffect(() => {
     const next: Record<string, boolean> = {};
     for (const row of rows) next[row.userId] = false;
     setDraftSelectedUserIds(next);
@@ -307,6 +288,7 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
           style={{
             position: 'fixed',
             inset: 0,
+            height: '100dvh',
             zIndex: 120,
             display: 'flex',
             justifyContent: 'center',
@@ -325,9 +307,10 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
             style={{
               width: 'min(560px, 100%)',
               maxHeight: 'min(80dvh, 700px)',
-              overflowY: 'auto',
-              overflowX: 'hidden',
-              WebkitOverflowScrolling: 'touch',
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.75rem',
               touchAction: 'pan-y',
               overscrollBehavior: 'auto',
               background: isDarkTheme ? 'rgba(22, 18, 31, 0.97)' : 'rgba(248, 251, 255, 0.98)',
@@ -364,6 +347,12 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
                 border: isDarkTheme ? '1px solid rgba(255, 255, 255, 0.16)' : '1px solid rgba(24, 44, 86, 0.22)',
                 borderRadius: 12,
                 padding: '0.55rem',
+                flex: '1 1 auto',
+                minHeight: 0,
+                overflowY: 'auto',
+                overflowX: 'hidden',
+                WebkitOverflowScrolling: 'touch',
+                overscrollBehaviorY: 'contain',
                 background: isDarkTheme ? 'rgba(12, 11, 20, 0.74)' : 'rgba(255, 255, 255, 0.96)'
               }}
             >
@@ -414,6 +403,7 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
                 paddingRight: '0.2rem',
                 paddingTop: '0.35rem',
                 paddingBottom: '0.1rem',
+                marginTop: 'auto',
                 background: 'transparent'
               }}
             >
