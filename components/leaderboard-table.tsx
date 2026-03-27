@@ -50,25 +50,11 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
   useEffect(() => {
     if (!isCreateModalOpen) return;
     const body = document.body;
-    const scrollY = window.scrollY;
-    const prev = {
-      overflow: body.style.overflow,
-      position: body.style.position,
-      top: body.style.top,
-      width: body.style.width,
-    };
-
+    const prev = body.style.overflow;
     body.style.overflow = 'hidden';
-    body.style.position = 'fixed';
-    body.style.top = `-${scrollY}px`;
-    body.style.width = '100%';
 
     return () => {
-      body.style.overflow = prev.overflow;
-      body.style.position = prev.position;
-      body.style.top = prev.top;
-      body.style.width = prev.width;
-      window.scrollTo({ top: scrollY, left: 0, behavior: 'auto' });
+      body.style.overflow = prev;
     };
   }, [isCreateModalOpen]);
 
@@ -330,7 +316,7 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
             style={{
               width: 'min(560px, 100%)',
               maxHeight: '90vh',
-              overflow: 'hidden',
+              overflow: 'auto',
               touchAction: 'pan-y',
               overscrollBehavior: 'contain',
               background: isDarkTheme ? 'rgba(22, 18, 31, 0.97)' : 'rgba(248, 251, 255, 0.98)',

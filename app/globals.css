@@ -4130,6 +4130,13 @@ html[data-theme='dark'] .legal-back-btn {
 
 /* Mobile leaderboard scroll stability */
 @media (max-width: 760px) {
+  input:not([type='checkbox']):not([type='radio']):not([type='range']),
+  select,
+  textarea {
+    font-size: 16px !important;
+    line-height: 1.25;
+  }
+
   body {
     background-attachment: scroll, scroll, scroll, scroll, scroll, scroll;
     overscroll-behavior-y: auto;
