@@ -48,17 +48,6 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
   }, []);
 
   useEffect(() => {
-    if (!isCreateModalOpen) return;
-    const body = document.body;
-    const prev = body.style.overflow;
-    body.style.overflow = 'hidden';
-
-    return () => {
-      body.style.overflow = prev;
-    };
-  }, [isCreateModalOpen]);
-
-  useEffect(() => {
     const next: Record<string, boolean> = {};
     for (const row of rows) next[row.userId] = false;
     setDraftSelectedUserIds(next);
@@ -300,14 +289,15 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
             position: 'fixed',
             inset: 0,
             zIndex: 120,
-            display: 'grid',
-            placeItems: 'center',
-            padding: '1rem',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+            padding: '4vh 1rem 2rem',
             background: isDarkTheme ? 'rgba(8, 13, 24, 0.58)' : 'rgba(34, 44, 66, 0.34)',
             backdropFilter: 'blur(2px)',
             overflowY: 'auto',
             WebkitOverflowScrolling: 'touch',
-            overscrollBehavior: 'contain',
+            overscrollBehavior: 'auto',
             touchAction: 'pan-y'
           }}
         >
@@ -315,10 +305,10 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
             className="panel stack-md"
             style={{
               width: 'min(560px, 100%)',
-              maxHeight: '90vh',
-              overflow: 'auto',
+              maxHeight: 'none',
+              overflow: 'visible',
               touchAction: 'pan-y',
-              overscrollBehavior: 'contain',
+              overscrollBehavior: 'auto',
               background: isDarkTheme ? 'rgba(22, 18, 31, 0.97)' : 'rgba(248, 251, 255, 0.98)',
               border: isDarkTheme ? '1px solid rgba(255, 255, 255, 0.16)' : '1px solid rgba(24, 44, 86, 0.22)',
               boxShadow: '0 20px 44px rgba(16, 24, 40, 0.32)'
@@ -353,9 +343,9 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
                 border: isDarkTheme ? '1px solid rgba(255, 255, 255, 0.16)' : '1px solid rgba(24, 44, 86, 0.22)',
                 borderRadius: 12,
                 padding: '0.55rem',
-                maxHeight: '44vh',
+                maxHeight: 'min(38vh, 340px)',
                 overflow: 'auto',
-                overscrollBehavior: 'contain',
+                overscrollBehavior: 'auto',
                 WebkitOverflowScrolling: 'touch',
                 touchAction: 'pan-y',
                 background: isDarkTheme ? 'rgba(12, 11, 20, 0.74)' : 'rgba(255, 255, 255, 0.96)'
@@ -405,7 +395,14 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
                 flexWrap: 'wrap',
                 alignItems: 'center',
                 justifyContent: 'flex-end',
-                paddingRight: '0.2rem'
+                paddingRight: '0.2rem',
+                position: 'sticky',
+                bottom: 0,
+                zIndex: 2,
+                paddingTop: '0.35rem',
+                paddingBottom: '0.1rem',
+                background: isDarkTheme ? 'rgba(22, 18, 31, 0.96)' : 'rgba(248, 251, 255, 0.97)',
+                borderTop: isDarkTheme ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(24, 44, 86, 0.1)'
               }}
             >
               <span className="muted">{selectedCount} usuario(s) seleccionado(s)</span>

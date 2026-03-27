@@ -35,7 +35,6 @@ body {
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
-  scrollbar-gutter: stable both-edges;
 }
 
 body {
