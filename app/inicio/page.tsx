@@ -57,8 +57,8 @@ export default async function InicioPage() {
           <h3>Resumen</h3>
           <div className="cards cards-summary">
             <div className="stat-card">
-              <div className="muted">Usuarios</div>
-              <div className="value">{state.summary.users}</div>
+              <div className="muted">Usuarios (pago aprobado)</div>
+              <div className="value">{state.paidParticipants}</div>
             </div>
             <div className="stat-card">
               <div className="muted">Resultados Cargados</div>

@@ -49,6 +49,7 @@ export function computeLeaderboard(db: ProdeDB): LeaderboardRow[] {
 
   for (const user of db.users) {
     if (user.role === 'admin') continue;
+    if (user.registrationPaymentStatus !== 'approved') continue;
     rowsByUserId.set(user.id, {
       userId: user.id,
       firstName: user.firstName,
