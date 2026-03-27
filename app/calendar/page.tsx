@@ -10,7 +10,7 @@ export default async function CalendarPage() {
     .sort((a, b) => new Date(a.kickoffAt).getTime() - new Date(b.kickoffAt).getTime())
     .map((match) => ({
       id: match.id,
-      stage: match.groupId === 'KO' ? match.stage ?? 'Fase final' : `Fase de grupos - ${match.groupId}`,
+      stage: match.groupId === 'KO' ? match.stage ?? 'Fase final' : `Grupos - ${match.groupId}`,
       date: match.kickoffAt,
       homeTeam: match.homeTeam,
       awayTeam: match.awayTeam,
