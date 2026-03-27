@@ -417,7 +417,7 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
 
                   return (
                     <div className="match-card" key={match.id}>
-                      <div>
+                      <div className="match-main">
                         <p className="match-meta">{meta} - {formatKickoffArgentina(match.kickoffAt)}</p>
                         {match.venue ? <p className="match-meta">Sede: {match.venue}</p> : null}
                         <div className="fixture-row">
@@ -433,7 +433,7 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
                         <input value={draft.away} onChange={(e) => setDraft(match.id, 'away', e.target.value)} disabled={readOnly || savingMatchId === match.id} />
                       </div>
                       {state.viewer.isAdmin ? (
-                        <div className="cta-row" style={{ marginTop: '0.45rem' }}>
+                        <div className="cta-row match-actions">
                           <button
                             className="btn btn-primary btn-small"
                             type="button"
@@ -487,7 +487,7 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
 
                   return (
                     <div className="match-card" key={match.id}>
-                      <div>
+                      <div className="match-main">
                         <p className="match-meta">{meta} - {formatKickoffArgentina(match.kickoffAt)}</p>
                         {match.venue ? <p className="match-meta">Sede: {match.venue}</p> : null}
                         <div className="fixture-row">
@@ -503,7 +503,7 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
                         <input value={draft.away} onChange={(e) => setDraft(match.id, 'away', e.target.value)} disabled={readOnly || savingMatchId === match.id} />
                       </div>
                       {state.viewer.isAdmin ? (
-                        <div className="cta-row" style={{ marginTop: '0.45rem' }}>
+                        <div className="cta-row match-actions">
                           <button
                             className="btn btn-primary btn-small"
                             type="button"
@@ -530,7 +530,7 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
 
                 return (
                   <div className="match-card" key={match.id}>
-                    <div>
+                    <div className="match-main">
                       <p className="match-meta">{meta} - {formatKickoffArgentina(match.kickoffAt)}</p>
                       {match.venue ? <p className="match-meta">Sede: {match.venue}</p> : null}
                       <div className="fixture-row">
@@ -546,7 +546,7 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
                       <input value={draft.away} onChange={(e) => setDraft(match.id, 'away', e.target.value)} disabled={readOnly || savingMatchId === match.id} />
                     </div>
                     {state.viewer.isAdmin ? (
-                      <div className="cta-row" style={{ marginTop: '0.45rem' }}>
+                      <div className="cta-row match-actions">
                         <button
                           className="btn btn-primary btn-small"
                           type="button"

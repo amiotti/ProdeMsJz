@@ -316,7 +316,7 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
             backdropFilter: 'blur(2px)',
             overflowY: 'auto',
             WebkitOverflowScrolling: 'touch',
-            overscrollBehavior: 'contain',
+            overscrollBehaviorY: 'auto',
             touchAction: 'pan-y'
           }}
         >
@@ -324,8 +324,10 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
             className="panel stack-md"
             style={{
               width: 'min(560px, 100%)',
-              maxHeight: 'none',
-              overflow: 'visible',
+              maxHeight: 'min(80dvh, 700px)',
+              overflowY: 'auto',
+              overflowX: 'hidden',
+              WebkitOverflowScrolling: 'touch',
               touchAction: 'pan-y',
               overscrollBehavior: 'auto',
               background: isDarkTheme ? 'rgba(22, 18, 31, 0.97)' : 'rgba(248, 251, 255, 0.98)',
@@ -362,11 +364,6 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
                 border: isDarkTheme ? '1px solid rgba(255, 255, 255, 0.16)' : '1px solid rgba(24, 44, 86, 0.22)',
                 borderRadius: 12,
                 padding: '0.55rem',
-                maxHeight: 'min(38vh, 340px)',
-                overflow: 'auto',
-                overscrollBehavior: 'contain',
-                WebkitOverflowScrolling: 'touch',
-                touchAction: 'pan-y',
                 background: isDarkTheme ? 'rgba(12, 11, 20, 0.74)' : 'rgba(255, 255, 255, 0.96)'
               }}
             >
@@ -415,13 +412,9 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
                 alignItems: 'center',
                 justifyContent: 'flex-end',
                 paddingRight: '0.2rem',
-                position: 'sticky',
-                bottom: 0,
-                zIndex: 2,
                 paddingTop: '0.35rem',
                 paddingBottom: '0.1rem',
-                background: isDarkTheme ? 'rgba(22, 18, 31, 0.96)' : 'rgba(248, 251, 255, 0.97)',
-                borderTop: isDarkTheme ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(24, 44, 86, 0.1)'
+                background: 'transparent'
               }}
             >
               <span className="muted">{selectedCount} usuario(s) seleccionado(s)</span>
