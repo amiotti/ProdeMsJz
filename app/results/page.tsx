@@ -3,10 +3,12 @@
 import { ResultsBoard } from '@/components/results-board';
 import { getSessionCookieName } from '@/lib/auth';
 import { getResultsScreenState } from '@/lib/db';
+import { requireAuthenticatedUser } from '@/lib/route-guard';
 
 export const dynamic = 'force-dynamic';
 
 export default async function ResultsPage() {
+  await requireAuthenticatedUser();
   const token = (await cookies()).get(getSessionCookieName())?.value ?? null;
   const state = await getResultsScreenState(token);
 
@@ -22,5 +24,3 @@ export default async function ResultsPage() {
     </section>
   );
 }
-
-

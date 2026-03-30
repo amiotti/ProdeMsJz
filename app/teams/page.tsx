@@ -2,11 +2,13 @@ import Link from 'next/link';
 
 import { FlagBadge } from '@/components/flag-badge';
 import { getState } from '@/lib/db';
+import { requireAuthenticatedUser } from '@/lib/route-guard';
 import { buildTeamProdeSummary, buildTeamSportFacts, getAllTeams } from '@/lib/worldcup26';
 
 export const revalidate = 60;
 
 export default async function TeamsPage() {
+  await requireAuthenticatedUser();
   const state = await getState();
   const teams = getAllTeams();
   const groupByTeam = new Map<string, string>();

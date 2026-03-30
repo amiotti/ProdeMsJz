@@ -1,8 +1,10 @@
 ﻿import { getState } from '@/lib/db';
+import { requireAuthenticatedUser } from '@/lib/route-guard';
 
 export const revalidate = 60;
 
 export default async function RulesPage() {
+  await requireAuthenticatedUser();
   const state = await getState();
   const { exactScore, correctOutcome } = state.db.pointsConfig;
 
@@ -134,3 +136,4 @@ export default async function RulesPage() {
     </section>
   );
 }
+

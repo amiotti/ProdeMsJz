@@ -1,8 +1,5 @@
-﻿import Link from 'next/link';
-import { cookies } from 'next/headers';
-
-import { UserEvolutionComparisonChart } from '@/components/user-evolution-comparison-chart';
-import { getSessionCookieName } from '@/lib/auth';
+﻿import { UserEvolutionComparisonChart } from '@/components/user-evolution-comparison-chart';
+import { requireAuthenticatedUser } from '@/lib/route-guard';
 import { getState } from '@/lib/db';
 import { calculatePredictionPoints } from '@/lib/prode';
 import { getStatsAnalytics, type StatsAnalyticsSnapshot } from '@/lib/stats-analytics';
@@ -789,29 +786,18 @@ function UserStatsDashboard({ state, user }: { state: StateResponse; user: User 
 }
 
 export default async function StatsPage() {
-  const token = (await cookies()).get(getSessionCookieName())?.value ?? null;
+  const { token } = await requireAuthenticatedUser();
   const state = await getState(token);
+  const viewerUser = state.viewer.user;
 
-  if (!state.viewer.isAuthenticated || !state.viewer.user) {
-    return (
-      <section className="stack-lg">
-        <div className="panel">
-          <h2>Estadísticas</h2>
-          <p className="muted">Debes iniciar sesión para ver tus estadísticas personales del PRODE.</p>
-          <div className="cta-row">
-            <Link className="cta-link" href="/login">Ingresar</Link>
-            <Link className="cta-link" href="/leaderboard">Ver tabla</Link>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (state.viewer.user.role === 'admin') {
+  if (viewerUser?.role === 'admin') {
     return <AdminStatsDashboard state={state} />;
   }
 
-  return <UserStatsDashboard state={state} user={state.viewer.user} />;
+  if (!viewerUser) return null;
+  return <UserStatsDashboard state={state} user={viewerUser} />;
 }
+
+
 
 

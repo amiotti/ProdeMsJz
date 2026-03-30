@@ -1,10 +1,12 @@
 ﻿import { TeamName } from '@/components/team-name';
 import { getState } from '@/lib/db';
 import { formatKickoffArgentina } from '@/lib/datetime';
+import { requireAuthenticatedUser } from '@/lib/route-guard';
 
 export const revalidate = 60;
 
 export default async function CalendarPage() {
+  await requireAuthenticatedUser();
   const state = await getState();
   const fixtures = [...state.db.matches]
     .sort((a, b) => new Date(a.kickoffAt).getTime() - new Date(b.kickoffAt).getTime())

@@ -3,6 +3,7 @@
 import { FlagBadge } from '@/components/flag-badge';
 import { TeamName } from '@/components/team-name';
 import { getState } from '@/lib/db';
+import { requireAuthenticatedUser } from '@/lib/route-guard';
 import { getTeamWikipediaSummary } from '@/lib/wikipedia';
 import {
   buildTeamEditorialNotes,
@@ -31,6 +32,7 @@ function formatMatchDateShort(dateIso: string) {
 }
 
 export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
+  await requireAuthenticatedUser();
   const { slug } = await params;
   const state = await getState();
   const team = getAllTeams().find((item) => item.slug === decodeURIComponent(slug));

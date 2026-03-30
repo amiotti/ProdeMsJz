@@ -1,16 +1,14 @@
 ﻿import Link from 'next/link';
-import { cookies } from 'next/headers';
 
 import { TeamName } from '@/components/team-name';
-import { getSessionCookieName, verifySession } from '@/lib/auth';
 import { formatDateTimeArgentina } from '@/lib/datetime';
 import { getHomePageState } from '@/lib/db';
+import { requireAuthenticatedUser } from '@/lib/route-guard';
 
 export const dynamic = 'force-dynamic';
 
 export default async function InicioPage() {
-  const token = (await cookies()).get(getSessionCookieName())?.value ?? null;
-  const session = verifySession(token);
+  await requireAuthenticatedUser();
   const state = await getHomePageState();
 
   const totalMatches = state.summary.matches;
@@ -36,11 +34,6 @@ export default async function InicioPage() {
             <p className="muted">Habrá premios para el Top 10 de participantes con mayor puntuación.</p>
           </div>
           <div className="cta-row">
-            {!session ? (
-              <Link href="/register" className="cta-link">
-                Registrar usuario
-              </Link>
-            ) : null}
             <Link href="/predictions" className="cta-link">
               Cargar predicciones
             </Link>

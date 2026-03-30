@@ -1,31 +1,11 @@
-﻿import Link from 'next/link';
-import { cookies } from 'next/headers';
-
-import { UsersPanel } from '@/components/users-panel';
-import { getSessionCookieName } from '@/lib/auth';
-import { getUserFromSessionToken, listContactMessages, listUsers } from '@/lib/db';
+﻿import { UsersPanel } from '@/components/users-panel';
+import { listContactMessages, listUsers } from '@/lib/db';
+import { requireAuthenticatedUser } from '@/lib/route-guard';
 
 export const dynamic = 'force-dynamic';
 
 export default async function UsersPage() {
-  const token = (await cookies()).get(getSessionCookieName())?.value ?? null;
-  const user = await getUserFromSessionToken(token);
-
-  if (!user) {
-    return (
-      <section className="stack-lg">
-        <div className="panel">
-          <h2>Usuarios</h2>
-          <p className="muted">Debes iniciar sesión para acceder.</p>
-          <div className="cta-row">
-            <Link className="cta-link" href="/login">
-              Ingresar
-            </Link>
-          </div>
-        </div>
-      </section>
-    );
-  }
+  const { user } = await requireAuthenticatedUser();
 
   if (user.role !== 'admin') {
     return (
@@ -41,4 +21,3 @@ export default async function UsersPage() {
   const [users, messages] = await Promise.all([listUsers(), listContactMessages()]);
   return <UsersPanel initialUsers={users} initialMessages={messages} />;
 }
-
