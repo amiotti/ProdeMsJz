@@ -441,6 +441,7 @@ export function PredictionsBoard({
           <p className="match-meta">{headerMeta} - {kickoff}</p>
           {extraMeta ? <p className="match-meta">{extraMeta}</p> : null}
           <p className="match-meta">Sede: {match.venue ?? 'Pendiente de confirmar'}</p>
+          <p className="match-meta">Fuente horaria: GMT oficial FIFA (convertido a hora Argentina).</p>
           <div className="fixture-row">
             <TeamName teamName={match.homeTeam} linkToTeam />
             <span className="vs">vs</span>

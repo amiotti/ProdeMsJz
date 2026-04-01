@@ -892,7 +892,8 @@ function parseOfficialFixtureLocalKickoffToIso(row: OfficialFixtureRow): string 
 }
 
 function getOfficialRowKickoffIso(row: OfficialFixtureRow): string {
-  return getManualKickoffOverrideIso(row) ?? parseOfficialFixtureLocalKickoffToIso(row) ?? parseGmtInfoToIso(row.dateHeading, row.gmtInfo);
+  // Use GMT provided by the official fixture as source of truth.
+  return parseGmtInfoToIso(row.dateHeading, row.gmtInfo);
 }
 
 function getManualKickoffOverrideIso(row: { stage: string; matchLabel: string }) {
