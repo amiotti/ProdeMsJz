@@ -102,6 +102,7 @@ export function PredictionsBoard({
   }, [state]);
 
   const currentUser = state?.viewer.user ?? null;
+  const hasApprovedPayment = currentUser?.registrationPaymentStatus === 'approved';
 
   const lockedMatchIds = useMemo(() => {
     const nowMs = Date.now();
@@ -194,6 +195,7 @@ export function PredictionsBoard({
   }, [visibleSections]);
 
   function setDraft(matchId: string, side: 'home' | 'away', value: string) {
+    if (!hasApprovedPayment) return;
     if (lockedMatchIds.has(matchId)) return;
     if (value && !/^\d+$/.test(value)) return;
 
@@ -208,12 +210,17 @@ export function PredictionsBoard({
   }
 
   function setTriviaDraft(questionId: string, value: string) {
+    if (!hasApprovedPayment) return;
     setTriviaDrafts((prev) => ({ ...prev, [questionId]: value }));
   }
 
   async function savePredictions(targetMatchId?: string) {
     if (!currentUser) {
       setMessage('Debes iniciar sesión para cargar predicciones.');
+      return;
+    }
+    if (!hasApprovedPayment) {
+      setMessage('Debes tener la inscripción aprobada para guardar predicciones.');
       return;
     }
 
@@ -268,6 +275,10 @@ export function PredictionsBoard({
       setMessage('Debes iniciar sesión para cargar predicciones.');
       return;
     }
+    if (!hasApprovedPayment) {
+      setMessage('Debes tener la inscripción aprobada para guardar predicciones.');
+      return;
+    }
 
     const predictions = Object.entries(drafts)
       .filter(
@@ -311,6 +322,10 @@ export function PredictionsBoard({
   async function saveTriviaAnswers() {
     if (!currentUser) {
       setMessage('Debes iniciar sesión para cargar trivias.');
+      return;
+    }
+    if (!hasApprovedPayment) {
+      setMessage('Debes tener la inscripción aprobada para guardar trivias.');
       return;
     }
 
@@ -370,7 +385,8 @@ export function PredictionsBoard({
   }
 
 
-  function renderTriviaPanel(key: string) {
+  function renderTriviaPanel(key: string, readOnly = false) {
+    const triviaReadOnly = readOnly || !triviaEditable;
     return (
       <div key={key} className="panel stack-md">
         <div className="section-head">
@@ -384,6 +400,9 @@ export function PredictionsBoard({
         {!triviaEditable ? (
           <p className="status">La trivia está cerrada porque ya comenzó la fase de llaves.</p>
         ) : null}
+        {readOnly ? (
+          <p className="status">Vista de solo lectura: habilita tu inscripción para editar y guardar.</p>
+        ) : null}
         <div className="stack-md">
           {state?.db.triviaQuestions.map((question, index) => (
             <label key={question.id} className="stack-xs">
@@ -395,13 +414,13 @@ export function PredictionsBoard({
                 onChange={(event) => setTriviaDraft(question.id, event.target.value)}
                 placeholder={question.answerType === 'number' ? 'Ingresa un número' : 'Escribe tu respuesta'}
                 inputMode={question.answerType === 'number' ? 'numeric' : undefined}
-                disabled={!triviaEditable || savingTrivia}
+                disabled={triviaReadOnly || savingTrivia}
               />
             </label>
           ))}
         </div>
         <div className="fixture-inline" style={{ justifyContent: 'flex-start' }}>
-          <button className="btn btn-primary" type="button" onClick={saveTriviaAnswers} disabled={!triviaEditable || savingTrivia}>
+          <button className="btn btn-primary" type="button" onClick={saveTriviaAnswers} disabled={triviaReadOnly || savingTrivia}>
             {savingTrivia ? 'Guardando...' : 'Guardar trivia'}
           </button>
         </div>
@@ -409,7 +428,7 @@ export function PredictionsBoard({
     );
   }
 
-  function renderMatchCard(match: Match, extraMeta?: string) {
+  function renderMatchCard(match: Match, extraMeta?: string, readOnly = false) {
     const draft = drafts[match.id] ?? { home: '', away: '' };
     const kickoff = formatKickoffArgentina(match.kickoffAt);
     const headerMeta = match.groupId === 'KO' ? match.stage ?? 'Fase final' : `Grupo ${match.groupId} - Fecha ${match.matchday}`;
@@ -447,6 +466,7 @@ export function PredictionsBoard({
             value={draft.home}
             onChange={(e) => setDraft(match.id, 'home', e.target.value)}
             aria-label={`Goles ${match.homeTeam}`}
+            disabled={readOnly}
           />
           <span className="score-divider">-</span>
           <input
@@ -454,12 +474,13 @@ export function PredictionsBoard({
             value={draft.away}
             onChange={(e) => setDraft(match.id, 'away', e.target.value)}
             aria-label={`Goles ${match.awayTeam}`}
+            disabled={readOnly}
           />
           <button
             className="btn btn-primary btn-small"
             type="button"
             onClick={() => savePredictions(match.id)}
-            disabled={saving || savingMatchId === match.id || draft.home === '' || draft.away === ''}
+            disabled={readOnly || saving || savingMatchId === match.id || draft.home === '' || draft.away === ''}
           >
             {savingMatchId === match.id ? 'Guardando...' : 'Guardar'}
           </button>
@@ -498,31 +519,28 @@ export function PredictionsBoard({
     );
   }
 
-  if (currentUser.registrationPaymentStatus !== 'approved') {
-    return (
-      <div className="panel stack-md">
-        <h3>Predicciones bloqueadas hasta confirmar pago</h3>
-        <p className="muted">
-          Tu usuario tiene estado de inscripción <strong>{currentUser.registrationPaymentStatus ?? 'pending'}</strong>. Debes completar y confirmar el pago de <strong>${registrationAmountArs.toLocaleString('es-AR')}</strong> para acceder a la carga de predicciones.
-        </p>
-        <div className="cta-row">
-          <button className="btn btn-primary" type="button" onClick={startRegistrationPayment} disabled={paying}>
-            {paying ? 'Redirigiendo a TaloPay...' : 'Pagar inscripción'}
-          </button>
-          <Link className="cta-link" href="/payment/return">
-            Revisar estado del pago
-          </Link>
-          <Link className="cta-link" href="/profile">
-            Mi perfil
-          </Link>
-        </div>
-        {message ? <p className="status">{message}</p> : null}
-      </div>
-    );
-  }
-
   return (
     <section className="stack-lg predictions-board">
+      {!hasApprovedPayment ? (
+        <div className="panel stack-md">
+          <h3>Predicciones bloqueadas hasta confirmar pago</h3>
+          <p className="muted">
+            Tu usuario tiene estado de inscripción <strong>{currentUser.registrationPaymentStatus ?? 'pending'}</strong>. Debes completar y confirmar el pago de <strong>${registrationAmountArs.toLocaleString('es-AR')}</strong> para acceder a la carga de predicciones.
+          </p>
+          <div className="cta-row">
+            <button className="btn btn-primary" type="button" onClick={startRegistrationPayment} disabled={paying}>
+              {paying ? 'Redirigiendo a TaloPay...' : 'Pagar inscripción'}
+            </button>
+            <Link className="cta-link" href="/payment/return">
+              Revisar estado del pago
+            </Link>
+            <Link className="cta-link" href="/profile">
+              Mi perfil
+            </Link>
+          </div>
+        </div>
+      ) : null}
+
       <div className="panel toolbar-grid">
         <label>
           Filtrar grupo
@@ -562,12 +580,12 @@ export function PredictionsBoard({
       {message ? <p className="status">{message}</p> : null}
 
       {selectedGroupId === 'TRIVIA' ? (
-        renderTriviaPanel('trivia-only')
+        renderTriviaPanel('trivia-only', !hasApprovedPayment)
       ) : viewMode === 'group' ? (
         visibleSections.flatMap((section, index) => {
           const nodes = [];
           if (selectedGroupId === 'ALL' && index === firstKnockoutSectionIndex) {
-            nodes.push(renderTriviaPanel('trivia-between-group-and-ko'));
+            nodes.push(renderTriviaPanel('trivia-between-group-and-ko', !hasApprovedPayment));
           }
           nodes.push(
             <div key={section.id} className="panel stack-md">
@@ -579,7 +597,7 @@ export function PredictionsBoard({
                     className="btn btn-primary btn-small"
                     type="button"
                     onClick={() => saveSectionPredictions(section.id, section.matches.map((m) => m.id))}
-                    disabled={savingSectionId === section.id || saving}
+                    disabled={!hasApprovedPayment || savingSectionId === section.id || saving}
                   >
                     {savingSectionId === section.id ? 'Guardando...' : section.saveLabel}
                   </button>
@@ -587,7 +605,7 @@ export function PredictionsBoard({
               </div>
 
               {section.subtitle ? <p className="muted compact-text">{section.subtitle}</p> : null}
-              <div className="match-list">{section.matches.map((match) => renderMatchCard(match))}</div>
+              <div className="match-list">{section.matches.map((match) => renderMatchCard(match, undefined, !hasApprovedPayment))}</div>
             </div>,
           );
           return nodes;
@@ -602,11 +620,11 @@ export function PredictionsBoard({
                   <span>{section.matches.length} partidos pendientes</span>
                 </div>
                 <div className="match-list">
-                  {section.matches.map((match) => renderMatchCard(match, match._meta))}
+                  {section.matches.map((match) => renderMatchCard(match, match._meta, !hasApprovedPayment))}
                 </div>
               </div>
             ))}
-            {renderTriviaPanel('trivia-between-group-and-ko-date')}
+            {renderTriviaPanel('trivia-between-group-and-ko-date', !hasApprovedPayment)}
             {dateSectionsByPhase.knockout.map((section) => (
               <div key={`ko-${section.label}`} className="panel stack-md">
                 <div className="section-head">
@@ -614,7 +632,7 @@ export function PredictionsBoard({
                   <span>{section.matches.length} partidos pendientes</span>
                 </div>
                 <div className="match-list">
-                  {section.matches.map((match) => renderMatchCard(match, match._meta))}
+                  {section.matches.map((match) => renderMatchCard(match, match._meta, !hasApprovedPayment))}
                 </div>
               </div>
             ))}
@@ -627,7 +645,7 @@ export function PredictionsBoard({
                 <span>{section.matches.length} partidos pendientes</span>
               </div>
               <div className="match-list">
-                {section.matches.map((match) => renderMatchCard(match, match._meta))}
+                {section.matches.map((match) => renderMatchCard(match, match._meta, !hasApprovedPayment))}
               </div>
             </div>
           ))
