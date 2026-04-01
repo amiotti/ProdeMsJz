@@ -68,6 +68,27 @@ function normalizeSpanishDisplayText(value: string): string {
   return applySpanishAccents(fixMojibakeText(value));
 }
 
+const TEAM_DISPLAY_OVERRIDES: Record<string, string> = {
+  Mexico: 'México',
+  Canada: 'Canadá',
+  Japon: 'Japón',
+  Tunez: 'Túnez',
+  Belgica: 'Bélgica',
+  Espana: 'España',
+  'Paises Bajos': 'Países Bajos',
+  Sudafrica: 'Sudáfrica',
+  Turquia: 'Turquía',
+  Haiti: 'Haití',
+  Iran: 'Irán',
+  Panama: 'Panamá',
+};
+
+export function getTeamDisplayName(teamName: string): string {
+  const canonical = ARTICLE_TEAM_TO_CANONICAL[teamName] ?? teamName;
+  const base = TEAM_DISPLAY_OVERRIDES[canonical] ?? TEAM_DISPLAY_OVERRIDES[teamName] ?? canonical;
+  return normalizeSpanishDisplayText(base);
+}
+
 const TEAM_WIKIPEDIA_TITLE_OVERRIDES: Record<string, string> = {
   'Arabia Saudita': 'SelecciÃƒÂ³n_de_fÃƒÂºtbol_de_Arabia_Saudita',
   Argelia: 'SelecciÃƒÂ³n_de_fÃƒÂºtbol_de_Argelia',
@@ -180,15 +201,14 @@ const TEAM_CATALOG: TeamInfo[] = [
     shortDescription: 'Seleccion africana con experiencia en torneos y juego fisico.',
   },
   {
-    id: 'ganador-repechaje-uefa-d',
-    name: 'Ganador Repechaje UEFA D',
-    slug: 'ganador-repechaje-uefa-d',
-    flag: 'PO',
+    id: 'chequia',
+    name: 'Chequia',
+    slug: 'chequia',
+    flag: 'CZ',
     confederation: 'UEFA',
-    fifaStrength: 1710,
-    shortDescription: 'Plaza pendiente del repechaje UEFA (ruta D), con final ya definida.',
-    notes: 'Final UEFA D (31/03): 🇨🇿 Chequia vs 🇩🇰 Dinamarca. Semifinales del 26/03: Dinamarca 4-0 Macedonia del Norte y Chequia 2-2 Irlanda (4-3 penales).',
-    isPlaceholder: true,
+    fifaStrength: 1790,
+    shortDescription: 'Clasificada via repechaje UEFA (ruta D). Equipo competitivo y ordenado.',
+    notes: 'Clasificacion confirmada el 31/03/2026 en el repechaje UEFA.',
   },
   {
     id: 'canada',
@@ -218,15 +238,14 @@ const TEAM_CATALOG: TeamInfo[] = [
     shortDescription: 'Seleccion asiatica con experiencia reciente en Mundial.',
   },
   {
-    id: 'ganador-repechaje-uefa-a',
-    name: 'Ganador Repechaje UEFA A',
-    slug: 'ganador-repechaje-uefa-a',
-    flag: 'PO',
+    id: 'bosnia-y-herzegovina',
+    name: 'Bosnia y Herzegovina',
+    slug: 'bosnia-y-herzegovina',
+    flag: 'BA',
     confederation: 'UEFA',
-    fifaStrength: 1730,
-    shortDescription: 'Plaza pendiente del repechaje UEFA (ruta A), con final ya definida.',
-    notes: 'Final UEFA A (31/03): 🇧🇦 Bosnia y Herzegovina vs 🇮🇹 Italia. Semifinales del 26/03: Italia 2-0 Irlanda del Norte y Bosnia 1-1 Gales (4-2 penales).',
-    isPlaceholder: true,
+    fifaStrength: 1750,
+    shortDescription: 'Clasificada via repechaje UEFA (ruta A).',
+    notes: 'Clasificacion confirmada el 31/03/2026 tras vencer a Italia por penales.',
   },
   {
     id: 'brasil',
@@ -292,15 +311,14 @@ const TEAM_CATALOG: TeamInfo[] = [
     shortDescription: 'Equipo sudamericano compacto y de juego directo.',
   },
   {
-    id: 'ganador-repechaje-uefa-c',
-    name: 'Ganador Repechaje UEFA C',
-    slug: 'ganador-repechaje-uefa-c',
-    flag: 'PO',
+    id: 'turquia',
+    name: 'Turquia',
+    slug: 'turquia',
+    flag: 'TR',
     confederation: 'UEFA',
-    fifaStrength: 1720,
-    shortDescription: 'Plaza pendiente del repechaje UEFA (ruta C), con final ya definida.',
-    notes: 'Final UEFA C (31/03): 🇽🇰 Kosovo vs 🇹🇷 Turquia. Semifinales del 26/03: Turquia 1-0 Rumania y Kosovo 4-3 Eslovaquia.',
-    isPlaceholder: true,
+    fifaStrength: 1785,
+    shortDescription: 'Clasificada via repechaje UEFA (ruta C).',
+    notes: 'Clasificacion confirmada el 31/03/2026.',
   },
   {
     id: 'alemania',
@@ -366,15 +384,14 @@ const TEAM_CATALOG: TeamInfo[] = [
     shortDescription: 'Seleccion africana ordenada y competitiva.',
   },
   {
-    id: 'ganador-repechaje-uefa-b',
-    name: 'Ganador Repechaje UEFA B',
-    slug: 'ganador-repechaje-uefa-b',
-    flag: 'PO',
+    id: 'suecia',
+    name: 'Suecia',
+    slug: 'suecia',
+    flag: 'SE',
     confederation: 'UEFA',
-    fifaStrength: 1725,
-    shortDescription: 'Plaza pendiente del repechaje UEFA (ruta B), con final ya definida.',
-    notes: 'Final UEFA B (31/03): 🇸🇪 Suecia vs 🇵🇱 Polonia. Semifinales del 26/03: Suecia 3-1 Ucrania y Polonia 2-1 Albania.',
-    isPlaceholder: true,
+    fifaStrength: 1800,
+    shortDescription: 'Clasificada via repechaje UEFA (ruta B).',
+    notes: 'Clasificacion confirmada el 31/03/2026.',
   },
   {
     id: 'belgica',
@@ -476,15 +493,14 @@ const TEAM_CATALOG: TeamInfo[] = [
     shortDescription: 'Seleccion europea en ascenso, fuerte en ataque directo.',
   },
   {
-    id: 'ganador-repechaje-intercontinental-2',
-    name: 'Ganador Repechaje Intercontinental 2',
-    slug: 'ganador-repechaje-intercontinental-2',
-    flag: 'PO',
-    confederation: 'Intercontinental',
-    fifaStrength: 1665,
-    shortDescription: 'Plaza pendiente del repechaje intercontinental (ruta 2), con final ya definida.',
-    notes: 'Final intercontinental ruta 2 (31/03): 🇮🇶 Irak vs 🇧🇴 Bolivia. Semifinal del 26/03: Bolivia 2-1 Surinam.',
-    isPlaceholder: true,
+    id: 'irak',
+    name: 'Irak',
+    slug: 'irak',
+    flag: 'IQ',
+    confederation: 'AFC',
+    fifaStrength: 1690,
+    shortDescription: 'Clasificada via repechaje intercontinental.',
+    notes: 'Clasificacion confirmada el 31/03/2026 tras vencer 2-1 a Bolivia.',
   },
   {
     id: 'argentina',
@@ -550,15 +566,14 @@ const TEAM_CATALOG: TeamInfo[] = [
     shortDescription: 'Seleccion asiatica con crecimiento sostenido.',
   },
   {
-    id: 'ganador-repechaje-intercontinental-1',
-    name: 'Ganador Repechaje Intercontinental 1',
-    slug: 'ganador-repechaje-intercontinental-1',
-    flag: 'PO',
-    confederation: 'Intercontinental',
-    fifaStrength: 1675,
-    shortDescription: 'Plaza pendiente del repechaje intercontinental (ruta 1), con final ya definida.',
-    notes: 'Final intercontinental ruta 1 (31/03): 🇨🇩 RD Congo vs 🇯🇲 Jamaica. Semifinal del 26/03: Jamaica 1-0 Nueva Caledonia.',
-    isPlaceholder: true,
+    id: 'rd-congo',
+    name: 'RD Congo',
+    slug: 'rd-congo',
+    flag: 'CD',
+    confederation: 'CAF',
+    fifaStrength: 1710,
+    shortDescription: 'Clasificada via repechaje intercontinental.',
+    notes: 'Clasificacion confirmada el 31/03/2026 tras vencer a Jamaica en tiempo extra.',
   },
   {
     id: 'inglaterra',
@@ -599,24 +614,24 @@ const TEAM_CATALOG: TeamInfo[] = [
 ];
 
 export const WORLD_CUP_2026_GROUPS: Group[] = [
-  { id: 'A', name: 'Grupo A', teams: ['Mexico', 'Corea del Sur', 'Sudafrica', 'Ganador Repechaje UEFA D'] },
-  { id: 'B', name: 'Grupo B', teams: ['Canada', 'Suiza', 'Qatar', 'Ganador Repechaje UEFA A'] },
+  { id: 'A', name: 'Grupo A', teams: ['Mexico', 'Corea del Sur', 'Sudafrica', 'Chequia'] },
+  { id: 'B', name: 'Grupo B', teams: ['Canada', 'Suiza', 'Qatar', 'Bosnia y Herzegovina'] },
   { id: 'C', name: 'Grupo C', teams: ['Brasil', 'Marruecos', 'Escocia', 'Haiti'] },
-  { id: 'D', name: 'Grupo D', teams: ['Estados Unidos', 'Australia', 'Paraguay', 'Ganador Repechaje UEFA C'] },
+  { id: 'D', name: 'Grupo D', teams: ['Estados Unidos', 'Australia', 'Paraguay', 'Turquia'] },
   { id: 'E', name: 'Grupo E', teams: ['Alemania', 'Ecuador', 'Costa de Marfil', 'Curazao'] },
-  { id: 'F', name: 'Grupo F', teams: ['Paises Bajos', 'Japon', 'Tunez', 'Ganador Repechaje UEFA B'] },
+  { id: 'F', name: 'Grupo F', teams: ['Paises Bajos', 'Japon', 'Tunez', 'Suecia'] },
   { id: 'G', name: 'Grupo G', teams: ['Belgica', 'Iran', 'Egipto', 'Nueva Zelanda'] },
   { id: 'H', name: 'Grupo H', teams: ['Espana', 'Uruguay', 'Arabia Saudita', 'Cabo Verde'] },
   {
     id: 'I',
     name: 'Grupo I',
-    teams: ['Francia', 'Senegal', 'Noruega', 'Ganador Repechaje Intercontinental 2'],
+    teams: ['Francia', 'Senegal', 'Noruega', 'Irak'],
   },
   { id: 'J', name: 'Grupo J', teams: ['Argentina', 'Austria', 'Argelia', 'Jordania'] },
   {
     id: 'K',
     name: 'Grupo K',
-    teams: ['Portugal', 'Colombia', 'Uzbekistan', 'Ganador Repechaje Intercontinental 1'],
+    teams: ['Portugal', 'Colombia', 'Uzbekistan', 'RD Congo'],
   },
   { id: 'L', name: 'Grupo L', teams: ['Inglaterra', 'Croacia', 'Panama', 'Ghana'] },
 ];
@@ -629,8 +644,12 @@ const ARTICLE_TEAM_TO_CANONICAL: Record<string, string> = {
   Belgium: 'Belgica',
   Brazil: 'Brasil',
   Canada: 'Canada',
+  'Bosnia and Herzegovina': 'Bosnia y Herzegovina',
+  Bosnia: 'Bosnia y Herzegovina',
   'Cape Verde': 'Cabo Verde',
   Colombia: 'Colombia',
+  Czechia: 'Chequia',
+  'Czech Republic': 'Chequia',
   Croatia: 'Croacia',
   Curacao: 'Curazao',
   Ecuador: 'Ecuador',
@@ -641,6 +660,7 @@ const ARTICLE_TEAM_TO_CANONICAL: Record<string, string> = {
   Ghana: 'Ghana',
   Haiti: 'Haiti',
   Iran: 'Iran',
+  Iraq: 'Irak',
   'Ivory Coast': 'Costa de Marfil',
   Japan: 'Japon',
   Jordan: 'Jordania',
@@ -653,6 +673,9 @@ const ARTICLE_TEAM_TO_CANONICAL: Record<string, string> = {
   Paraguay: 'Paraguay',
   Portugal: 'Portugal',
   Qatar: 'Qatar',
+  'DR Congo': 'RD Congo',
+  'Congo DR': 'RD Congo',
+  Sweden: 'Suecia',
   'Saudi Arabia': 'Arabia Saudita',
   Scotland: 'Escocia',
   Senegal: 'Senegal',
@@ -660,6 +683,7 @@ const ARTICLE_TEAM_TO_CANONICAL: Record<string, string> = {
   'South Korea': 'Corea del Sur',
   Spain: 'Espana',
   Switzerland: 'Suiza',
+  Turkey: 'Turquia',
   Tunisia: 'Tunez',
   Uruguay: 'Uruguay',
   USA: 'Estados Unidos',
@@ -673,6 +697,36 @@ const CANONICAL_GROUP_BY_TEAM = new Map<string, string>(
 );
 
 const OFFICIAL_FIXTURE_ROWS = (officialFixtureRaw.fixtures as OfficialFixtureRow[]).slice();
+
+function buildTbdFallbackByGroup(rows: OfficialFixtureRow[]) {
+  const knownTeamsByGroup = new Map<string, Set<string>>();
+
+  for (const row of rows) {
+    if (row.stage !== 'group') continue;
+    const groupId = inferGroupFromArticleFixture(row);
+    if (!groupId) continue;
+
+    const home = row.homeTeam ? ARTICLE_TEAM_TO_CANONICAL[row.homeTeam] ?? row.homeTeam : null;
+    const away = row.awayTeam ? ARTICLE_TEAM_TO_CANONICAL[row.awayTeam] ?? row.awayTeam : null;
+    const set = knownTeamsByGroup.get(groupId) ?? new Set<string>();
+    if (home && home !== 'TBD') set.add(home);
+    if (away && away !== 'TBD') set.add(away);
+    knownTeamsByGroup.set(groupId, set);
+  }
+
+  const fallback = new Map<string, string>();
+  for (const group of WORLD_CUP_2026_GROUPS) {
+    const known = knownTeamsByGroup.get(group.id) ?? new Set<string>();
+    const missing = group.teams.filter((team) => !known.has(team));
+    if (missing.length === 1) {
+      fallback.set(group.id, missing[0]);
+    }
+  }
+
+  return fallback;
+}
+
+const TBD_FALLBACK_BY_GROUP = buildTbdFallbackByGroup(OFFICIAL_FIXTURE_ROWS);
 
 const TEAM_INFO_BY_NAME = new Map(TEAM_CATALOG.map((team) => [team.name, team]));
 
@@ -695,6 +749,7 @@ const FIFA_TEAM_NEWS_SLUG_BY_TEAM: Record<string, string> = {
   'Costa de Marfil': 'cote-divoire',
   Croacia: 'croatia',
   Curazao: 'curacao',
+  Chequia: 'czechia',
   Ecuador: 'ecuador',
   Egipto: 'egypt',
   Espana: 'spain',
@@ -702,8 +757,10 @@ const FIFA_TEAM_NEWS_SLUG_BY_TEAM: Record<string, string> = {
   Escocia: 'scotland',
   Francia: 'france',
   Ghana: 'ghana',
+  'Bosnia y Herzegovina': 'bosnia-and-herzegovina',
   Haiti: 'haiti',
   Iran: 'ir-iran',
+  Irak: 'iraq',
   Inglaterra: 'england',
   Japon: 'japan',
   Jordania: 'jordan',
@@ -716,9 +773,12 @@ const FIFA_TEAM_NEWS_SLUG_BY_TEAM: Record<string, string> = {
   'Paises Bajos': 'netherlands',
   Portugal: 'portugal',
   Qatar: 'qatar',
+  'RD Congo': 'dr-congo',
+  Suecia: 'sweden',
   Senegal: 'senegal',
   Sudafrica: 'south-africa',
   Suiza: 'switzerland',
+  Turquia: 'turkey',
   Tunez: 'tunisia',
   Uruguay: 'uruguay',
   Uzbekistan: 'uzbekistan',
@@ -854,9 +914,7 @@ function mapArticleTeamToCanonical(articleTeam: string, groupIdHint: string | nu
   if (mapped !== 'TBD') return mapped;
   if (!groupIdHint) return articleTeam;
 
-  const group = WORLD_CUP_2026_GROUPS.find((g) => g.id === groupIdHint);
-  const placeholder = group?.teams.find((team) => team.startsWith('Ganador Repechaje'));
-  return placeholder ?? articleTeam;
+  return TBD_FALLBACK_BY_GROUP.get(groupIdHint) ?? articleTeam;
 }
 
 function inferGroupFromArticleFixture(row: OfficialFixtureRow): string | null {
@@ -1320,6 +1378,3 @@ export function buildCalendarFixtures(
 
   return fixtures.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 }
-
-
-

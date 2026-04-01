@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { getTeamInfo, hasKnownTeam } from '@/lib/worldcup26';
+import { getTeamDisplayName, getTeamInfo, hasKnownTeam } from '@/lib/worldcup26';
 import { FlagBadge } from '@/components/flag-badge';
 
 type TeamNameProps = {
@@ -11,10 +11,11 @@ type TeamNameProps = {
 
 export function TeamName({ teamName, linkToTeam = false, className }: TeamNameProps) {
   const info = getTeamInfo(teamName);
+  const displayName = getTeamDisplayName(teamName);
   const label = (
     <span className={className ? `team-inline ${className}` : 'team-inline'}>
       <FlagBadge teamName={teamName} />
-      <span>{teamName}</span>
+      <span>{displayName}</span>
     </span>
   );
 
@@ -22,4 +23,3 @@ export function TeamName({ teamName, linkToTeam = false, className }: TeamNamePr
 
   return <Link href={`/teams/${info.slug}`}>{label}</Link>;
 }
-

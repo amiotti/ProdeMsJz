@@ -1,4 +1,9 @@
-﻿/** @type {import('next').NextConfig} */
+/** @type {import('next').NextConfig} */
+const isDevelopment = process.env.NODE_ENV !== 'production';
+const scriptSrc = isDevelopment
+  ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+  : "script-src 'self' 'unsafe-inline'";
+
 const securityHeaders = [
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'X-Frame-Options', value: 'DENY' },
@@ -16,7 +21,7 @@ const securityHeaders = [
       "img-src 'self' data: https: blob:",
       "font-src 'self' https://fonts.gstatic.com data:",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "script-src 'self' 'unsafe-inline'",
+      scriptSrc,
       "connect-src 'self' https: wss:",
       "frame-src https:",
     ].join('; '),

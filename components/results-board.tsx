@@ -121,7 +121,7 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
   const [drafts, setDrafts] = useState<DraftMap>({});
   const [triviaDrafts, setTriviaDrafts] = useState<TriviaDraftMap>({});
   const [selectedGroupId, setSelectedGroupId] = useState('ALL');
-  const [viewMode, setViewMode] = useState<ResultsViewMode>('results');
+  const [viewMode] = useState<ResultsViewMode>('results');
   const [sortMode, setSortMode] = useState<ResultsSortMode>('date');
 
   useEffect(() => {
@@ -348,25 +348,6 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
             <option value="group">Grupo / etapa</option>
           </select>
         </label>
-
-        <div className="readonly-note">
-          <div className="fixture-inline" style={{ justifyContent: 'flex-start' }}>
-            <button
-              type="button"
-              className={`btn btn-small ${viewMode === 'results' ? 'btn-danger' : ''}`}
-              onClick={() => setViewMode('results')}
-            >
-              Resultados
-            </button>
-            <button
-              type="button"
-              className={`btn btn-small ${viewMode === 'standings' ? 'btn-danger' : ''}`}
-              onClick={() => setViewMode('standings')}
-            >
-              Posiciones
-            </button>
-          </div>
-        </div>
 
         {state.viewer.isAdmin ? (
           <button className="btn btn-primary" type="button" onClick={save} disabled={saving}>

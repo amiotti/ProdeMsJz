@@ -351,6 +351,10 @@ select {
   display: none;
 }
 
+.mobile-nav-shell {
+  display: none;
+}
+
 .mobile-nav summary {
   list-style: none;
 }
@@ -385,11 +389,18 @@ select {
   min-width: 0;
 }
 
+.mobile-nav-caret {
+  margin-left: auto;
+  font-size: 0.85rem;
+  line-height: 1;
+  opacity: 0.8;
+  transition: transform 120ms ease;
+}
+
 .mobile-nav-trigger-current {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  margin-left: auto;
 }
 
 .mobile-nav-action {
@@ -424,6 +435,10 @@ select {
 .mobile-nav[open] .mobile-nav-trigger {
   border-color: rgba(89, 227, 215, 0.34);
   box-shadow: 0 12px 24px rgba(27, 46, 92, 0.12);
+}
+
+.mobile-nav[open] .mobile-nav-caret {
+  transform: rotate(180deg);
 }
 
 .mobile-nav-trigger-icon {
@@ -2645,8 +2660,16 @@ select:focus {
     display: none;
   }
 
+  .mobile-nav-shell {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
   .mobile-nav {
     display: block;
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   .brand-wrap {
@@ -2839,8 +2862,7 @@ select:focus {
   }
 
   .mobile-nav-trigger-current {
-    max-width: 40%;
-    font-size: 0.72rem;
+    flex: 0 0 auto;
   }
 
   .mobile-nav-panel {

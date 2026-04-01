@@ -18,6 +18,9 @@ export default async function InicioPage() {
     .filter((m) => new Date(m.kickoffAt).getTime() > Date.now())
     .sort((a, b) => new Date(a.kickoffAt).getTime() - new Date(b.kickoffAt).getTime())[0];
   const currentLeader = state.leaderboard[0] ?? null;
+  const hasLeaderWithPoints = Boolean(currentLeader && currentLeader.totalPoints > 0 && resultsLoaded > 0);
+  const leaderName = hasLeaderWithPoints && currentLeader ? `${currentLeader.firstName} ${currentLeader.lastName}` : 'Sin resultados oficiales cargados';
+  const leaderMeta = hasLeaderWithPoints && currentLeader ? `${currentLeader.totalPoints} pts` : 'Se actualiza cuando haya resultados oficiales y puntajes';
 
   return (
     <section className="stack-lg">
@@ -41,7 +44,7 @@ export default async function InicioPage() {
               Ver tabla
             </Link>
             <Link href="/calendar" className="cta-link">
-              Ver calendario
+              Ver fixture
             </Link>
           </div>
         </div>
@@ -74,14 +77,12 @@ export default async function InicioPage() {
             <div className="detail-card">
               <span className="detail-label">Partidos del torneo</span>
               <strong>{totalMatches}</strong>
-              <span className="muted compact-text">Fixture completo del Mundial 2026 cargado en calendario.</span>
+              <span className="muted compact-text">Fixture completo del Mundial 2026 cargado en la sección Fixture.</span>
             </div>
             <div className="detail-card">
               <span className="detail-label">Líder provisional</span>
-              <strong>{currentLeader ? `${currentLeader.firstName} ${currentLeader.lastName}` : 'Sin datos aún'}</strong>
-              <span className="muted compact-text">
-                {currentLeader ? `${currentLeader.totalPoints} pts` : 'Se actualiza al cargar resultados oficiales'}
-              </span>
+              <strong>{leaderName}</strong>
+              <span className="muted compact-text">{leaderMeta}</span>
             </div>
             <div className="detail-card">
               <span className="detail-label">Próximo partido</span>

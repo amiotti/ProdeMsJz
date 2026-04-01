@@ -36,7 +36,7 @@ export async function AppShell({ children }: { children: ReactNode }) {
 
   const nav = [
     { href: '/inicio', label: 'Inicio' },
-    { href: '/calendar', label: 'Calendario' },
+    { href: '/calendar', label: 'Fixture' },
     { href: '/teams', label: 'Selecciones' },
     { href: '/rules', label: 'Reglas' },
     ...(isAdmin ? [] : [{ href: '/predictions', label: 'Predicciones' }]),

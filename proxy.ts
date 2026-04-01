@@ -124,7 +124,7 @@ function rejectApi(status: number, message: string, retryAfterSec?: number) {
   return withSecurityHeaders(res);
 }
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
   const method = req.method.toUpperCase();
   const sessionToken = req.cookies.get(SESSION_COOKIE)?.value ?? null;
@@ -199,4 +199,5 @@ export const config = {
     '/((?!_next/static|_next/image|favicon.ico|icon.png|icon.svg|robots.txt|sitemap.xml|.*\\.(?:png|jpg|jpeg|svg|webp|ico|css|js|map|txt|woff|woff2)$).*)',
   ],
 };
+
 

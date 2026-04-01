@@ -102,54 +102,60 @@ export function HeaderNav({ items }: { items: NavItem[] }) {
         })}
       </nav>
 
-      <details className="mobile-nav" ref={detailsRef}>
-        <summary className="mobile-nav-trigger" aria-label="Abrir menú de secciones">
-          <span className="mobile-nav-trigger-left">
-            <span className="mobile-nav-trigger-icon" aria-hidden="true">
-              ☰
+      <div className="mobile-nav-shell">
+        <details className="mobile-nav" ref={detailsRef}>
+          <summary className="mobile-nav-trigger" aria-label="Abrir menú de secciones">
+            <span className="mobile-nav-trigger-left">
+              <span className="mobile-nav-trigger-icon" aria-hidden="true">
+                ☰
+              </span>
+              <span>{currentLabel}</span>
             </span>
-            <span>{currentLabel}</span>
-          </span>
-          <span className="mobile-nav-trigger-current">
-            <button
-              className="mobile-nav-action"
-              type="button"
-              aria-label="Ir a mi perfil"
-              title="Ir a mi perfil"
-              onClick={goToProfile}
-            >
-              <ProfileIcon />
-            </button>
-            <button
-              className="mobile-nav-action mobile-nav-action-logout"
-              type="button"
-              aria-label="Cerrar sesión"
-              title="Cerrar sesión"
-              onClick={logout}
-              disabled={loggingOut}
-            >
-              <LogoutIcon />
-            </button>
-          </span>
-        </summary>
-        <nav className="mobile-nav-panel" aria-label="Secciones">
-          {items.map((item) => {
-            const active = isActivePath(pathname, item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`mobile-nav-link${active ? ' is-active' : ''}`}
-                onClick={() => {
-                  if (detailsRef.current) detailsRef.current.open = false;
-                }}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
-      </details>
+            <span className="mobile-nav-caret" aria-hidden="true">
+              ▾
+            </span>
+          </summary>
+          <nav className="mobile-nav-panel" aria-label="Secciones">
+            {items.map((item) => {
+              const active = isActivePath(pathname, item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`mobile-nav-link${active ? ' is-active' : ''}`}
+                  onClick={() => {
+                    if (detailsRef.current) detailsRef.current.open = false;
+                  }}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+        </details>
+
+        <div className="mobile-nav-trigger-current">
+          <button
+            className="mobile-nav-action"
+            type="button"
+            aria-label="Ir a mi perfil"
+            title="Ir a mi perfil"
+            onClick={goToProfile}
+          >
+            <ProfileIcon />
+          </button>
+          <button
+            className="mobile-nav-action mobile-nav-action-logout"
+            type="button"
+            aria-label="Cerrar sesión"
+            title="Cerrar sesión"
+            onClick={logout}
+            disabled={loggingOut}
+          >
+            <LogoutIcon />
+          </button>
+        </div>
+      </div>
     </>
   );
 }
