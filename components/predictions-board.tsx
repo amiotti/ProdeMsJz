@@ -4,14 +4,14 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 
 import { TeamName } from '@/components/team-name';
-import { formatDateArgentinaShort, formatKickoffNoConversion } from '@/lib/datetime';
+import { formatDateArgentinaShort, formatKickoffArgentina } from '@/lib/datetime';
 import type { Match, StateResponse, TriviaQuestion } from '@/lib/types';
 import { estimateMatchProbabilities } from '@/lib/worldcup26';
 
 type DraftMap = Record<string, { home: string; away: string }>;
 type TriviaDraftMap = Record<string, string>;
 type ViewMode = 'group' | 'date';
-type MatchSection = { id: string; title: string; subtitle: string; matches: Match[]; saveLabel: string };
+type MatchSection = { id: string; title: string; matches: Match[]; saveLabel: string };
 type DateMatch = Match & { _meta: string };
 type DateSection = { label: string; matches: DateMatch[] };
 
@@ -133,7 +133,6 @@ export function PredictionsBoard({
       .map((group) => ({
         id: group.id,
         title: group.name,
-        subtitle: group.teams.join(' · '),
         matches: editableMatches.filter((match) => match.groupId === group.id),
         saveLabel: 'Guardar grupo',
       }))
@@ -151,7 +150,6 @@ export function PredictionsBoard({
     return [...byStage.entries()].map(([stage, matches]) => ({
       id: `KO-${stage}`,
       title: stage,
-      subtitle: '',
       matches,
       saveLabel: 'Guardar etapa',
     }));
@@ -395,7 +393,7 @@ export function PredictionsBoard({
         </div>
         <p className="muted">
           Puedes responder la trivia en cualquier momento antes de que inicie la fase de llaves.
-          {triviaCutoffAt ? ` Cierre: ${formatKickoffNoConversion(triviaCutoffAt)}.` : ''}
+          {triviaCutoffAt ? ` Cierre: ${formatKickoffArgentina(triviaCutoffAt)}.` : ''}
         </p>
         {!triviaEditable ? (
           <p className="status">La trivia está cerrada porque ya comenzó la fase de llaves.</p>
@@ -432,7 +430,7 @@ export function PredictionsBoard({
 
   function renderMatchCard(match: Match, extraMeta?: string, readOnly = false) {
     const draft = drafts[match.id] ?? { home: '', away: '' };
-    const kickoff = formatKickoffNoConversion(match.kickoffAt);
+    const kickoff = formatKickoffArgentina(match.kickoffAt);
     const headerMeta = match.groupId === 'KO' ? match.stage ?? 'Fase final' : `Grupo ${match.groupId} - Fecha ${match.matchday}`;
 
     return (
@@ -577,7 +575,7 @@ export function PredictionsBoard({
           {triviaCutoffAt ? (
             <>
               {' '}
-              La trivia debe completarse antes del comienzo de la fase de llaves ({formatKickoffNoConversion(triviaCutoffAt)}).
+              La trivia debe completarse antes del comienzo de la fase de llaves ({formatKickoffArgentina(triviaCutoffAt)}).
             </>
           ) : null}
         </p>
@@ -610,7 +608,6 @@ export function PredictionsBoard({
                 </div>
               </div>
 
-              {section.subtitle ? <p className="muted compact-text">{section.subtitle}</p> : null}
               <div className="match-list">{section.matches.map((match) => renderMatchCard(match, undefined, !hasApprovedPayment))}</div>
             </div>,
           );
