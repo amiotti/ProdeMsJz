@@ -891,9 +891,32 @@ function parseOfficialFixtureLocalKickoffToIso(row: OfficialFixtureRow): string 
   return utc.toISOString();
 }
 
+function parseOfficialFixtureEtKickoffToIso(row: OfficialFixtureRow): string | null {
+  const date = parseDateHeadingToUtcDate(row.dateHeading);
+  const time = parseLocalTimeToParts(row.localTime);
+  if (!time) return null;
+
+  // The source fixture uses Eastern Time (ET) for kickoff labels.
+  // During June/July 2026 ET is UTC-4 (EDT).
+  const easternOffset = -4;
+  const utc = new Date(Date.UTC(date.year, date.month - 1, date.day, time.hour - easternOffset, time.minute, 0));
+  if (time.addDay) {
+    utc.setUTCDate(utc.getUTCDate() + time.addDay);
+  }
+  return utc.toISOString();
+}
+
 function getOfficialRowKickoffIso(row: OfficialFixtureRow): string {
-  // Use GMT provided by the official fixture as source of truth.
-  return parseGmtInfoToIso(row.dateHeading, row.gmtInfo);
+  // Priority:
+  // 1) ET kickoff labels from the official fixture (matches published AR schedules)
+  // 2) explicit overrides
+  // 3) fallback parsers
+  return (
+    parseOfficialFixtureEtKickoffToIso(row) ??
+    getManualKickoffOverrideIso(row) ??
+    parseGmtInfoToIso(row.dateHeading, row.gmtInfo) ??
+    parseOfficialFixtureLocalKickoffToIso(row)
+  );
 }
 
 function getManualKickoffOverrideIso(row: { stage: string; matchLabel: string }) {
