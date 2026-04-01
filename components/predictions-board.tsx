@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 
 import { TeamName } from '@/components/team-name';
-import { formatDateArgentinaShort, formatKickoffArgentina } from '@/lib/datetime';
+import { formatDateArgentinaShort, formatKickoffNoConversion } from '@/lib/datetime';
 import type { Match, StateResponse, TriviaQuestion } from '@/lib/types';
 import { estimateMatchProbabilities } from '@/lib/worldcup26';
 
@@ -395,7 +395,7 @@ export function PredictionsBoard({
         </div>
         <p className="muted">
           Puedes responder la trivia en cualquier momento antes de que inicie la fase de llaves.
-          {triviaCutoffAt ? ` Cierre: ${formatKickoffArgentina(triviaCutoffAt)}.` : ''}
+          {triviaCutoffAt ? ` Cierre: ${formatKickoffNoConversion(triviaCutoffAt)}.` : ''}
         </p>
         {!triviaEditable ? (
           <p className="status">La trivia está cerrada porque ya comenzó la fase de llaves.</p>
@@ -432,7 +432,7 @@ export function PredictionsBoard({
 
   function renderMatchCard(match: Match, extraMeta?: string, readOnly = false) {
     const draft = drafts[match.id] ?? { home: '', away: '' };
-    const kickoff = formatKickoffArgentina(match.kickoffAt);
+    const kickoff = formatKickoffNoConversion(match.kickoffAt);
     const headerMeta = match.groupId === 'KO' ? match.stage ?? 'Fase final' : `Grupo ${match.groupId} - Fecha ${match.matchday}`;
 
     return (
@@ -441,7 +441,6 @@ export function PredictionsBoard({
           <p className="match-meta">{headerMeta} - {kickoff}</p>
           {extraMeta ? <p className="match-meta">{extraMeta}</p> : null}
           <p className="match-meta">Sede: {match.venue ?? 'Pendiente de confirmar'}</p>
-          <p className="match-meta">Fuente horaria: GMT oficial FIFA (convertido a hora Argentina).</p>
           <div className="fixture-row">
             <TeamName teamName={match.homeTeam} linkToTeam />
             <span className="vs">vs</span>
@@ -578,7 +577,7 @@ export function PredictionsBoard({
           {triviaCutoffAt ? (
             <>
               {' '}
-              La trivia debe completarse antes del comienzo de la fase de llaves ({formatKickoffArgentina(triviaCutoffAt)}).
+              La trivia debe completarse antes del comienzo de la fase de llaves ({formatKickoffNoConversion(triviaCutoffAt)}).
             </>
           ) : null}
         </p>

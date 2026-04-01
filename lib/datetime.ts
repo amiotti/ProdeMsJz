@@ -10,6 +10,16 @@ const kickoffFormatter = new Intl.DateTimeFormat('es-AR', {
   hour12: false,
 });
 
+const kickoffNoConversionFormatter = new Intl.DateTimeFormat('es-AR', {
+  timeZone: 'UTC',
+  day: 'numeric',
+  month: 'numeric',
+  year: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: false,
+});
+
 const dateFormatter = new Intl.DateTimeFormat('es-AR', {
   timeZone: ARG_TIME_ZONE,
   day: 'numeric',
@@ -31,6 +41,10 @@ export function formatKickoffArgentina(iso: string) {
   return `${kickoffFormatter.format(new Date(iso)).replace(',', '')} hs`;
 }
 
+export function formatKickoffNoConversion(iso: string) {
+  return `${kickoffNoConversionFormatter.format(new Date(iso)).replace(',', '')} hs`;
+}
+
 export function formatDateArgentinaShort(iso: string) {
   return dateFormatter.format(new Date(iso));
 }
@@ -38,5 +52,4 @@ export function formatDateArgentinaShort(iso: string) {
 export function formatDateTimeArgentina(iso: string) {
   return `${dateTimeFormatter.format(new Date(iso)).replace(',', '')} hs`;
 }
-
 
