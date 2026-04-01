@@ -59,6 +59,8 @@ export function ContactForm({
       <label>
         Nombre
         <input
+          id="contact-name"
+          autoComplete="name"
           {...register('name', { required: 'Ingresa tu nombre', minLength: { value: 2, message: 'Muy corto' } })}
           placeholder="Ej: Juan Pérez"
         />
@@ -68,6 +70,8 @@ export function ContactForm({
       <label>
         Email
         <input
+          id="contact-email"
+          autoComplete="email"
           type="email"
           {...register('email', {
             required: 'Ingresa tu email',
@@ -81,6 +85,8 @@ export function ContactForm({
       <label className="contact-form-span">
         Teléfono (opcional)
         <input
+          id="contact-phone"
+          autoComplete="tel"
           {...register('phone', {
             pattern: { value: /^[0-9+()\-\s]{0,32}$/, message: 'Teléfono inválido' },
           })}
@@ -92,6 +98,7 @@ export function ContactForm({
       <label className="contact-form-span">
         Consulta
         <textarea
+          id="contact-message"
           {...register('message', {
             required: 'Escribe tu consulta',
             minLength: { value: 10, message: 'Escribe al menos 10 caracteres' },

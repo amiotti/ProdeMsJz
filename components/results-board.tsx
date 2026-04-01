@@ -329,7 +329,7 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
       <div className="panel toolbar-grid">
         <label>
           Filtrar grupo
-          <select value={selectedGroupId} onChange={(e) => setSelectedGroupId(e.target.value)}>
+          <select id="results-filter-group" name="resultsFilterGroup" value={selectedGroupId} onChange={(e) => setSelectedGroupId(e.target.value)}>
             <option value="ALL">Todos</option>
             <option value="KO">Fase final</option>
             <option value="TRIVIA">Trivia</option>
@@ -343,7 +343,7 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
 
         <label>
           Ordenar por
-          <select value={sortMode} onChange={(e) => setSortMode(e.target.value as ResultsSortMode)} disabled={selectedGroupId === 'TRIVIA'}>
+          <select id="results-sort-mode" name="resultsSortMode" value={sortMode} onChange={(e) => setSortMode(e.target.value as ResultsSortMode)} disabled={selectedGroupId === 'TRIVIA'}>
             <option value="date">Fecha</option>
             <option value="group">Grupo / etapa</option>
           </select>
@@ -373,6 +373,8 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
                     {index + 1}. {question.prompt}
                   </span>
                   <input
+                    id={`results-trivia-${question.id}`}
+                    name={`results-trivia-${question.id}`}
                     value={triviaDrafts[question.id] ?? ''}
                     onChange={(event) => setTriviaDraft(question.id, event.target.value)}
                     placeholder={question.answerType === 'number' ? 'Respuesta numérica' : 'Respuesta oficial'}
@@ -409,9 +411,9 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
                       </div>
 
                       <div className={`score-inputs${readOnly ? ' is-locked' : ''}`}>
-                        <input value={draft.home} onChange={(e) => setDraft(match.id, 'home', e.target.value)} disabled={readOnly || savingMatchId === match.id} />
+                        <input id={`results-home-${match.id}`} name={`results-home-${match.id}`} value={draft.home} onChange={(e) => setDraft(match.id, 'home', e.target.value)} disabled={readOnly || savingMatchId === match.id} />
                         <span className="score-divider">-</span>
-                        <input value={draft.away} onChange={(e) => setDraft(match.id, 'away', e.target.value)} disabled={readOnly || savingMatchId === match.id} />
+                        <input id={`results-away-${match.id}`} name={`results-away-${match.id}`} value={draft.away} onChange={(e) => setDraft(match.id, 'away', e.target.value)} disabled={readOnly || savingMatchId === match.id} />
                       </div>
                       {state.viewer.isAdmin ? (
                         <div className="cta-row match-actions">
@@ -444,6 +446,8 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
                       {index + 1}. {question.prompt}
                     </span>
                     <input
+                      id={`results-trivia-all-${question.id}`}
+                      name={`results-trivia-all-${question.id}`}
                       value={triviaDrafts[question.id] ?? ''}
                       onChange={(event) => setTriviaDraft(question.id, event.target.value)}
                       placeholder={question.answerType === 'number' ? 'Respuesta numérica' : 'Respuesta oficial'}
@@ -479,9 +483,9 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
                       </div>
 
                       <div className={`score-inputs${readOnly ? ' is-locked' : ''}`}>
-                        <input value={draft.home} onChange={(e) => setDraft(match.id, 'home', e.target.value)} disabled={readOnly || savingMatchId === match.id} />
+                        <input id={`results-home-all-${match.id}`} name={`results-home-all-${match.id}`} value={draft.home} onChange={(e) => setDraft(match.id, 'home', e.target.value)} disabled={readOnly || savingMatchId === match.id} />
                         <span className="score-divider">-</span>
-                        <input value={draft.away} onChange={(e) => setDraft(match.id, 'away', e.target.value)} disabled={readOnly || savingMatchId === match.id} />
+                        <input id={`results-away-all-${match.id}`} name={`results-away-all-${match.id}`} value={draft.away} onChange={(e) => setDraft(match.id, 'away', e.target.value)} disabled={readOnly || savingMatchId === match.id} />
                       </div>
                       {state.viewer.isAdmin ? (
                         <div className="cta-row match-actions">
@@ -522,9 +526,9 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
                     </div>
 
                     <div className={`score-inputs${readOnly ? ' is-locked' : ''}`}>
-                      <input value={draft.home} onChange={(e) => setDraft(match.id, 'home', e.target.value)} disabled={readOnly || savingMatchId === match.id} />
+                      <input id={`results-home-filter-${match.id}`} name={`results-home-filter-${match.id}`} value={draft.home} onChange={(e) => setDraft(match.id, 'home', e.target.value)} disabled={readOnly || savingMatchId === match.id} />
                       <span className="score-divider">-</span>
-                      <input value={draft.away} onChange={(e) => setDraft(match.id, 'away', e.target.value)} disabled={readOnly || savingMatchId === match.id} />
+                      <input id={`results-away-filter-${match.id}`} name={`results-away-filter-${match.id}`} value={draft.away} onChange={(e) => setDraft(match.id, 'away', e.target.value)} disabled={readOnly || savingMatchId === match.id} />
                     </div>
                     {state.viewer.isAdmin ? (
                       <div className="cta-row match-actions">
@@ -557,6 +561,8 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
                         {index + 1}. {question.prompt}
                       </span>
                       <input
+                        id={`results-trivia-filter-${question.id}`}
+                        name={`results-trivia-filter-${question.id}`}
                         value={triviaDrafts[question.id] ?? ''}
                         onChange={(event) => setTriviaDraft(question.id, event.target.value)}
                         placeholder={question.answerType === 'number' ? 'Respuesta numérica' : 'Respuesta oficial'}

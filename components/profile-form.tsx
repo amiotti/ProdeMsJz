@@ -104,27 +104,30 @@ export function ProfileForm({ user }: { user: User }) {
             <div className="form-grid">
               <label>
                 Nombre
-                <input value={firstName} onChange={(e) => setFirstName(e.target.value)} required disabled={loading} />
+                <input id="profile-first-name" name="firstName" autoComplete="given-name" value={firstName} onChange={(e) => setFirstName(e.target.value)} required disabled={loading} />
               </label>
               <label>
                 Apellido
-                <input value={lastName} onChange={(e) => setLastName(e.target.value)} required disabled={loading} />
+                <input id="profile-last-name" name="lastName" autoComplete="family-name" value={lastName} onChange={(e) => setLastName(e.target.value)} required disabled={loading} />
               </label>
               <label>
                 Email
-                <input value={user.email} disabled />
+                <input id="profile-email" name="email" autoComplete="email" value={user.email} disabled />
               </label>
               <label>
                 Teléfono
-                <input value={phone} onChange={(e) => setPhone(e.target.value)} required disabled={loading} />
+                <input id="profile-phone" name="phone" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required disabled={loading} />
               </label>
               <label>
                 CBU/CVU o Alias
-                <input value={bankInfo} onChange={(e) => setBankInfo(e.target.value)} required disabled={loading} />
+                <input id="profile-bank-info" name="bankInfo" autoComplete="off" value={bankInfo} onChange={(e) => setBankInfo(e.target.value)} required disabled={loading} />
               </label>
               <label>
                 Nueva contraseña (opcional)
                 <input
+                  id="profile-password"
+                  name="newPassword"
+                  autoComplete="new-password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}

@@ -410,6 +410,8 @@ export function PredictionsBoard({
                 {index + 1}. {question.prompt}
               </span>
               <input
+                id={`trivia-${question.id}`}
+                name={`trivia-${question.id}`}
                 value={triviaDrafts[question.id] ?? ''}
                 onChange={(event) => setTriviaDraft(question.id, event.target.value)}
                 placeholder={question.answerType === 'number' ? 'Ingresa un número' : 'Escribe tu respuesta'}
@@ -462,6 +464,8 @@ export function PredictionsBoard({
 
         <div className="score-inputs score-inputs-with-action">
           <input
+            id={`pred-home-${match.id}`}
+            name={`pred-home-${match.id}`}
             inputMode="numeric"
             value={draft.home}
             onChange={(e) => setDraft(match.id, 'home', e.target.value)}
@@ -470,6 +474,8 @@ export function PredictionsBoard({
           />
           <span className="score-divider">-</span>
           <input
+            id={`pred-away-${match.id}`}
+            name={`pred-away-${match.id}`}
             inputMode="numeric"
             value={draft.away}
             onChange={(e) => setDraft(match.id, 'away', e.target.value)}
@@ -544,7 +550,7 @@ export function PredictionsBoard({
       <div className="panel toolbar-grid">
         <label>
           Filtrar grupo
-          <select value={selectedGroupId} onChange={(e) => setSelectedGroupId(e.target.value)}>
+          <select id="pred-filter-group" name="predFilterGroup" value={selectedGroupId} onChange={(e) => setSelectedGroupId(e.target.value)}>
             <option value="ALL">Todos</option>
             <option value="KO">Fase final</option>
             <option value="TRIVIA">Trivia</option>
@@ -558,7 +564,7 @@ export function PredictionsBoard({
 
         <label>
           Ver por
-          <select value={viewMode} onChange={(e) => setViewMode(e.target.value as ViewMode)} disabled={selectedGroupId === 'TRIVIA'}>
+          <select id="pred-view-mode" name="predViewMode" value={viewMode} onChange={(e) => setViewMode(e.target.value as ViewMode)} disabled={selectedGroupId === 'TRIVIA'}>
             <option value="group">Grupo / etapa</option>
             <option value="date">Fecha de partido</option>
           </select>

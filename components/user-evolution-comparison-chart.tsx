@@ -130,7 +130,7 @@ export function UserEvolutionComparisonChart({
       <div className="toolbar-grid">
         <label>
           Tu curva
-          <input value={currentUser.label} disabled />
+          <input id="stats-current-user" name="statsCurrentUser" value={currentUser.label} disabled />
         </label>
 
         <label>
@@ -155,6 +155,8 @@ export function UserEvolutionComparisonChart({
             <label>
               Buscar usuario
               <input
+                id="stats-compare-search"
+                name="compareSearch"
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
                 placeholder="Nombre o apellido"
@@ -165,6 +167,8 @@ export function UserEvolutionComparisonChart({
               {filteredOptions.map((user) => (
                 <label key={user.userId} className="compare-picker-item">
                   <input
+                    id={`stats-compare-${user.userId}`}
+                    name={`compareUser-${user.userId}`}
                     type="checkbox"
                     checked={compareUserIds.includes(user.userId)}
                     onChange={() => toggleUser(user.userId)}

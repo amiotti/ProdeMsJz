@@ -133,6 +133,8 @@ export function UsersPanel({ initialUsers, initialMessages }: { initialUsers: Us
                   ) : (
                     <div className="inline-actions">
                       <select
+                        id={`users-payment-${user.id}`}
+                        name={`paymentStatus-${user.id}`}
                         value={paymentDrafts[user.id] ?? 'pending'}
                         onChange={(e) => {
                           const nextStatus = e.target.value as User['registrationPaymentStatus'];
@@ -197,6 +199,8 @@ export function UsersPanel({ initialUsers, initialMessages }: { initialUsers: Us
                   <label className="contact-status-field">
                     Estado
                     <select
+                      id={`contact-status-${message.id}`}
+                      name={`contactStatus-${message.id}`}
                       value={message.status}
                       onChange={(e) => void updateMessageStatus(message.id, e.target.value as ContactMessageStatus)}
                       disabled={loadingMessageId === message.id}

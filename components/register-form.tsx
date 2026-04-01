@@ -79,23 +79,26 @@ export function RegisterForm() {
     <form className="panel form-grid form-grid-register" onSubmit={onSubmit}>
       <label>
         Nombre
-        <input value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Ej: Juan" required />
+        <input id="register-first-name" name="firstName" autoComplete="given-name" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Ej: Juan" required />
       </label>
       <label>
         Apellido
-        <input value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Ej: Pérez" required />
+        <input id="register-last-name" name="lastName" autoComplete="family-name" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Ej: Pérez" required />
       </label>
       <label>
         Email
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="juan@mail.com" required />
+        <input id="register-email" name="email" autoComplete="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="juan@mail.com" required />
       </label>
       <label>
         Teléfono
-        <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+54 9 11 ..." required />
+        <input id="register-phone" name="phone" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+54 9 11 ..." required />
       </label>
       <label>
         CBU/CVU o Alias
         <input
+          id="register-bank-info"
+          name="bankInfo"
+          autoComplete="off"
           value={bankInfo}
           onChange={(e) => setBankInfo(e.target.value)}
           placeholder="Alias o CBU/CVU para premios"
@@ -105,6 +108,9 @@ export function RegisterForm() {
       <label>
         Contraseña
         <input
+          id="register-password"
+          name="password"
+          autoComplete="new-password"
           type="password"
           value={password}
           minLength={8}
@@ -123,6 +129,8 @@ export function RegisterForm() {
             </Link>
           </span>
           <input
+            id="register-accept-terms"
+            name="acceptedTerms"
             type="checkbox"
             checked={acceptedTerms}
             onChange={(e) => setAcceptedTerms(e.target.checked)}
@@ -138,6 +146,8 @@ export function RegisterForm() {
             </Link>
           </span>
           <input
+            id="register-accept-privacy"
+            name="acceptedPrivacy"
             type="checkbox"
             checked={acceptedPrivacy}
             onChange={(e) => setAcceptedPrivacy(e.target.checked)}
@@ -148,6 +158,8 @@ export function RegisterForm() {
         <label className="auth-legal-row">
           <span className="auth-legal-text">Declaro ser mayor de 18 años</span>
           <input
+            id="register-declared-adult"
+            name="declaredAdult"
             type="checkbox"
             checked={declaredAdult}
             onChange={(e) => setDeclaredAdult(e.target.checked)}

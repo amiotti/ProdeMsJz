@@ -52,23 +52,23 @@ export function ResetPasswordForm() {
     <form className="panel form-grid form-grid-login" onSubmit={onSubmit}>
       <label>
         Email de la cuenta
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <input id="reset-email" name="email" autoComplete="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
       </label>
       <label>
         Teléfono registrado
-        <input type="text" value={phone} onChange={(e) => setPhone(e.target.value)} required />
+        <input id="reset-phone" name="phone" autoComplete="tel" type="text" value={phone} onChange={(e) => setPhone(e.target.value)} required />
       </label>
       <label>
         Alias o CBU/CVU registrado
-        <input type="text" value={bankInfo} onChange={(e) => setBankInfo(e.target.value)} required />
+        <input id="reset-bank-info" name="bankInfo" autoComplete="off" type="text" value={bankInfo} onChange={(e) => setBankInfo(e.target.value)} required />
       </label>
       <label>
         Nueva contraseña
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} />
+        <input id="reset-password" name="newPassword" autoComplete="new-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} />
       </label>
       <label>
         Repetir nueva contraseña
-        <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required minLength={8} />
+        <input id="reset-confirm-password" name="confirmPassword" autoComplete="new-password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required minLength={8} />
       </label>
       <button className="btn btn-primary" type="submit" disabled={loading}>
         {loading ? 'Actualizando...' : 'Restablecer contraseña'}
@@ -83,4 +83,5 @@ export function ResetPasswordForm() {
     </form>
   );
 }
+
 

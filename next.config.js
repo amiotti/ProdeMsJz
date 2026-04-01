@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const isDevelopment = process.env.NODE_ENV !== 'production';
-const scriptSrc = isDevelopment
+const allowUnsafeEval = isDevelopment || process.env.CSP_ALLOW_UNSAFE_EVAL === 'true';
+const scriptSrc = allowUnsafeEval
   ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
   : "script-src 'self' 'unsafe-inline'";
 

@@ -139,9 +139,9 @@ export function ProfilePredictions({
                 ) : null}
               </div>
               <div className="score-inputs is-locked">
-                <input value={String(prediction.homeGoals)} disabled aria-label="Goles pronosticados local" />
+                <input id={`profile-pred-home-${prediction.id}`} name={`profilePredHome-${prediction.id}`} value={String(prediction.homeGoals)} disabled aria-label="Goles pronosticados local" />
                 <span className="score-divider">-</span>
-                <input value={String(prediction.awayGoals)} disabled aria-label="Goles pronosticados visitante" />
+                <input id={`profile-pred-away-${prediction.id}`} name={`profilePredAway-${prediction.id}`} value={String(prediction.awayGoals)} disabled aria-label="Goles pronosticados visitante" />
                 <span className="chip">Guardada</span>
               </div>
             </div>

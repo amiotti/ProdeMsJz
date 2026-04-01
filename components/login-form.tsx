@@ -44,11 +44,11 @@ export function LoginForm() {
     <form className="panel form-grid form-grid-login" onSubmit={onSubmit}>
       <label>
         Email
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <input id="login-email" name="email" autoComplete="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
       </label>
       <label>
         Contraseña
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        <input id="login-password" name="password" autoComplete="current-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
       </label>
       <p className="muted auth-inline-link-row">
         ¿Olvidaste tu contraseña?{' '}

@@ -123,7 +123,19 @@ export default async function CalendarPage() {
             </div>
 
             <div className="table-wrap">
-              <table className="table">
+              <table className="table fixture-standings-table">
+                <colgroup>
+                  <col style={{ width: '6%' }} />
+                  <col style={{ width: '40%' }} />
+                  <col style={{ width: '6.75%' }} />
+                  <col style={{ width: '6.75%' }} />
+                  <col style={{ width: '6.75%' }} />
+                  <col style={{ width: '6.75%' }} />
+                  <col style={{ width: '6.75%' }} />
+                  <col style={{ width: '6.75%' }} />
+                  <col style={{ width: '6.75%' }} />
+                  <col style={{ width: '6.75%' }} />
+                </colgroup>
                 <thead>
                   <tr>
                     <th>#</th>
@@ -161,10 +173,15 @@ export default async function CalendarPage() {
               </table>
             </div>
 
-            <div className="stack-xs">
+            <div className="fixture-matches-compact">
+              <p className="fixture-matches-title">PARTIDOS:</p>
               {matches.map((match) => (
-                <p key={match.id} className="muted compact-text">
-                  {formatDateShortNoYear(match.kickoffAt)} {getTeamDisplayName(match.homeTeam)} vs {getTeamDisplayName(match.awayTeam)} {match.venue ?? ''}
+                <p key={match.id} className="muted compact-text fixture-match-line">
+                  <span className="fixture-match-date">{formatDateShortNoYear(match.kickoffAt)}</span>
+                  <span className="fixture-match-teams">
+                    {getTeamDisplayName(match.homeTeam)} vs {getTeamDisplayName(match.awayTeam)}
+                  </span>
+                  <span className="fixture-match-venue">{match.venue ?? ''}</span>
                 </p>
               ))}
             </div>

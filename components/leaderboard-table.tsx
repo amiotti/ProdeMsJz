@@ -208,6 +208,8 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
 
           <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
             <select
+              id="leaderboard-group-filter"
+              name="leaderboardGroupFilter"
               value={activeGroupId}
               onChange={(event) => setActiveGroupId(event.target.value)}
               aria-label="Grupo activo de la tabla"
@@ -325,6 +327,8 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
 
             <div style={{ display: 'grid', gap: '0.45rem', justifyItems: 'center' }}>
               <input
+                id="leaderboard-group-name"
+                name="groupName"
                 type="text"
                 value={groupName}
                 onChange={(event) => setGroupName(event.target.value)}
@@ -333,6 +337,8 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
                 style={{ width: 'min(420px, 100%)', background: isDarkTheme ? 'rgba(10, 10, 18, 0.42)' : '#ffffff' }}
               />
               <input
+                id="leaderboard-user-query"
+                name="userQuery"
                 type="text"
                 value={userQuery}
                 onChange={(event) => setUserQuery(event.target.value)}
@@ -373,6 +379,8 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
                       }}
                     >
                       <input
+                        id={`leaderboard-user-${row.userId}`}
+                        name={`leaderboard-user-${row.userId}`}
                         type="checkbox"
                         checked={Boolean(draftSelectedUserIds[row.userId])}
                         onChange={() => toggleDraftUser(row.userId)}

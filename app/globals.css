@@ -1820,7 +1820,7 @@ select:focus {
 }
 
 .fixture-inline-table .fixture-home {
-  justify-self: end;
+  justify-self: start;
 }
 
 .fixture-inline-table .fixture-away {
@@ -1832,7 +1832,7 @@ select:focus {
 }
 
 .fixture-inline-table .fixture-home .team-inline {
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 
 .fixture-inline-table .fixture-home .team-inline,
@@ -1847,6 +1847,57 @@ select:focus {
 
 .fixture-col-cell {
   vertical-align: middle !important;
+}
+
+.fixture-standings-table {
+  table-layout: fixed;
+}
+
+.fixture-standings-table th,
+.fixture-standings-table td {
+  text-align: center;
+}
+
+.fixture-standings-table th:nth-child(2),
+.fixture-standings-table td:nth-child(2) {
+  text-align: left;
+}
+
+.fixture-matches-compact {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.fixture-matches-title {
+  margin: 0.2rem 0 0.35rem;
+  color: var(--gold);
+  font-size: 0.82rem;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.fixture-match-line {
+  margin: 0;
+  line-height: 1.25;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+
+.fixture-match-date {
+  min-width: 3.2rem;
+  font-weight: 700;
+}
+
+.fixture-match-teams {
+  min-width: 14.5rem;
+  font-weight: 600;
+}
+
+.fixture-match-venue {
+  opacity: 0.92;
 }
 
 .vs {
