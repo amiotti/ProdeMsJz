@@ -3598,11 +3598,19 @@ html[data-theme='dark'] select {
 }
 
 html[data-theme='dark'] .toolbar-grid select {
-  border-color: rgba(255, 255, 255, 0.2);
+  color: #e8f1ff;
+  border-color: rgba(255, 255, 255, 0.18);
   background-image:
-    linear-gradient(45deg, transparent 50%, rgba(233, 243, 255, 0.78) 50%),
-    linear-gradient(135deg, rgba(233, 243, 255, 0.78) 50%, transparent 50%),
-    linear-gradient(180deg, rgba(12, 14, 20, 0.86), rgba(12, 14, 20, 0.86));
+    linear-gradient(45deg, transparent 50%, rgba(226, 239, 255, 0.65) 50%),
+    linear-gradient(135deg, rgba(226, 239, 255, 0.65) 50%, transparent 50%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.04));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 8px 16px rgba(0, 0, 0, 0.22);
+}
+
+html[data-theme='dark'] .toolbar-grid label {
+  color: #c5d5ea;
 }
 
 html[data-theme='dark'] .match-card {
