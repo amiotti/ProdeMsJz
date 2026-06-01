@@ -100,10 +100,6 @@ export default async function InicioPage() {
               <div className="value">{loadProgressPct}%</div>
             </div>
           </div>
-          <p className="muted">
-            Puntaje actual: {state.pointsConfig.exactScore} puntos exacto / {state.pointsConfig.correctOutcome}{' '}
-            puntos por ganador o empate.
-          </p>
           <div className="detail-grid">
             <div className="detail-card">
               <span className="detail-label">Partidos del torneo</span>
