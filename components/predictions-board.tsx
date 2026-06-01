@@ -154,11 +154,17 @@ export function PredictionsBoard({
     }));
   }, [editableMatches]);
 
+  const savedPredictedMatchIds = useMemo(() => {
+    if (!currentUser) return new Set<string>();
+    return new Set(
+      state?.db.predictions
+        .filter((prediction) => prediction.userId === currentUser.id)
+        .map((prediction) => prediction.matchId) ?? [],
+    );
+  }, [currentUser, state?.db.predictions]);
+
   const visibleSections = useMemo(() => {
-    const withoutPrediction = (matchId: string) => {
-      const draft = drafts[matchId];
-      return !draft || draft.home === '' || draft.away === '';
-    };
+    const withoutPrediction = (matchId: string) => !savedPredictedMatchIds.has(matchId);
 
     const filterUnpredicted = (sections: MatchSection[]) =>
       sections
@@ -181,7 +187,7 @@ export function PredictionsBoard({
       sections.push(...groupSections.filter((section) => section.id === selectedGroupId));
     }
     return sections;
-  }, [drafts, groupSections, knockoutSections, selectedGroupId]);
+  }, [groupSections, knockoutSections, savedPredictedMatchIds, selectedGroupId]);
 
   const visibleDateSections = useMemo(() => {
     const flat: DateMatch[] = visibleSections.flatMap((section) =>
