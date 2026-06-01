@@ -1,6 +1,5 @@
 ﻿import Link from 'next/link';
 
-import { RegistrationPaymentCta } from '@/components/registration-payment-cta';
 import { TeamName } from '@/components/team-name';
 import { formatDateTimeArgentina } from '@/lib/datetime';
 import { getHomePageState } from '@/lib/db';
@@ -41,18 +40,17 @@ export default async function InicioPage() {
             <p className="muted">Último puesto: 5% del pozo</p>
           </div>
           {!hasApprovedPayment ? (
-            <div className="panel stack-md">
+            <div className="panel stack-md pending-payment-panel">
               <h3>Inscripción pendiente</h3>
               <div className="stack-xs">
                 <p className="muted">Para habilitar predicciones y tabla de posiciones debes completar la inscripción.</p>
                 <p className="muted">
-                  Puedes pagar online con TaloPay o transferir directamente al alias <strong>amiotti.mp</strong>.
+                  Puedes transferir directamente al alias <strong>amiotti.mp</strong>
                 </p>
                 <p className="muted">
                   Si transfieres, envía el comprobante de pago por WhatsApp al <strong>+5493742554827</strong>.
                 </p>
               </div>
-              <RegistrationPaymentCta />
             </div>
           ) : null}
           <div className="cta-row">

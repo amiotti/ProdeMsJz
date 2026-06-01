@@ -39,7 +39,7 @@ export async function AppShell({ children }: { children: ReactNode }) {
     { href: '/calendar', label: 'Fixture' },
     { href: '/teams', label: 'Selecciones' },
     { href: '/rules', label: 'Reglas' },
-    ...(isAdmin ? [] : [{ href: '/predictions', label: 'Predicciones' }]),
+    ...(isAdmin ? [] : [{ href: '/predictions', label: 'PRODE' }]),
     { href: '/results', label: 'Resultados Oficiales' },
     { href: '/leaderboard', label: 'Tabla' },
     { href: '/stats', label: 'Estadísticas' },
