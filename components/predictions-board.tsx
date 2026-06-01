@@ -61,7 +61,7 @@ export function PredictionsBoard({
   const [savingTrivia, setSavingTrivia] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [selectedGroupId, setSelectedGroupId] = useState('ALL');
-  const [viewMode, setViewMode] = useState<ViewMode>('group');
+  const [viewMode, setViewMode] = useState<ViewMode>('date');
   const [drafts, setDrafts] = useState<DraftMap>({});
   const [triviaDrafts, setTriviaDrafts] = useState<TriviaDraftMap>({});
 
@@ -407,7 +407,7 @@ export function PredictionsBoard({
     );
   }
 
-  function renderMatchCard(match: Match, extraMeta?: string, readOnly = false) {
+  function renderMatchCard(match: Match, readOnly = false) {
     const draft = drafts[match.id] ?? { home: '', away: '' };
     const kickoff = formatKickoffArgentina(match.kickoffAt);
     const headerMeta = match.groupId === 'KO' ? match.stage ?? 'Fase final' : `Grupo ${match.groupId} - Fecha ${match.matchday}`;
@@ -416,8 +416,6 @@ export function PredictionsBoard({
       <div key={match.id} className="match-card">
         <div>
           <p className="match-meta">{headerMeta} - {kickoff}</p>
-          {extraMeta ? <p className="match-meta">{extraMeta}</p> : null}
-          <p className="match-meta">Sede: {match.venue ?? 'Pendiente de confirmar'}</p>
           <div className="fixture-row">
             <TeamName teamName={match.homeTeam} linkToTeam />
             <span className="vs">vs</span>
@@ -584,7 +582,7 @@ export function PredictionsBoard({
                 </div>
               </div>
 
-              <div className="match-list">{section.matches.map((match) => renderMatchCard(match, undefined, !hasApprovedPayment))}</div>
+              <div className="match-list">{section.matches.map((match) => renderMatchCard(match, !hasApprovedPayment))}</div>
             </div>,
           );
           return nodes;
@@ -595,11 +593,11 @@ export function PredictionsBoard({
             {dateSectionsByPhase.group.map((section) => (
               <div key={`group-${section.label}`} className="panel stack-md">
                 <div className="section-head">
-                  <h3>{section.label}</h3>
+                  <h3 className="pred-date-heading"><span className="pred-date-icon" aria-hidden="true">📅</span>{section.label}</h3>
                   <span>{section.matches.length} partidos pendientes</span>
                 </div>
                 <div className="match-list">
-                  {section.matches.map((match) => renderMatchCard(match, match._meta, !hasApprovedPayment))}
+                  {section.matches.map((match) => renderMatchCard(match, !hasApprovedPayment))}
                 </div>
               </div>
             ))}
@@ -607,11 +605,11 @@ export function PredictionsBoard({
             {dateSectionsByPhase.knockout.map((section) => (
               <div key={`ko-${section.label}`} className="panel stack-md">
                 <div className="section-head">
-                  <h3>{section.label}</h3>
+                  <h3 className="pred-date-heading"><span className="pred-date-icon" aria-hidden="true">📅</span>{section.label}</h3>
                   <span>{section.matches.length} partidos pendientes</span>
                 </div>
                 <div className="match-list">
-                  {section.matches.map((match) => renderMatchCard(match, match._meta, !hasApprovedPayment))}
+                  {section.matches.map((match) => renderMatchCard(match, !hasApprovedPayment))}
                 </div>
               </div>
             ))}
@@ -620,11 +618,11 @@ export function PredictionsBoard({
           visibleDateSections.map((section) => (
             <div key={section.label} className="panel stack-md">
               <div className="section-head">
-                <h3>{section.label}</h3>
+                <h3 className="pred-date-heading"><span className="pred-date-icon" aria-hidden="true">📅</span>{section.label}</h3>
                 <span>{section.matches.length} partidos pendientes</span>
               </div>
               <div className="match-list">
-                {section.matches.map((match) => renderMatchCard(match, match._meta, !hasApprovedPayment))}
+                {section.matches.map((match) => renderMatchCard(match, !hasApprovedPayment))}
               </div>
             </div>
           ))

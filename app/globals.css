@@ -1783,6 +1783,19 @@ select:focus {
   margin: 0;
 }
 
+.pred-date-heading {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--accent-2);
+  text-shadow: 0 0 18px rgba(255, 176, 0, 0.24);
+}
+
+.pred-date-icon {
+  font-size: 0.95em;
+  line-height: 1;
+}
+
 .section-head span {
   color: var(--muted);
 }
