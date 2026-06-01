@@ -512,19 +512,11 @@ export function PredictionsBoard({
           </p>
           <div className="stack-xs">
             <p className="muted">
-              Puedes pagar online con TaloPay o transferir directamente al alias <strong>amiotti.mp</strong>.
+              Puedes transferir directamente al alias <strong>amiotti.mp</strong>
             </p>
             <p className="muted">
               Si transfieres, envía el comprobante de pago por WhatsApp al <strong>+5493742554827</strong>.
             </p>
-          </div>
-          <div className="cta-row">
-            <Link className="cta-link" href="/payment/return">
-              Revisar estado del pago
-            </Link>
-            <Link className="cta-link" href="/profile">
-              Mi perfil
-            </Link>
           </div>
         </div>
       ) : null}
