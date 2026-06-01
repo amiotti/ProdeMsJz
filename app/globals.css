@@ -1782,6 +1782,7 @@ select:focus {
 .toolbar-grid select {
   appearance: none;
   -webkit-appearance: none;
+  -moz-appearance: none;
   font-family: var(--font-body), 'Noto Sans', 'Segoe UI', Roboto, Arial, sans-serif;
   font-size: 0.95rem;
   font-weight: 700;
@@ -1801,6 +1802,10 @@ select:focus {
     100% 100%;
   background-repeat: no-repeat;
   padding-right: 2.2rem;
+}
+
+.toolbar-grid select::-ms-expand {
+  display: none;
 }
 
 .toolbar-grid select option {
@@ -3600,10 +3605,21 @@ html[data-theme='dark'] select {
 html[data-theme='dark'] .toolbar-grid select {
   color: #e8f1ff;
   border-color: rgba(255, 255, 255, 0.18);
+  background-color: rgba(12, 14, 20, 0.82);
   background-image:
     linear-gradient(45deg, transparent 50%, rgba(226, 239, 255, 0.65) 50%),
     linear-gradient(135deg, rgba(226, 239, 255, 0.65) 50%, transparent 50%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.04));
+  background-position:
+    calc(100% - 18px) calc(50% - 3px),
+    calc(100% - 12px) calc(50% - 3px),
+    0 0;
+  background-size:
+    6px 6px,
+    6px 6px,
+    100% 100%;
+  background-repeat: no-repeat;
+  padding-right: 2.2rem;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
     0 8px 16px rgba(0, 0, 0, 0.22);
