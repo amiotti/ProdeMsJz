@@ -64,7 +64,6 @@ export function PredictionsBoard({
   const [viewMode, setViewMode] = useState<ViewMode>('group');
   const [drafts, setDrafts] = useState<DraftMap>({});
   const [triviaDrafts, setTriviaDrafts] = useState<TriviaDraftMap>({});
-  const [paying, setPaying] = useState(false);
 
   async function loadState() {
     setLoading(true);
@@ -362,26 +361,6 @@ export function PredictionsBoard({
     }
   }
 
-  async function startRegistrationPayment() {
-    setPaying(true);
-    setMessage(null);
-    try {
-      const response = await fetch('/api/payments/talo/link', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
-      const data = await response.json();
-      if (!response.ok || !data.ok) throw new Error(data.error || 'No se pudo generar el pago');
-      const redirectUrl = data.url as string | undefined;
-      if (!redirectUrl) throw new Error('TaloPay no devolvio URL de checkout');
-      window.location.href = redirectUrl;
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'No se pudo iniciar el pago');
-    } finally {
-      setPaying(false);
-    }
-  }
-
 
   function renderTriviaPanel(key: string, readOnly = false) {
     const triviaReadOnly = readOnly || !triviaEditable;
@@ -526,7 +505,7 @@ export function PredictionsBoard({
   return (
     <section className="stack-lg predictions-board">
       {!hasApprovedPayment ? (
-        <div className="panel stack-md">
+        <div className="panel stack-md blocked-payment-panel">
           <h3>Predicciones bloqueadas hasta confirmar pago</h3>
           <p className="muted">
             Tu usuario tiene estado de inscripción <strong>{currentUser.registrationPaymentStatus ?? 'pending'}</strong>. Debes completar y confirmar el pago de <strong>${registrationAmountArs.toLocaleString('es-AR')}</strong> para acceder a la carga de predicciones.
@@ -540,9 +519,6 @@ export function PredictionsBoard({
             </p>
           </div>
           <div className="cta-row">
-            <button className="btn btn-primary" type="button" onClick={startRegistrationPayment} disabled={paying}>
-              {paying ? 'Redirigiendo a TaloPay...' : 'Pagar inscripción'}
-            </button>
             <Link className="cta-link" href="/payment/return">
               Revisar estado del pago
             </Link>

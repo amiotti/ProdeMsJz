@@ -7,10 +7,21 @@ import { requireAuthenticatedUser } from '@/lib/route-guard';
 
 export const dynamic = 'force-dynamic';
 
+function getRegistrationAmountArs() {
+  const isProd = process.env.VERCEL_ENV === 'production' || process.env.NODE_ENV === 'production';
+  const scoped = isProd
+    ? process.env.TALOPAY_REGISTRATION_AMOUNT_ARS_PROD
+    : process.env.TALOPAY_REGISTRATION_AMOUNT_ARS_LOCAL;
+  const fallback = process.env.TALOPAY_REGISTRATION_AMOUNT_ARS;
+  const parsed = Number(scoped ?? fallback ?? 0);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+}
+
 export default async function InicioPage() {
   const { user } = await requireAuthenticatedUser();
   const state = await getHomePageState();
   const hasApprovedPayment = user.role === 'admin' || user.registrationPaymentStatus === 'approved';
+  const registrationAmountArs = getRegistrationAmountArs();
 
   const totalMatches = state.summary.matches;
   const resultsLoaded = state.summary.matchesWithOfficialResult;
@@ -33,17 +44,14 @@ export default async function InicioPage() {
             Registro de participantes, predicciones por partido, resultados oficiales y tabla de posiciones para el
             torneo de 48 selecciones.
           </p>
-          <div className="panel prizes-panel">
-            <h3>Premios</h3>
-            <p className="muted">1°: 70% del pozo</p>
-            <p className="muted">2°: 25% del pozo</p>
-            <p className="muted">Último puesto: 5% del pozo</p>
-          </div>
           {!hasApprovedPayment ? (
             <div className="panel stack-md pending-payment-panel">
               <h3>Inscripción pendiente</h3>
               <div className="stack-xs">
                 <p className="muted">Para habilitar predicciones y tabla de posiciones debes completar la inscripción.</p>
+                <p className="muted">
+                  Monto a abonar: <strong>${registrationAmountArs.toLocaleString('es-AR')}</strong>
+                </p>
                 <p className="muted">
                   Puedes transferir directamente al alias <strong>amiotti.mp</strong>
                 </p>
@@ -53,6 +61,12 @@ export default async function InicioPage() {
               </div>
             </div>
           ) : null}
+          <div className="panel prizes-panel">
+            <h3>Premios</h3>
+            <p className="muted">1°: 70% del pozo</p>
+            <p className="muted">2°: 25% del pozo</p>
+            <p className="muted">Último puesto: 5% del pozo</p>
+          </div>
           <div className="cta-row">
             <Link href="/predictions" className="cta-link">
               Cargar predicciones

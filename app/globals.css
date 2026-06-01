@@ -1510,6 +1510,24 @@ select {
   margin-top: 0.2rem;
 }
 
+.blocked-payment-panel {
+  padding: 0.8rem 0.9rem;
+  gap: 0.45rem;
+}
+
+.blocked-payment-panel h3 {
+  margin: 0 0 0.15rem;
+}
+
+.blocked-payment-panel p {
+  margin: 0;
+  line-height: 1.3;
+}
+
+.blocked-payment-panel .cta-row {
+  margin-top: 0.35rem;
+}
+
 .stack-lg {
   display: grid;
   gap: 1rem;
