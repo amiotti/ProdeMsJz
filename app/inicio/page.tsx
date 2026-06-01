@@ -1,5 +1,6 @@
 ﻿import Link from 'next/link';
 
+import { RegistrationPaymentCta } from '@/components/registration-payment-cta';
 import { TeamName } from '@/components/team-name';
 import { formatDateTimeArgentina } from '@/lib/datetime';
 import { getHomePageState } from '@/lib/db';
@@ -8,8 +9,9 @@ import { requireAuthenticatedUser } from '@/lib/route-guard';
 export const dynamic = 'force-dynamic';
 
 export default async function InicioPage() {
-  await requireAuthenticatedUser();
+  const { user } = await requireAuthenticatedUser();
   const state = await getHomePageState();
+  const hasApprovedPayment = user.role === 'admin' || user.registrationPaymentStatus === 'approved';
 
   const totalMatches = state.summary.matches;
   const resultsLoaded = state.summary.matchesWithOfficialResult;
@@ -34,8 +36,23 @@ export default async function InicioPage() {
           </p>
           <div className="panel prizes-panel">
             <h3>Premios Top 10</h3>
-            <p className="muted">Habrá premios para el Top 10 de participantes con mayor puntuación.</p>
+            <p className="muted">1°: 70% del pozo</p>
+            <p className="muted">2°: 25% del pozo</p>
+            <p className="muted">Último puesto: 5% del pozo</p>
           </div>
+          {!hasApprovedPayment ? (
+            <div className="panel stack-md">
+              <h3>Inscripción pendiente</h3>
+              <p className="muted">Para habilitar predicciones y tabla de posiciones debes completar la inscripción.</p>
+              <p className="muted">
+                Puedes pagar online con TaloPay o transferir directamente al alias <strong>amiotti.mp</strong>.
+              </p>
+              <p className="muted">
+                Si transfieres, envía el comprobante de pago por WhatsApp al <strong>+5493742554827</strong>.
+              </p>
+              <RegistrationPaymentCta />
+            </div>
+          ) : null}
           <div className="cta-row">
             <Link href="/predictions" className="cta-link">
               Cargar predicciones

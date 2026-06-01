@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { TeamName } from '@/components/team-name';
 import { formatDateArgentinaShort, formatKickoffArgentina } from '@/lib/datetime';
 import type { Match, StateResponse, TriviaQuestion } from '@/lib/types';
-import { estimateMatchProbabilities } from '@/lib/worldcup26';
+import { estimateMatchProbabilities, getTeamDisplayName } from '@/lib/worldcup26';
 
 type DraftMap = Record<string, { home: string; away: string }>;
 type TriviaDraftMap = Record<string, string>;
@@ -449,7 +449,7 @@ export function PredictionsBoard({
               Probabilidades:{' '}
               {(() => {
                 const p = estimateMatchProbabilities(match.homeTeam, match.awayTeam);
-                return `${p.homeWinPct}% ${match.homeTeam} | ${p.drawPct}% empate | ${p.awayWinPct}% ${match.awayTeam}`;
+                return `${p.homeWinPct}% ${getTeamDisplayName(match.homeTeam)} | ${p.drawPct}% empate | ${p.awayWinPct}% ${getTeamDisplayName(match.awayTeam)}`;
               })()}
             </p>
           ) : null}
