@@ -508,14 +508,14 @@ export function PredictionsBoard({
         <div className="panel stack-md blocked-payment-panel">
           <h3>Predicciones bloqueadas hasta confirmar pago</h3>
           <p className="muted">
-            Tu usuario tiene estado de inscripción <strong>{currentUser.registrationPaymentStatus ?? 'pending'}</strong>. Debes completar y confirmar el pago de <strong>${registrationAmountArs.toLocaleString('es-AR')}</strong> para acceder a la carga de predicciones.
+            Debes completar y confirmar el pago de <strong>${registrationAmountArs.toLocaleString('es-AR')}</strong> para acceder a la carga de predicciones.
           </p>
           <div className="stack-xs">
             <p className="muted">
               Puedes transferir directamente al alias <strong>amiotti.mp</strong>
             </p>
             <p className="muted">
-              Si transfieres, envía el comprobante de pago por WhatsApp al <strong>+5493742554827</strong>.
+              Si transfieres, envía el comprobante de pago por WhatsApp al <strong>+5493472554827</strong>.
             </p>
           </div>
         </div>

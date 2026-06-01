@@ -56,7 +56,7 @@ export default async function InicioPage() {
                   Puedes transferir directamente al alias <strong>amiotti.mp</strong>
                 </p>
                 <p className="muted">
-                  Si transfieres, envía el comprobante de pago por WhatsApp al <strong>+5493742554827</strong>.
+                  Si transfieres, envía el comprobante de pago por WhatsApp al <strong>+5493472554827</strong>.
                 </p>
               </div>
             </div>
