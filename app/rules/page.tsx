@@ -128,7 +128,7 @@ export default async function RulesPage() {
         <h3>Alcance actual</h3>
         <ul className="rules-bullets">
           <li>El calendario muestra el fixture completo del Mundial 2026.</li>
-          <li>Las probabilidades de `Predicciones` son estimaciones internas de la app (no cuotas).</li>
+          <li>Las probabilidades de `Predicciones` son estimaciones internas de la app.</li>
           <li>La carga de resultados oficiales se realiza desde `Resultados Oficiales`.</li>
           <li>La trivia se puede responder hasta el cierre de la fase de grupos; luego queda bloqueada.</li>
         </ul>

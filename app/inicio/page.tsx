@@ -4,6 +4,7 @@ import { TeamName } from '@/components/team-name';
 import { formatDateTimeArgentina } from '@/lib/datetime';
 import { getHomePageState } from '@/lib/db';
 import { requireAuthenticatedUser } from '@/lib/route-guard';
+import { getTeamDisplayName } from '@/lib/worldcup26';
 
 export const dynamic = 'force-dynamic';
 
@@ -113,7 +114,11 @@ export default async function InicioPage() {
             </div>
             <div className="detail-card">
               <span className="detail-label">Próximo partido</span>
-              <strong>{nextMatch ? `${nextMatch.homeTeam} vs ${nextMatch.awayTeam}` : 'Sin partidos pendientes'}</strong>
+              <strong>
+                {nextMatch
+                  ? `${getTeamDisplayName(nextMatch.homeTeam)} vs ${getTeamDisplayName(nextMatch.awayTeam)}`
+                  : 'Sin partidos pendientes'}
+              </strong>
               <span className="muted compact-text">
                 {nextMatch ? formatDateTimeArgentina(nextMatch.kickoffAt) : 'El fixture no tiene fechas futuras'}
               </span>
@@ -123,8 +128,7 @@ export default async function InicioPage() {
       </div>
 
       <div className="panel stack-md">
-        <h3>Grupos (zonas) y equipos</h3>
-        <p className="muted">Grupos cargados con selecciones definidas tras el sorteo.</p>
+        <h3>Grupos</h3>
         <div className="group-grid">
           {state.groups.map((group) => (
             <div key={group.id} className="group-card">
