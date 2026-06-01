@@ -155,17 +155,33 @@ export function PredictionsBoard({
   }, [editableMatches]);
 
   const visibleSections = useMemo(() => {
+    const withoutPrediction = (matchId: string) => {
+      const draft = drafts[matchId];
+      return !draft || draft.home === '' || draft.away === '';
+    };
+
+    const filterUnpredicted = (sections: MatchSection[]) =>
+      sections
+        .map((section) => ({
+          ...section,
+          matches: section.matches.filter((match) => withoutPrediction(match.id)),
+        }))
+        .filter((section) => section.matches.length > 0);
+
     const sections: MatchSection[] = [];
     if (selectedGroupId === 'ALL') {
       sections.push(...groupSections);
       sections.push(...knockoutSections);
+    } else if (selectedGroupId === 'UNPREDICTED') {
+      sections.push(...filterUnpredicted(groupSections));
+      sections.push(...filterUnpredicted(knockoutSections));
     } else if (selectedGroupId === 'KO') {
       sections.push(...knockoutSections);
     } else if (selectedGroupId !== 'TRIVIA') {
       sections.push(...groupSections.filter((section) => section.id === selectedGroupId));
     }
     return sections;
-  }, [groupSections, knockoutSections, selectedGroupId]);
+  }, [drafts, groupSections, knockoutSections, selectedGroupId]);
 
   const visibleDateSections = useMemo(() => {
     const flat: DateMatch[] = visibleSections.flatMap((section) =>
@@ -524,6 +540,7 @@ export function PredictionsBoard({
           Filtrar grupo
           <select id="pred-filter-group" name="predFilterGroup" value={selectedGroupId} onChange={(e) => setSelectedGroupId(e.target.value)}>
             <option value="ALL">Todos</option>
+            <option value="UNPREDICTED">Sin Predicción</option>
             <option value="KO">Fase final</option>
             <option value="TRIVIA">Trivia</option>
             {state.db.groups.map((group) => (
