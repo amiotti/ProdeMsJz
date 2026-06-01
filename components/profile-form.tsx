@@ -15,8 +15,10 @@ export function ProfileForm({ user }: { user: User }) {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+  const [paying, setPaying] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
+  const hasApprovedPayment = user.registrationPaymentStatus === 'approved';
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -66,6 +68,26 @@ export function ProfileForm({ user }: { user: User }) {
     }
   }
 
+  async function startRegistrationPayment() {
+    setPaying(true);
+    setStatus(null);
+    try {
+      const response = await fetch('/api/payments/talo/link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await response.json();
+      if (!response.ok || !data.ok) throw new Error(data.error || 'No se pudo generar el link de pago');
+      const redirectUrl = data.url as string | undefined;
+      if (!redirectUrl) throw new Error('TaloPay no devolvió URL de checkout');
+      window.location.href = redirectUrl;
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : 'No se pudo iniciar el pago');
+    } finally {
+      setPaying(false);
+    }
+  }
+
   return (
     <section className="stack-lg">
       {isAdmin ? (
@@ -92,101 +114,128 @@ export function ProfileForm({ user }: { user: User }) {
           {status ? <p className="status">{status}</p> : null}
         </div>
       ) : (
-        <form className="panel stack-md profile-form" onSubmit={onSubmit}>
-          <div className="section-head">
-            <h3>Datos de registro</h3>
-            <button className="btn btn-primary btn-small" type="button" onClick={() => setEditing((prev) => !prev)}>
-              {editing ? 'Cancelar edición' : 'Editar perfil'}
-            </button>
-          </div>
-
-          {editing ? (
-            <div className="form-grid">
-              <label>
-                Nombre
-                <input id="profile-first-name" name="firstName" autoComplete="given-name" value={firstName} onChange={(e) => setFirstName(e.target.value)} required disabled={loading} />
-              </label>
-              <label>
-                Apellido
-                <input id="profile-last-name" name="lastName" autoComplete="family-name" value={lastName} onChange={(e) => setLastName(e.target.value)} required disabled={loading} />
-              </label>
-              <label>
-                Email
-                <input id="profile-email" name="email" autoComplete="email" value={user.email} disabled />
-              </label>
-              <label>
-                Teléfono
-                <input id="profile-phone" name="phone" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required disabled={loading} />
-              </label>
-              <label>
-                CBU/CVU o Alias
-                <input id="profile-bank-info" name="bankInfo" autoComplete="off" value={bankInfo} onChange={(e) => setBankInfo(e.target.value)} required disabled={loading} />
-              </label>
-              <label>
-                Nueva contraseña (opcional)
-                <input
-                  id="profile-password"
-                  name="newPassword"
-                  autoComplete="new-password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  minLength={8}
-                  placeholder="Dejar vacío para no cambiar"
-                  disabled={loading}
-                />
-              </label>
-            </div>
-          ) : (
-            <div className="detail-grid">
-              <div className="detail-card">
-                <span className="detail-label">Nombre</span>
-                <strong>{firstName}</strong>
+        <>
+          {!hasApprovedPayment ? (
+            <div className="panel stack-md">
+              <div className="section-head">
+                <h3>Pago de inscripción</h3>
+                <span>Estado actual: {user.registrationPaymentStatus ?? 'pending'}</span>
               </div>
-              <div className="detail-card">
-                <span className="detail-label">Apellido</span>
-                <strong>{lastName}</strong>
+              <p className="muted">
+                Para habilitar predicciones y tabla de posiciones debes completar la inscripción.
+              </p>
+              <div className="stack-xs">
+                <p className="muted">
+                  Puedes pagar online con TaloPay o transferir al alias <strong>amiotti.mp</strong>.
+                </p>
+                <p className="muted">
+                  Si transfieres, envía el comprobante por WhatsApp al <strong>+5493742554827</strong>.
+                </p>
               </div>
-              <div className="detail-card">
-                <span className="detail-label">Email</span>
-                <strong>{user.email}</strong>
-              </div>
-              <div className="detail-card">
-                <span className="detail-label">Teléfono</span>
-                <strong>{phone}</strong>
-              </div>
-              <div className="detail-card">
-                <span className="detail-label">CBU/CVU o Alias</span>
-                <strong>{bankInfo}</strong>
-              </div>
-              <div className="detail-card">
-                <span className="detail-label">Rol</span>
-                <strong>Usuario</strong>
-              </div>
-              <div className="detail-card">
-                <span className="detail-label">Estado inscripción</span>
-                <strong>{user.registrationPaymentStatus ?? 'pending'}</strong>
+              <div className="cta-row">
+                <button className="btn btn-primary" type="button" onClick={startRegistrationPayment} disabled={paying}>
+                  {paying ? 'Redirigiendo a TaloPay...' : 'Pagar inscripción'}
+                </button>
               </div>
             </div>
-          )}
+          ) : null}
 
-          <div className="cta-row">
+          <form className="panel stack-md profile-form" onSubmit={onSubmit}>
+            <div className="section-head">
+              <h3>Datos de registro</h3>
+              <button className="btn btn-primary btn-small" type="button" onClick={() => setEditing((prev) => !prev)}>
+                {editing ? 'Cancelar edición' : 'Editar perfil'}
+              </button>
+            </div>
+
             {editing ? (
-              <>
-                <button className="btn btn-primary" type="submit" disabled={loading}>
-                  {loading ? 'Guardando...' : 'Guardar perfil'}
-                </button>
-                <button className="btn" type="button" onClick={() => setEditing(false)} disabled={loading}>
-                  Cancelar
-                </button>
-              </>
-            ) : null}
-            <button className="btn btn-primary" type="button" onClick={logout} disabled={loggingOut}>
-              {loggingOut ? 'Saliendo...' : 'Cerrar sesión'}
-            </button>
-          </div>
-          {status ? <p className="status">{status}</p> : null}
-        </form>
+              <div className="form-grid">
+                <label>
+                  Nombre
+                  <input id="profile-first-name" name="firstName" autoComplete="given-name" value={firstName} onChange={(e) => setFirstName(e.target.value)} required disabled={loading} />
+                </label>
+                <label>
+                  Apellido
+                  <input id="profile-last-name" name="lastName" autoComplete="family-name" value={lastName} onChange={(e) => setLastName(e.target.value)} required disabled={loading} />
+                </label>
+                <label>
+                  Email
+                  <input id="profile-email" name="email" autoComplete="email" value={user.email} disabled />
+                </label>
+                <label>
+                  Teléfono
+                  <input id="profile-phone" name="phone" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required disabled={loading} />
+                </label>
+                <label>
+                  CBU/CVU o Alias
+                  <input id="profile-bank-info" name="bankInfo" autoComplete="off" value={bankInfo} onChange={(e) => setBankInfo(e.target.value)} required disabled={loading} />
+                </label>
+                <label>
+                  Nueva contraseña (opcional)
+                  <input
+                    id="profile-password"
+                    name="newPassword"
+                    autoComplete="new-password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    minLength={8}
+                    placeholder="Dejar vacío para no cambiar"
+                    disabled={loading}
+                  />
+                </label>
+              </div>
+            ) : (
+              <div className="detail-grid">
+                <div className="detail-card">
+                  <span className="detail-label">Nombre</span>
+                  <strong>{firstName}</strong>
+                </div>
+                <div className="detail-card">
+                  <span className="detail-label">Apellido</span>
+                  <strong>{lastName}</strong>
+                </div>
+                <div className="detail-card">
+                  <span className="detail-label">Email</span>
+                  <strong>{user.email}</strong>
+                </div>
+                <div className="detail-card">
+                  <span className="detail-label">Teléfono</span>
+                  <strong>{phone}</strong>
+                </div>
+                <div className="detail-card">
+                  <span className="detail-label">CBU/CVU o Alias</span>
+                  <strong>{bankInfo}</strong>
+                </div>
+                <div className="detail-card">
+                  <span className="detail-label">Rol</span>
+                  <strong>Usuario</strong>
+                </div>
+                <div className="detail-card">
+                  <span className="detail-label">Estado inscripción</span>
+                  <strong>{user.registrationPaymentStatus ?? 'pending'}</strong>
+                </div>
+              </div>
+            )}
+
+            <div className="cta-row">
+              {editing ? (
+                <>
+                  <button className="btn btn-primary" type="submit" disabled={loading}>
+                    {loading ? 'Guardando...' : 'Guardar perfil'}
+                  </button>
+                  <button className="btn" type="button" onClick={() => setEditing(false)} disabled={loading}>
+                    Cancelar
+                  </button>
+                </>
+              ) : null}
+              <button className="btn btn-primary" type="button" onClick={logout} disabled={loggingOut}>
+                {loggingOut ? 'Saliendo...' : 'Cerrar sesión'}
+              </button>
+            </div>
+            {status ? <p className="status">{status}</p> : null}
+          </form>
+        </>
       )}
     </section>
   );

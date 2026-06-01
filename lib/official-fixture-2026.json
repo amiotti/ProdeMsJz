@@ -9,7 +9,8 @@
       "gmtInfo": "21:00 GMT",
       "venue": "Mexico City Stadium, Mexico City, Mexico",
       "homeTeam": "Mexico",
-      "awayTeam": "South Africa"
+      "awayTeam": "South Africa",
+      "kickoffArgentina": "2026-06-11T16:00:00-03:00"
     },
     {
       "stage": "group",
@@ -19,7 +20,8 @@
       "gmtInfo": "04:00 GMT on Friday",
       "venue": "Estadio Guadalajara, Zapopan, Mexico",
       "homeTeam": "South Korea",
-      "awayTeam": "TDB"
+      "awayTeam": "TDB",
+      "kickoffArgentina": "2026-06-11T23:00:00-03:00"
     },
     {
       "stage": "group",
@@ -29,7 +31,8 @@
       "gmtInfo": "20:00 GMT",
       "venue": "Toronto Stadium, Toronto, Canada",
       "homeTeam": "Canada",
-      "awayTeam": "TBD"
+      "awayTeam": "TBD",
+      "kickoffArgentina": "2026-06-12T16:00:00-03:00"
     },
     {
       "stage": "group",
@@ -39,7 +42,8 @@
       "gmtInfo": "05:00 GMT on Saturday",
       "venue": "Los Angeles Stadium, Los Angeles, US",
       "homeTeam": "USA",
-      "awayTeam": "Paraguay"
+      "awayTeam": "Paraguay",
+      "kickoffArgentina": "2026-06-12T22:00:00-03:00"
     },
     {
       "stage": "group",
@@ -49,7 +53,8 @@
       "gmtInfo": "23:00 GMT",
       "venue": "San Francisco Bay Area Stadium, San Francisco, US",
       "homeTeam": "Qatar",
-      "awayTeam": "Switzerland"
+      "awayTeam": "Switzerland",
+      "kickoffArgentina": "2026-06-13T16:00:00-03:00"
     },
     {
       "stage": "group",
@@ -59,7 +64,8 @@
       "gmtInfo": "23:00 GMT",
       "venue": "New York New Jersey Stadium, New Jersey, US",
       "homeTeam": "Brazil",
-      "awayTeam": "Morocco"
+      "awayTeam": "Morocco",
+      "kickoffArgentina": "2026-06-13T19:00:00-03:00"
     },
     {
       "stage": "group",
@@ -69,7 +75,8 @@
       "gmtInfo": "02:00 GMT on Sunday",
       "venue": "Boston Stadium, Boston, US",
       "homeTeam": "Haiti",
-      "awayTeam": "Scotland"
+      "awayTeam": "Scotland",
+      "kickoffArgentina": "2026-06-13T22:00:00-03:00"
     },
     {
       "stage": "group",
@@ -79,7 +86,8 @@
       "gmtInfo": "08:00 GMT on Sunday",
       "venue": "BC Place, Vancouver, Canada",
       "homeTeam": "Australia",
-      "awayTeam": "TBD"
+      "awayTeam": "TBD",
+      "kickoffArgentina": "2026-06-14T01:00:00-03:00"
     },
     {
       "stage": "group",
@@ -89,7 +97,8 @@
       "gmtInfo": "19:00 GMT",
       "venue": "Houston Stadium, Houston, US",
       "homeTeam": "Germany",
-      "awayTeam": "Curacao"
+      "awayTeam": "Curacao",
+      "kickoffArgentina": "2026-06-14T14:00:00-03:00"
     },
     {
       "stage": "group",
@@ -99,7 +108,8 @@
       "gmtInfo": "22:00 GMT",
       "venue": "Dallas Stadium, Dallas, US",
       "homeTeam": "Netherlands",
-      "awayTeam": "Japan"
+      "awayTeam": "Japan",
+      "kickoffArgentina": "2026-06-14T17:00:00-03:00"
     },
     {
       "stage": "group",
@@ -109,7 +119,8 @@
       "gmtInfo": "00:00 GMT on Monday",
       "venue": "Philadelphia Stadium, Philadelphia, US",
       "homeTeam": "Ivory Coast",
-      "awayTeam": "Ecuador"
+      "awayTeam": "Ecuador",
+      "kickoffArgentina": "2026-06-14T20:00:00-03:00"
     },
     {
       "stage": "group",
@@ -119,7 +130,8 @@
       "gmtInfo": "04:00 GMT on Monday",
       "venue": "Estadio Monterrey, Guadalupe, Mexico",
       "homeTeam": "TBD",
-      "awayTeam": "Tunisia"
+      "awayTeam": "Tunisia",
+      "kickoffArgentina": "2026-06-14T23:00:00-03:00"
     },
     {
       "stage": "group",
@@ -129,7 +141,8 @@
       "gmtInfo": "17:00 GMT",
       "venue": "Atlanta Stadium, Atlanta, US",
       "homeTeam": "Spain",
-      "awayTeam": "Cape Verde"
+      "awayTeam": "Cape Verde",
+      "kickoffArgentina": "2026-06-15T13:00:00-03:00"
     },
     {
       "stage": "group",
@@ -139,7 +152,8 @@
       "gmtInfo": "23:00 GMT",
       "venue": "BC Place, Vancouver, Canada",
       "homeTeam": "Belgium",
-      "awayTeam": "Egypt"
+      "awayTeam": "Egypt",
+      "kickoffArgentina": "2026-06-15T16:00:00-03:00"
     },
     {
       "stage": "group",
@@ -149,7 +163,8 @@
       "gmtInfo": "23:00 GMT",
       "venue": "Miami Stadium, Miami, US",
       "homeTeam": "Saudi Arabia",
-      "awayTeam": "Uruguay"
+      "awayTeam": "Uruguay",
+      "kickoffArgentina": "2026-06-15T19:00:00-03:00"
     },
     {
       "stage": "group",
@@ -159,7 +174,8 @@
       "gmtInfo": "05:00 GMT on Tuesday",
       "venue": "Los Angeles Stadium, Los Angeles, US",
       "homeTeam": "Iran",
-      "awayTeam": "New Zealand"
+      "awayTeam": "New Zealand",
+      "kickoffArgentina": "2026-06-15T22:00:00-03:00"
     },
     {
       "stage": "group",
@@ -169,7 +185,8 @@
       "gmtInfo": "20:00 GMT",
       "venue": "New York New Jersey Stadium, New Jersey, US",
       "homeTeam": "France",
-      "awayTeam": "Senegal"
+      "awayTeam": "Senegal",
+      "kickoffArgentina": "2026-06-16T16:00:00-03:00"
     },
     {
       "stage": "group",
@@ -179,7 +196,8 @@
       "gmtInfo": "23:00 GMT",
       "venue": "Boston Stadium, Boston, US",
       "homeTeam": "TBD",
-      "awayTeam": "Norway"
+      "awayTeam": "Norway",
+      "kickoffArgentina": "2026-06-16T19:00:00-03:00"
     },
     {
       "stage": "group",
@@ -189,7 +207,8 @@
       "gmtInfo": "03:00 GMT on Wednesday",
       "venue": "Kansas City Stadium, Kansas City, US",
       "homeTeam": "Argentina",
-      "awayTeam": "Algeria"
+      "awayTeam": "Algeria",
+      "kickoffArgentina": "2026-06-16T22:00:00-03:00"
     },
     {
       "stage": "group",
@@ -199,7 +218,8 @@
       "gmtInfo": "08:00 GMT on Wednesday",
       "venue": "San Francisco Bay Area Stadium, San Francisco, US",
       "homeTeam": "Austria",
-      "awayTeam": "Jordan"
+      "awayTeam": "Jordan",
+      "kickoffArgentina": "2026-06-17T01:00:00-03:00"
     },
     {
       "stage": "group",
@@ -209,7 +229,8 @@
       "gmtInfo": "19:00 GMT",
       "venue": "Houston Stadium, Houston, US",
       "homeTeam": "Portugal",
-      "awayTeam": "TBD"
+      "awayTeam": "TBD",
+      "kickoffArgentina": "2026-06-17T14:00:00-03:00"
     },
     {
       "stage": "group",
@@ -219,7 +240,8 @@
       "gmtInfo": "22:00 GMT",
       "venue": "Dallas Stadium, Dallas, US",
       "homeTeam": "England",
-      "awayTeam": "Croatia"
+      "awayTeam": "Croatia",
+      "kickoffArgentina": "2026-06-17T17:00:00-03:00"
     },
     {
       "stage": "group",
@@ -229,7 +251,8 @@
       "gmtInfo": "00:00 GMT on Thursday",
       "venue": "Toronto Stadium, Toronto, Canada",
       "homeTeam": "Ghana",
-      "awayTeam": "Panama"
+      "awayTeam": "Panama",
+      "kickoffArgentina": "2026-06-17T20:00:00-03:00"
     },
     {
       "stage": "group",
@@ -239,7 +262,8 @@
       "gmtInfo": "04:00 GMT on Thursday",
       "venue": "Mexico City Stadium, Mexico City, Mexico",
       "homeTeam": "Uzbekistan",
-      "awayTeam": "Colombia"
+      "awayTeam": "Colombia",
+      "kickoffArgentina": "2026-06-17T23:00:00-03:00"
     },
     {
       "stage": "group",
@@ -249,7 +273,8 @@
       "gmtInfo": "17:00 GMT",
       "venue": "Atlanta Stadium, Atlanta, US",
       "homeTeam": "TBD",
-      "awayTeam": "South Africa"
+      "awayTeam": "South Africa",
+      "kickoffArgentina": "2026-06-18T13:00:00-03:00"
     },
     {
       "stage": "group",
@@ -259,7 +284,8 @@
       "gmtInfo": "23:00 GMT",
       "venue": "Los Angeles Stadium, Los Angeles, US",
       "homeTeam": "Switzerland",
-      "awayTeam": "TBD"
+      "awayTeam": "TBD",
+      "kickoffArgentina": "2026-06-18T16:00:00-03:00"
     },
     {
       "stage": "group",
@@ -269,7 +295,8 @@
       "gmtInfo": "02:00 GMT on Friday",
       "venue": "BC Place, Vancouver, Canada",
       "homeTeam": "Canada",
-      "awayTeam": "Qatar"
+      "awayTeam": "Qatar",
+      "kickoffArgentina": "2026-06-18T19:00:00-03:00"
     },
     {
       "stage": "group",
@@ -279,7 +306,8 @@
       "gmtInfo": "03:00 GMT on Friday",
       "venue": "Estadio Guadalajara, Zapopan, Mexico",
       "homeTeam": "Mexico",
-      "awayTeam": "South Korea"
+      "awayTeam": "South Korea",
+      "kickoffArgentina": "2026-06-18T22:00:00-03:00"
     },
     {
       "stage": "group",
@@ -289,7 +317,8 @@
       "gmtInfo": "23:00 GMT",
       "venue": "Boston Stadium, Boston, US",
       "homeTeam": "Scotland",
-      "awayTeam": "Morocco"
+      "awayTeam": "Morocco",
+      "kickoffArgentina": "2026-06-19T19:00:00-03:00"
     },
     {
       "stage": "group",
@@ -299,7 +328,8 @@
       "gmtInfo": "23:00 GMT",
       "venue": "Seattle Stadium, Seattle, US",
       "homeTeam": "USA",
-      "awayTeam": "Australia"
+      "awayTeam": "Australia",
+      "kickoffArgentina": "2026-06-19T16:00:00-03:00"
     },
     {
       "stage": "group",
@@ -309,7 +339,8 @@
       "gmtInfo": "02:00 GMT on Saturday",
       "venue": "Philadelphia Stadium, Philadelphia, US",
       "homeTeam": "Brazil",
-      "awayTeam": "Haiti"
+      "awayTeam": "Haiti",
+      "kickoffArgentina": "2026-06-19T22:00:00-03:00"
     },
     {
       "stage": "group",
@@ -319,7 +350,8 @@
       "gmtInfo": "08:00 GMT on Saturday",
       "venue": "San Francisco Bay Area Stadium, San Francisco, US",
       "homeTeam": "TBD",
-      "awayTeam": "Paraguay"
+      "awayTeam": "Paraguay",
+      "kickoffArgentina": "2026-06-20T01:00:00-03:00"
     },
     {
       "stage": "group",
@@ -329,7 +361,8 @@
       "gmtInfo": "19:00 GMT",
       "venue": "Houston Stadium, Houston, US",
       "homeTeam": "Netherlands",
-      "awayTeam": "TBD"
+      "awayTeam": "TBD",
+      "kickoffArgentina": "2026-06-20T14:00:00-03:00"
     },
     {
       "stage": "group",
@@ -339,7 +372,8 @@
       "gmtInfo": "21:00 GMT",
       "venue": "Toronto Stadium, Toronto, Canada",
       "homeTeam": "Germany",
-      "awayTeam": "Ivory Coast"
+      "awayTeam": "Ivory Coast",
+      "kickoffArgentina": "2026-06-20T17:00:00-03:00"
     },
     {
       "stage": "group",
@@ -349,7 +383,8 @@
       "gmtInfo": "04:00 GMT on Sunday",
       "venue": "Kansas City Stadium, Kansas City, US",
       "homeTeam": "Ecuador",
-      "awayTeam": "Curacao"
+      "awayTeam": "Curacao",
+      "kickoffArgentina": "2026-06-20T21:00:00-03:00"
     },
     {
       "stage": "group",
@@ -359,7 +394,8 @@
       "gmtInfo": "06:00 GMT on Sunday",
       "venue": "Estadio Monterrey, Guadalupe, Mexico",
       "homeTeam": "Tunisia",
-      "awayTeam": "Japan"
+      "awayTeam": "Japan",
+      "kickoffArgentina": "2026-06-21T01:00:00-03:00"
     },
     {
       "stage": "group",
@@ -369,7 +405,8 @@
       "gmtInfo": "17:00 GMT",
       "venue": "Atlanta Stadium, Atlanta, US",
       "homeTeam": "Spain",
-      "awayTeam": "Saudi Arabia"
+      "awayTeam": "Saudi Arabia",
+      "kickoffArgentina": "2026-06-21T13:00:00-03:00"
     },
     {
       "stage": "group",
@@ -379,7 +416,8 @@
       "gmtInfo": "23:00 GMT",
       "venue": "Los Angeles Stadium, Los Angeles, US",
       "homeTeam": "Belgium",
-      "awayTeam": "Iran"
+      "awayTeam": "Iran",
+      "kickoffArgentina": "2026-06-21T16:00:00-03:00"
     },
     {
       "stage": "group",
@@ -389,7 +427,8 @@
       "gmtInfo": "23:00 GMT",
       "venue": "Miami Stadium, Miami, US",
       "homeTeam": "Uruguay",
-      "awayTeam": "Cape Verde"
+      "awayTeam": "Cape Verde",
+      "kickoffArgentina": "2026-06-21T19:00:00-03:00"
     },
     {
       "stage": "group",
@@ -399,7 +438,8 @@
       "gmtInfo": "05:00 GMT on Monday",
       "venue": "BC Place, Vancouver, Canada",
       "homeTeam": "New Zealand",
-      "awayTeam": "Egypt"
+      "awayTeam": "Egypt",
+      "kickoffArgentina": "2026-06-21T22:00:00-03:00"
     },
     {
       "stage": "group",
@@ -409,7 +449,8 @@
       "gmtInfo": "19:00 GMT",
       "venue": "Dallas Stadium, Dallas, US",
       "homeTeam": "Argentina",
-      "awayTeam": "Austria"
+      "awayTeam": "Austria",
+      "kickoffArgentina": "2026-06-22T14:00:00-03:00"
     },
     {
       "stage": "group",
@@ -419,7 +460,8 @@
       "gmtInfo": "22:00 GMT",
       "venue": "Philadelphia Stadium, Philadelphia, US",
       "homeTeam": "France",
-      "awayTeam": "TBD"
+      "awayTeam": "TBD",
+      "kickoffArgentina": "2026-06-22T18:00:00-03:00"
     },
     {
       "stage": "group",
@@ -429,7 +471,8 @@
       "gmtInfo": "01:00 GMT on Tuesday",
       "venue": "New York New Jersey Stadium, New Jersey, US",
       "homeTeam": "Norway",
-      "awayTeam": "Senegal"
+      "awayTeam": "Senegal",
+      "kickoffArgentina": "2026-06-22T21:00:00-03:00"
     },
     {
       "stage": "group",
@@ -439,7 +482,8 @@
       "gmtInfo": "07:00 GMT on Tuesday",
       "venue": "San Francisco Bay Area Stadium, San Francisco, US",
       "homeTeam": "Jordan",
-      "awayTeam": "Algeria"
+      "awayTeam": "Algeria",
+      "kickoffArgentina": "2026-06-23T00:00:00-03:00"
     },
     {
       "stage": "group",
@@ -449,7 +493,8 @@
       "gmtInfo": "19:00 GMT",
       "venue": "Houston Stadium, Houston, US",
       "homeTeam": "Portugal",
-      "awayTeam": "Uzbekistan"
+      "awayTeam": "Uzbekistan",
+      "kickoffArgentina": "2026-06-23T14:00:00-03:00"
     },
     {
       "stage": "group",
@@ -459,7 +504,8 @@
       "gmtInfo": "21:00 GMT",
       "venue": "Boston Stadium, Boston, US",
       "homeTeam": "England",
-      "awayTeam": "Ghana"
+      "awayTeam": "Ghana",
+      "kickoffArgentina": "2026-06-23T17:00:00-03:00"
     },
     {
       "stage": "group",
@@ -469,7 +515,8 @@
       "gmtInfo": "00:00 GMT on Wednesday",
       "venue": "Toronto Stadium, Toronto, Canada",
       "homeTeam": "Panama",
-      "awayTeam": "Croatia"
+      "awayTeam": "Croatia",
+      "kickoffArgentina": "2026-06-23T20:00:00-03:00"
     },
     {
       "stage": "group",
@@ -479,7 +526,8 @@
       "gmtInfo": "04:00 GMT on Wednesday",
       "venue": "Estadio Guadalajara, Zapopan, Mexico",
       "homeTeam": "Colombia",
-      "awayTeam": "TBD"
+      "awayTeam": "TBD",
+      "kickoffArgentina": "2026-06-23T23:00:00-03:00"
     },
     {
       "stage": "group",
@@ -489,7 +537,8 @@
       "gmtInfo": "23:00 GMT",
       "venue": "BC Place, Vancouver, Canada",
       "homeTeam": "Switzerland",
-      "awayTeam": "Canada"
+      "awayTeam": "Canada",
+      "kickoffArgentina": "2026-06-24T16:00:00-03:00"
     },
     {
       "stage": "group",
@@ -499,7 +548,8 @@
       "gmtInfo": "23:00 GMT",
       "venue": "Seattle Stadium, Seattle, US",
       "homeTeam": "TBD",
-      "awayTeam": "Qatar"
+      "awayTeam": "Qatar",
+      "kickoffArgentina": "2026-06-24T16:00:00-03:00"
     },
     {
       "stage": "group",
@@ -509,7 +559,8 @@
       "gmtInfo": "23:00 GMT",
       "venue": "Miami Stadium, Miami, US",
       "homeTeam": "Scotland",
-      "awayTeam": "Brazil"
+      "awayTeam": "Brazil",
+      "kickoffArgentina": "2026-06-24T19:00:00-03:00"
     },
     {
       "stage": "group",
@@ -519,7 +570,8 @@
       "gmtInfo": "23:00 GMT",
       "venue": "Atlanta Stadium, Atlanta, US",
       "homeTeam": "Morocco",
-      "awayTeam": "Haiti"
+      "awayTeam": "Haiti",
+      "kickoffArgentina": "2026-06-24T19:00:00-03:00"
     },
     {
       "stage": "group",
@@ -529,7 +581,8 @@
       "gmtInfo": "03:00 GMT on Thursday",
       "venue": "Mexico City Stadium, Mexico City, Mexico",
       "homeTeam": "TBD",
-      "awayTeam": "Mexico"
+      "awayTeam": "Mexico",
+      "kickoffArgentina": "2026-06-24T22:00:00-03:00"
     },
     {
       "stage": "group",
@@ -539,7 +592,8 @@
       "gmtInfo": "03:00 GMT on Thursday",
       "venue": "Estadio Monterrey, Guadalupe, Mexico",
       "homeTeam": "South Africa",
-      "awayTeam": "South Korea"
+      "awayTeam": "South Korea",
+      "kickoffArgentina": "2026-06-24T22:00:00-03:00"
     },
     {
       "stage": "group",
@@ -549,7 +603,8 @@
       "gmtInfo": "21:00 GMT",
       "venue": "New York New Jersey Stadium, New Jersey, US",
       "homeTeam": "Ecuador",
-      "awayTeam": "Germany"
+      "awayTeam": "Germany",
+      "kickoffArgentina": "2026-06-25T17:00:00-03:00"
     },
     {
       "stage": "group",
@@ -559,7 +614,8 @@
       "gmtInfo": "21:00 GMT",
       "venue": "Philadelphia Stadium, Philadelphia, US",
       "homeTeam": "Curacao",
-      "awayTeam": "Ivory Coast"
+      "awayTeam": "Ivory Coast",
+      "kickoffArgentina": "2026-06-25T17:00:00-03:00"
     },
     {
       "stage": "group",
@@ -569,7 +625,8 @@
       "gmtInfo": "01:00 GMT on Friday",
       "venue": "Dallas Stadium, Dallas, US",
       "homeTeam": "Japan",
-      "awayTeam": "TBD"
+      "awayTeam": "TBD",
+      "kickoffArgentina": "2026-06-25T20:00:00-03:00"
     },
     {
       "stage": "group",
@@ -579,7 +636,8 @@
       "gmtInfo": "06:00 GMT on Friday",
       "venue": "Los Angeles Stadium, Los Angeles, US",
       "homeTeam": "TBD",
-      "awayTeam": "USA"
+      "awayTeam": "USA",
+      "kickoffArgentina": "2026-06-25T23:00:00-03:00"
     },
     {
       "stage": "group",
@@ -589,7 +647,8 @@
       "gmtInfo": "06:00 GMT on Friday",
       "venue": "San Francisco Bay Area Stadium, San Francisco, US",
       "homeTeam": "Paraguay",
-      "awayTeam": "Australia"
+      "awayTeam": "Australia",
+      "kickoffArgentina": "2026-06-25T23:00:00-03:00"
     },
     {
       "stage": "group",
@@ -599,7 +658,8 @@
       "gmtInfo": "20:00 GMT",
       "venue": "Boston Stadium, Boston, US",
       "homeTeam": "Norway",
-      "awayTeam": "France"
+      "awayTeam": "France",
+      "kickoffArgentina": "2026-06-26T16:00:00-03:00"
     },
     {
       "stage": "group",
@@ -609,7 +669,8 @@
       "gmtInfo": "20:00 GMT",
       "venue": "Toronto Stadium, Toronto, Canada",
       "homeTeam": "Senegal",
-      "awayTeam": "TBD"
+      "awayTeam": "TBD",
+      "kickoffArgentina": "2026-06-26T16:00:00-03:00"
     },
     {
       "stage": "group",
@@ -619,7 +680,8 @@
       "gmtInfo": "02:00 GMT on Saturday",
       "venue": "Houston Stadium, Houston, US",
       "homeTeam": "Cape Verde",
-      "awayTeam": "Saudi Arabia"
+      "awayTeam": "Saudi Arabia",
+      "kickoffArgentina": "2026-06-26T21:00:00-03:00"
     },
     {
       "stage": "group",
@@ -629,7 +691,8 @@
       "gmtInfo": "02:00 GMT on Saturday",
       "venue": "Estadio Guadalajara, Zapopan, Mexico",
       "homeTeam": "Uruguay",
-      "awayTeam": "Spain"
+      "awayTeam": "Spain",
+      "kickoffArgentina": "2026-06-26T21:00:00-03:00"
     },
     {
       "stage": "group",
@@ -639,7 +702,8 @@
       "gmtInfo": "07:00 GMT on Saturday",
       "venue": "Seattle Stadium, Seattle, US",
       "homeTeam": "Egypt",
-      "awayTeam": "Iran"
+      "awayTeam": "Iran",
+      "kickoffArgentina": "2026-06-27T00:00:00-03:00"
     },
     {
       "stage": "group",
@@ -649,7 +713,8 @@
       "gmtInfo": "07:00 GMT on Saturday",
       "venue": "BC Place, Vancouver, Canada",
       "homeTeam": "New Zealand",
-      "awayTeam": "Belgium"
+      "awayTeam": "Belgium",
+      "kickoffArgentina": "2026-06-27T00:00:00-03:00"
     },
     {
       "stage": "group",
@@ -659,7 +724,8 @@
       "gmtInfo": "22:00 GMT",
       "venue": "New York New Jersey Stadium, New Jersey, US",
       "homeTeam": "Panama",
-      "awayTeam": "England"
+      "awayTeam": "England",
+      "kickoffArgentina": "2026-06-27T18:00:00-03:00"
     },
     {
       "stage": "group",
@@ -669,7 +735,8 @@
       "gmtInfo": "22:00 GMT",
       "venue": "Philadelphia Stadium, Philadelphia, US",
       "homeTeam": "Croatia",
-      "awayTeam": "Ghana"
+      "awayTeam": "Ghana",
+      "kickoffArgentina": "2026-06-27T18:00:00-03:00"
     },
     {
       "stage": "group",
@@ -679,7 +746,8 @@
       "gmtInfo": "02:30 GMT on Sunday",
       "venue": "Miami Stadium, Miami, US",
       "homeTeam": "Colombia",
-      "awayTeam": "Portugal"
+      "awayTeam": "Portugal",
+      "kickoffArgentina": "2026-06-27T20:30:00-03:00"
     },
     {
       "stage": "group",
@@ -689,7 +757,8 @@
       "gmtInfo": "02:30 GMT on Sunday",
       "venue": "Atlanta Stadium, Atlanta, US",
       "homeTeam": "TBD",
-      "awayTeam": "Uzbekistan"
+      "awayTeam": "Uzbekistan",
+      "kickoffArgentina": "2026-06-27T20:30:00-03:00"
     },
     {
       "stage": "group",
@@ -699,7 +768,8 @@
       "gmtInfo": "04:00 GMT on Sunday",
       "venue": "Kansas City Stadium, Kansas City, US",
       "homeTeam": "Algeria",
-      "awayTeam": "Austria"
+      "awayTeam": "Austria",
+      "kickoffArgentina": "2026-06-27T23:00:00-03:00"
     },
     {
       "stage": "group",
@@ -709,7 +779,8 @@
       "gmtInfo": "04:00 GMT on Sunday",
       "venue": "Dallas Stadium, Dallas, US",
       "homeTeam": "Jordan",
-      "awayTeam": "Argentina"
+      "awayTeam": "Argentina",
+      "kickoffArgentina": "2026-06-27T23:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -717,7 +788,8 @@
       "matchLabel": "Round of 32 match",
       "localTime": "3pm",
       "gmtInfo": "23:00 GMT",
-      "venue": "Los Angeles Stadium, Los Angeles, US"
+      "venue": "Los Angeles Stadium, Los Angeles, US",
+      "kickoffArgentina": "2026-06-28T16:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -725,7 +797,8 @@
       "matchLabel": "Round of 32 match",
       "localTime": "1pm",
       "gmtInfo": "19:00 GMT",
-      "venue": "Houston Stadium, Houston, US"
+      "venue": "Houston Stadium, Houston, US",
+      "kickoffArgentina": "2026-06-29T14:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -733,7 +806,8 @@
       "matchLabel": "Round of 32 match",
       "localTime": "4:30pm",
       "gmtInfo": "22:30 GMT",
-      "venue": "Boston Stadium, Boston, US"
+      "venue": "Boston Stadium, Boston, US",
+      "kickoffArgentina": "2026-06-29T17:30:00-03:00"
     },
     {
       "stage": "knockout",
@@ -741,7 +815,8 @@
       "matchLabel": "Round of 32 match",
       "localTime": "9pm",
       "gmtInfo": "03:00 GMT on Tuesday",
-      "venue": "Estadio Monterrey, Guadalupe, Mexico"
+      "venue": "Estadio Monterrey, Guadalupe, Mexico",
+      "kickoffArgentina": "2026-06-29T22:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -749,7 +824,8 @@
       "matchLabel": "Round of 32 match",
       "localTime": "1pm",
       "gmtInfo": "19:00 GMT",
-      "venue": "Dallas Stadium, Dallas, US"
+      "venue": "Dallas Stadium, Dallas, US",
+      "kickoffArgentina": "2026-06-30T14:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -757,7 +833,8 @@
       "matchLabel": "Round of 32 match",
       "localTime": "5pm",
       "gmtInfo": "22:00 GMT",
-      "venue": "New York New Jersey Stadium, New Jersey, US"
+      "venue": "New York New Jersey Stadium, New Jersey, US",
+      "kickoffArgentina": "2026-06-30T18:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -765,7 +842,8 @@
       "matchLabel": "Round of 32 match",
       "localTime": "9pm",
       "gmtInfo": "03:00 GMT on Wednesday",
-      "venue": "Mexico City Stadium, Mexico City, Mexico"
+      "venue": "Mexico City Stadium, Mexico City, Mexico",
+      "kickoffArgentina": "2026-06-30T22:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -773,7 +851,8 @@
       "matchLabel": "Round of 32 match",
       "localTime": "12pm",
       "gmtInfo": "17:00 GMT",
-      "venue": "Atlanta Stadium, Atlanta, US"
+      "venue": "Atlanta Stadium, Atlanta, US",
+      "kickoffArgentina": "2026-07-01T13:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -781,7 +860,8 @@
       "matchLabel": "Round of 32 match",
       "localTime": "4pm",
       "gmtInfo": "00:00 GMT on Thursday",
-      "venue": "Seattle Stadium, Seattle, US"
+      "venue": "Seattle Stadium, Seattle, US",
+      "kickoffArgentina": "2026-07-01T17:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -789,7 +869,8 @@
       "matchLabel": "Round of 32 match",
       "localTime": "8pm",
       "gmtInfo": "04:00 GMT on Thursday",
-      "venue": "San Francisco Bay Area Stadium, San Francisco, US"
+      "venue": "San Francisco Bay Area Stadium, San Francisco, US",
+      "kickoffArgentina": "2026-07-01T21:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -797,7 +878,8 @@
       "matchLabel": "Round of 32 match",
       "localTime": "3pm",
       "gmtInfo": "23:00 GMT",
-      "venue": "Los Angeles Stadium, Los Angeles, US"
+      "venue": "Los Angeles Stadium, Los Angeles, US",
+      "kickoffArgentina": "2026-07-02T16:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -805,7 +887,8 @@
       "matchLabel": "Round of 32 match",
       "localTime": "7pm",
       "gmtInfo": "00:00 GMT on Friday",
-      "venue": "Toronto Stadium, Toronto, Canada"
+      "venue": "Toronto Stadium, Toronto, Canada",
+      "kickoffArgentina": "2026-07-02T20:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -813,7 +896,8 @@
       "matchLabel": "Round of 32 match",
       "localTime": "11pm",
       "gmtInfo": "07:00 GMT on Friday",
-      "venue": "BC Place, Vancouver, Canada"
+      "venue": "BC Place, Vancouver, Canada",
+      "kickoffArgentina": "2026-07-03T00:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -821,7 +905,8 @@
       "matchLabel": "Round of 32 match",
       "localTime": "2pm",
       "gmtInfo": "21:00 GMT",
-      "venue": "Dallas Stadium, Dallas, US"
+      "venue": "Dallas Stadium, Dallas, US",
+      "kickoffArgentina": "2026-07-03T15:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -829,7 +914,8 @@
       "matchLabel": "Round of 32 match",
       "localTime": "6pm",
       "gmtInfo": "23:00 GMT",
-      "venue": "Miami Stadium, Miami, US"
+      "venue": "Miami Stadium, Miami, US",
+      "kickoffArgentina": "2026-07-03T19:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -837,7 +923,8 @@
       "matchLabel": "Round of 32 match",
       "localTime": "9:30pm",
       "gmtInfo": "03:30 GMT on Saturday",
-      "venue": "Kansas City Stadium, Kansas City, US"
+      "venue": "Kansas City Stadium, Kansas City, US",
+      "kickoffArgentina": "2026-07-03T22:30:00-03:00"
     },
     {
       "stage": "knockout",
@@ -845,7 +932,8 @@
       "matchLabel": "Round of 16 match",
       "localTime": "1pm",
       "gmtInfo": "19:00 GMT",
-      "venue": "Houston Stadium, Houston, US"
+      "venue": "Houston Stadium, Houston, US",
+      "kickoffArgentina": "2026-07-04T14:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -853,7 +941,8 @@
       "matchLabel": "Round of 16 match",
       "localTime": "5pm",
       "gmtInfo": "22:00 GMT",
-      "venue": "Philadelphia Stadium, Philadelphia, US"
+      "venue": "Philadelphia Stadium, Philadelphia, US",
+      "kickoffArgentina": "2026-07-04T18:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -861,7 +950,8 @@
       "matchLabel": "Round of 16 match",
       "localTime": "4pm",
       "gmtInfo": "21:00 GMT",
-      "venue": "New York New Jersey Stadium, New Jersey, US"
+      "venue": "New York New Jersey Stadium, New Jersey, US",
+      "kickoffArgentina": "2026-07-05T17:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -869,7 +959,8 @@
       "matchLabel": "Round of 16 match",
       "localTime": "8pm",
       "gmtInfo": "02:00 GMT on Monday",
-      "venue": "Mexico City Stadium, Mexico City, Mexico"
+      "venue": "Mexico City Stadium, Mexico City, Mexico",
+      "kickoffArgentina": "2026-07-05T21:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -877,7 +968,8 @@
       "matchLabel": "Round of 16 match",
       "localTime": "3pm",
       "gmtInfo": "21:00 GMT",
-      "venue": "Dallas Stadium, Dallas, US"
+      "venue": "Dallas Stadium, Dallas, US",
+      "kickoffArgentina": "2026-07-06T16:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -885,7 +977,8 @@
       "matchLabel": "Round of 16 match",
       "localTime": "8pm",
       "gmtInfo": "04:00 GMT on Tuesday",
-      "venue": "Seattle Stadium, Seattle, US"
+      "venue": "Seattle Stadium, Seattle, US",
+      "kickoffArgentina": "2026-07-06T21:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -893,7 +986,8 @@
       "matchLabel": "Round of 16 match",
       "localTime": "12pm",
       "gmtInfo": "17:00 GMT",
-      "venue": "Atlanta Stadium, Atlanta, US"
+      "venue": "Atlanta Stadium, Atlanta, US",
+      "kickoffArgentina": "2026-07-07T13:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -901,7 +995,8 @@
       "matchLabel": "Round of 16 match",
       "localTime": "4pm",
       "gmtInfo": "00:00 GMT on Wednesday",
-      "venue": "BC Place, Vancouver, Canada"
+      "venue": "BC Place, Vancouver, Canada",
+      "kickoffArgentina": "2026-07-07T17:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -909,7 +1004,8 @@
       "matchLabel": "First quarterfinal",
       "localTime": "4pm",
       "gmtInfo": "21:00 GMT",
-      "venue": "Boston Stadium, Boston, US"
+      "venue": "Boston Stadium, Boston, US",
+      "kickoffArgentina": "2026-07-09T17:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -917,7 +1013,8 @@
       "matchLabel": "Second quarterfinal",
       "localTime": "3pm",
       "gmtInfo": "23:00 GMT",
-      "venue": "Los Angeles Stadium, Los Angeles, US"
+      "venue": "Los Angeles Stadium, Los Angeles, US",
+      "kickoffArgentina": "2026-07-10T16:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -925,7 +1022,8 @@
       "matchLabel": "Third quarterfinal",
       "localTime": "5pm",
       "gmtInfo": "22:00 GMT",
-      "venue": "Miami Stadium, Miami, US"
+      "venue": "Miami Stadium, Miami, US",
+      "kickoffArgentina": "2026-07-11T18:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -933,7 +1031,8 @@
       "matchLabel": "Fourth quarterfinal",
       "localTime": "9pm",
       "gmtInfo": "03:00 GMT on Sunday",
-      "venue": "Kansas City Stadium, Kansas City, US"
+      "venue": "Kansas City Stadium, Kansas City, US",
+      "kickoffArgentina": "2026-07-11T22:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -941,7 +1040,8 @@
       "matchLabel": "First semifinal",
       "localTime": "3pm",
       "gmtInfo": "21:00 GMT",
-      "venue": "Dallas Stadium, Dallas, US"
+      "venue": "Dallas Stadium, Dallas, US",
+      "kickoffArgentina": "2026-07-14T16:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -949,7 +1049,8 @@
       "matchLabel": "Second semifinal",
       "localTime": "3pm",
       "gmtInfo": "20:00 GMT",
-      "venue": "Atlanta Stadium, Atlanta, US"
+      "venue": "Atlanta Stadium, Atlanta, US",
+      "kickoffArgentina": "2026-07-15T16:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -957,7 +1058,8 @@
       "matchLabel": "Bronze medal match",
       "localTime": "5pm",
       "gmtInfo": "22:00 GMT",
-      "venue": "Miami Stadium, Miami, US"
+      "venue": "Miami Stadium, Miami, US",
+      "kickoffArgentina": "2026-07-18T18:00:00-03:00"
     },
     {
       "stage": "knockout",
@@ -965,7 +1067,8 @@
       "matchLabel": "Final",
       "localTime": "3pm",
       "gmtInfo": "20:00 GMT",
-      "venue": "New York New Jersey Stadium, New Jersey, US"
+      "venue": "New York New Jersey Stadium, New Jersey, US",
+      "kickoffArgentina": "2026-07-19T16:00:00-03:00"
     }
   ]
 }

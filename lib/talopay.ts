@@ -211,8 +211,13 @@ async function taloAuthedRequest<T>(path: string, init: RequestInit): Promise<T>
   }
 }
 
-function registrationExternalIdForUser(userId: string) {
+function registrationExternalIdPrefixForUser(userId: string) {
   return `prode-registration-${userId}`;
+}
+
+function registrationExternalIdForUser(userId: string) {
+  // Unique external_id per payment attempt to avoid stale/expired checkout URLs.
+  return `${registrationExternalIdPrefixForUser(userId)}__${Date.now()}`;
 }
 
 function normalizeCurrency(value: unknown) {
@@ -290,7 +295,8 @@ export function extractUserIdFromTaloRegistrationExternalId(externalId: string |
   const value = String(externalId ?? '');
   const prefix = 'prode-registration-';
   if (!value.startsWith(prefix)) return null;
-  const userId = value.slice(prefix.length).trim();
+  const raw = value.slice(prefix.length).trim();
+  const userId = raw.split('__')[0]?.trim();
   return userId || null;
 }
 
@@ -389,8 +395,8 @@ export function isValidTaloRegistrationPaymentForUser(
 
   const cfg = getTaloConfig();
   const externalId = extractPaymentExternalId(payment);
-  const expectedExternalId = registrationExternalIdForUser(userId);
-  let referenceOk = externalId === expectedExternalId;
+  const expectedExternalPrefix = registrationExternalIdPrefixForUser(userId);
+  let referenceOk = externalId === expectedExternalPrefix || externalId.startsWith(`${expectedExternalPrefix}__`);
 
   if (!referenceOk && !externalId && options?.allowMissingExternalIdForExpectedPaymentId) {
     const expectedPaymentId = String(options.expectedPaymentId ?? '').trim();

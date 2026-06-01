@@ -149,6 +149,7 @@ type OfficialFixtureRow = {
   localTime: string;
   gmtInfo: string;
   venue: string;
+  kickoffArgentina?: string;
   homeTeam?: string;
   awayTeam?: string;
 };
@@ -891,6 +892,24 @@ function parseOfficialFixtureLocalKickoffToIso(row: OfficialFixtureRow): string 
   return utc.toISOString();
 }
 
+function parseKickoffArgentinaIso(row: OfficialFixtureRow): string | null {
+  const raw = String(row.kickoffArgentina ?? '').trim();
+  if (!raw) return null;
+
+  const direct = Date.parse(raw);
+  if (Number.isFinite(direct)) {
+    return new Date(direct).toISOString();
+  }
+
+  // Backward-compatible fallback if JSON uses local datetime without explicit zone.
+  const withArgentinaOffset = Date.parse(`${raw}-03:00`);
+  if (Number.isFinite(withArgentinaOffset)) {
+    return new Date(withArgentinaOffset).toISOString();
+  }
+
+  return null;
+}
+
 function parseOfficialFixtureEtKickoffToIso(row: OfficialFixtureRow): string | null {
   const date = parseDateHeadingToUtcDate(row.dateHeading);
   const time = parseLocalTimeToParts(row.localTime);
@@ -908,12 +927,13 @@ function parseOfficialFixtureEtKickoffToIso(row: OfficialFixtureRow): string | n
 
 function getOfficialRowKickoffIso(row: OfficialFixtureRow): string {
   // Priority:
-  // 1) ET kickoff labels from the official fixture (matches published AR schedules)
+  // 1) explicit AR kickoff from JSON (source of truth)
   // 2) explicit overrides
-  // 3) fallback parsers
+  // 3) fallback parsers for legacy rows without kickoffArgentina
   return (
-    parseOfficialFixtureEtKickoffToIso(row) ??
+    parseKickoffArgentinaIso(row) ??
     getManualKickoffOverrideIso(row) ??
+    parseOfficialFixtureEtKickoffToIso(row) ??
     parseGmtInfoToIso(row.dateHeading, row.gmtInfo) ??
     parseOfficialFixtureLocalKickoffToIso(row)
   );
