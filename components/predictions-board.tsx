@@ -446,7 +446,7 @@ export function PredictionsBoard({
           </div>
           {match.groupId !== 'KO' ? (
             <p className="prob-row">
-              Probabilidades (estimadas):{' '}
+              Probabilidades:{' '}
               {(() => {
                 const p = estimateMatchProbabilities(match.homeTeam, match.awayTeam);
                 return `${p.homeWinPct}% ${match.homeTeam} | ${p.drawPct}% empate | ${p.awayWinPct}% ${match.awayTeam}`;
@@ -531,6 +531,14 @@ export function PredictionsBoard({
           <p className="muted">
             Tu usuario tiene estado de inscripción <strong>{currentUser.registrationPaymentStatus ?? 'pending'}</strong>. Debes completar y confirmar el pago de <strong>${registrationAmountArs.toLocaleString('es-AR')}</strong> para acceder a la carga de predicciones.
           </p>
+          <div className="stack-xs">
+            <p className="muted">
+              Puedes pagar online con TaloPay o transferir directamente al alias <strong>amiotti.mp</strong>.
+            </p>
+            <p className="muted">
+              Si transfieres, envía el comprobante de pago por WhatsApp al <strong>+5493742554827</strong>.
+            </p>
+          </div>
           <div className="cta-row">
             <button className="btn btn-primary" type="button" onClick={startRegistrationPayment} disabled={paying}>
               {paying ? 'Redirigiendo a TaloPay...' : 'Pagar inscripción'}
