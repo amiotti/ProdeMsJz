@@ -27,7 +27,7 @@ export default async function InicioPage() {
   return (
     <section className="stack-lg">
       <div className="hero">
-        <div className="panel">
+        <div className="panel stack-md">
           <p className="eyebrow hero-kicker">FIFA WORLD CUP 26</p>
           <h2 className="hero-title">PRODE Mundial 2026</h2>
           <p className="muted">
@@ -35,7 +35,7 @@ export default async function InicioPage() {
             torneo de 48 selecciones.
           </p>
           <div className="panel prizes-panel">
-            <h3>Premios Top 10</h3>
+            <h3>Premios</h3>
             <p className="muted">1°: 70% del pozo</p>
             <p className="muted">2°: 25% del pozo</p>
             <p className="muted">Último puesto: 5% del pozo</p>
@@ -43,13 +43,15 @@ export default async function InicioPage() {
           {!hasApprovedPayment ? (
             <div className="panel stack-md">
               <h3>Inscripción pendiente</h3>
-              <p className="muted">Para habilitar predicciones y tabla de posiciones debes completar la inscripción.</p>
-              <p className="muted">
-                Puedes pagar online con TaloPay o transferir directamente al alias <strong>amiotti.mp</strong>.
-              </p>
-              <p className="muted">
-                Si transfieres, envía el comprobante de pago por WhatsApp al <strong>+5493742554827</strong>.
-              </p>
+              <div className="stack-xs">
+                <p className="muted">Para habilitar predicciones y tabla de posiciones debes completar la inscripción.</p>
+                <p className="muted">
+                  Puedes pagar online con TaloPay o transferir directamente al alias <strong>amiotti.mp</strong>.
+                </p>
+                <p className="muted">
+                  Si transfieres, envía el comprobante de pago por WhatsApp al <strong>+5493742554827</strong>.
+                </p>
+              </div>
               <RegistrationPaymentCta />
             </div>
           ) : null}
