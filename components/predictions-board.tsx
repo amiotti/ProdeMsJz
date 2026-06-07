@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { TeamName } from '@/components/team-name';
 import { formatDateArgentinaShort, formatKickoffArgentina } from '@/lib/datetime';
@@ -64,6 +64,7 @@ export function PredictionsBoard({
   const [viewMode, setViewMode] = useState<ViewMode>('date');
   const [drafts, setDrafts] = useState<DraftMap>({});
   const [triviaDrafts, setTriviaDrafts] = useState<TriviaDraftMap>({});
+  const awayInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   async function loadState() {
     setLoading(true);
@@ -226,6 +227,13 @@ export function PredictionsBoard({
         [side]: value,
       },
     }));
+  }
+
+  function setHomeDraftAndAdvance(matchId: string, value: string) {
+    setDraft(matchId, 'home', value);
+    if (/^\d+$/.test(value)) {
+      window.requestAnimationFrame(() => awayInputRefs.current[matchId]?.focus());
+    }
   }
 
   function setTriviaDraft(questionId: string, value: string) {
@@ -465,7 +473,7 @@ export function PredictionsBoard({
             name={`pred-home-${match.id}`}
             inputMode="numeric"
             value={draft.home}
-            onChange={(e) => setDraft(match.id, 'home', e.target.value)}
+            onChange={(e) => setHomeDraftAndAdvance(match.id, e.target.value)}
             aria-label={`Goles ${match.homeTeam}`}
             disabled={readOnly}
           />
@@ -474,6 +482,9 @@ export function PredictionsBoard({
             id={`pred-away-${match.id}`}
             name={`pred-away-${match.id}`}
             inputMode="numeric"
+            ref={(node) => {
+              awayInputRefs.current[match.id] = node;
+            }}
             value={draft.away}
             onChange={(e) => setDraft(match.id, 'away', e.target.value)}
             aria-label={`Goles ${match.awayTeam}`}

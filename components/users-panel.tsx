@@ -158,14 +158,22 @@ export function UsersPanel({ initialUsers, initialMessages }: { initialUsers: Us
                   {user.role === 'admin' ? (
                     <span className="muted">No editable</span>
                   ) : (
-                    <button
-                      className="btn btn-danger btn-small"
-                      type="button"
-                      onClick={() => deleteUser(user.id)}
-                      disabled={loadingUserId === user.id}
-                    >
-                      {loadingUserId === user.id ? 'Eliminando...' : 'Eliminar'}
-                    </button>
+                    <div className="inline-actions">
+                      <a
+                        className="btn btn-primary btn-small"
+                        href={`/api/profile/predictions-pdf?userId=${encodeURIComponent(user.id)}`}
+                      >
+                        Descargar Predicciones
+                      </a>
+                      <button
+                        className="btn btn-danger btn-small"
+                        type="button"
+                        onClick={() => deleteUser(user.id)}
+                        disabled={loadingUserId === user.id}
+                      >
+                        {loadingUserId === user.id ? 'Eliminando...' : 'Eliminar'}
+                      </button>
+                    </div>
                   )}
                 </td>
               </tr>

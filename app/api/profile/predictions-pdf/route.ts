@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 
 import { getSessionCookieName } from '@/lib/auth';
 import { formatDateTimeArgentina } from '@/lib/datetime';
-import { getPredictionsScreenState, getUserFromSessionToken } from '@/lib/db';
+import { getPredictionsScreenState, getState, getUserFromSessionToken } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -87,7 +87,7 @@ function buildSimplePdf(lines: string[]) {
   return Buffer.from(pdf, 'latin1');
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const token = (await cookies()).get(getSessionCookieName())?.value ?? null;
     const user = await getUserFromSessionToken(token);
@@ -95,9 +95,23 @@ export async function GET() {
       return NextResponse.json({ ok: false, error: 'Debes iniciar sesiÃ³n.' }, { status: 401 });
     }
 
-    const state = await getPredictionsScreenState(token);
+    const url = new URL(request.url);
+    const requestedUserId = url.searchParams.get('userId')?.trim() || null;
+    const isAdminExport = Boolean(requestedUserId && user.role === 'admin');
+    const state = isAdminExport ? await getState(token) : await getPredictionsScreenState(token);
+    const targetUser = isAdminExport
+      ? state.db.users.find((row) => row.id === requestedUserId && row.role !== 'admin')
+      : user;
+
+    if (!targetUser) {
+      return NextResponse.json({ ok: false, error: 'Usuario no encontrado.' }, { status: 404 });
+    }
+    if (requestedUserId && user.role !== 'admin' && requestedUserId !== user.id) {
+      return NextResponse.json({ ok: false, error: 'No autorizado.' }, { status: 403 });
+    }
+
     const rows = state.db.predictions
-      .filter((p) => p.userId === user.id)
+      .filter((p) => p.userId === targetUser.id)
       .map((p) => {
         const match = state.db.matches.find((m) => m.id === p.matchId);
         return match ? { prediction: p, match } : null;
@@ -105,12 +119,21 @@ export async function GET() {
       .filter((row): row is NonNullable<typeof row> => Boolean(row))
       .sort((a, b) => new Date(a.match.kickoffAt).getTime() - new Date(b.match.kickoffAt).getTime());
 
+    const triviaRows = state.db.triviaPredictions
+      .filter((p) => p.userId === targetUser.id)
+      .map((p) => {
+        const question = state.db.triviaQuestions.find((q) => q.id === p.questionId);
+        return question ? { prediction: p, question } : null;
+      })
+      .filter((row): row is NonNullable<typeof row> => Boolean(row));
+
     const headerLines = [
       'PRODE Mundial 2026 - Predicciones guardadas',
-      `Usuario: ${ascii(`${user.firstName} ${user.lastName}`.trim() || user.name)}`,
-      `Email: ${ascii(user.email)}`,
+      `Usuario: ${ascii(`${targetUser.firstName} ${targetUser.lastName}`.trim() || targetUser.name)}`,
+      `Email: ${ascii(targetUser.email)}`,
       `Generado: ${ascii(formatDateTimeArgentina(new Date().toISOString()))}`,
       `Cantidad de predicciones: ${rows.length}`,
+      `Cantidad de trivias: ${triviaRows.length}`,
       ' ',
     ];
 
@@ -124,8 +147,27 @@ export async function GET() {
       ];
     });
 
-    const pdfBuffer = buildSimplePdf([...headerLines, ...(bodyLines.length ? bodyLines : ['Sin predicciones guardadas.'])]);
-    const fileName = `predicciones-${ascii((`${user.firstName}-${user.lastName}` || user.name).toLowerCase()).replace(/\s+/g, '-')}.pdf`;
+    const triviaLines = triviaRows.length
+      ? [
+          'Trivia',
+          ' ',
+          ...triviaRows.flatMap(({ prediction, question }, index) => [
+            `${index + 1}. ${ascii(question.prompt)}`,
+            `   Respuesta: ${ascii(prediction.answer)}`,
+            ' ',
+          ]),
+        ]
+      : [];
+
+    const pdfLines = [
+      ...headerLines,
+      ...(bodyLines.length ? bodyLines : ['Sin predicciones de partidos guardadas.', ' ']),
+      ...triviaLines,
+      ...(triviaRows.length ? [] : ['Sin trivias guardadas.']),
+    ];
+
+    const pdfBuffer = buildSimplePdf(pdfLines);
+    const fileName = `predicciones-${ascii((`${targetUser.firstName}-${targetUser.lastName}` || targetUser.name).toLowerCase()).replace(/\s+/g, '-')}.pdf`;
 
     return new NextResponse(pdfBuffer, {
       status: 200,
@@ -140,4 +182,3 @@ export async function GET() {
     return NextResponse.json({ ok: false, error: message }, { status: 400 });
   }
 }
-
