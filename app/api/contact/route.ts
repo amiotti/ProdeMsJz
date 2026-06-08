@@ -1,7 +1,7 @@
 ﻿import { cookies } from 'next/headers';
 
 import { getSessionCookieName } from '@/lib/auth';
-import { adminUpdateContactMessageStatus, createContactMessage, getUserFromSessionToken, listContactMessages } from '@/lib/db';
+import { adminDeleteContactMessage, adminUpdateContactMessageStatus, createContactMessage, getUserFromSessionToken, listContactMessages } from '@/lib/db';
 import { checkRateLimit, getClientIdentifier } from '@/lib/rate-limit';
 import { assertSameOriginForMutation, noStoreJson, parseJsonBody } from '@/lib/security';
 import type { ContactMessageStatus } from '@/lib/types';
@@ -82,6 +82,31 @@ export async function PATCH(request: Request) {
     return noStoreJson({ ok: true, messages });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'No se pudo actualizar la consulta';
+    return noStoreJson({ ok: false, error: message }, { status: 400 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const originError = assertSameOriginForMutation(request);
+    if (originError) return originError;
+
+    const admin = await requireAdmin();
+    if (!admin) return noStoreJson({ ok: false, error: 'Solo admin' }, { status: 403 });
+    const ip = getClientIdentifier(request);
+    const adminRate = checkRateLimit(`contact:admin:delete:${admin.id}:${ip}`, { limit: 60, windowMs: 10 * 60 * 1000 });
+    if (!adminRate.ok) return noStoreJson({ ok: false, error: 'Demasiadas acciones. Intenta mas tarde.' }, { status: 429 });
+
+    const parsed = await parseJsonBody<{ messageId?: string }>(request, { maxBytes: 8 * 1024 });
+    if (!parsed.ok) return parsed.response;
+    const body = parsed.data;
+    if (!body.messageId) return noStoreJson({ ok: false, error: 'Falta messageId' }, { status: 400 });
+
+    await adminDeleteContactMessage(body.messageId);
+    const messages = await listContactMessages();
+    return noStoreJson({ ok: true, messages });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'No se pudo eliminar la consulta';
     return noStoreJson({ ok: false, error: message }, { status: 400 });
   }
 }

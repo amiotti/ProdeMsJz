@@ -1265,6 +1265,15 @@ export async function adminUpdateContactMessageStatus(
     updatedAt,
   });
 }
+
+export async function adminDeleteContactMessage(messageId: string): Promise<void> {
+  await ensureBaseData();
+  const messages = await queryContactMessagesOnly();
+  const current = messages.find((item) => item.id === messageId);
+  if (!current) throw new Error('Consulta no encontrada');
+
+  await getInstantAdminDb().transact([tx.prode_contact_messages[messageId].delete()]);
+}
 export async function adminSetUserRegistrationPaymentStatus(
   targetUserId: string,
   status: 'pending' | 'approved' | 'failed',

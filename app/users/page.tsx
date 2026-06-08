@@ -1,11 +1,11 @@
 ﻿import { UsersPanel } from '@/components/users-panel';
-import { getState, listContactMessages, listUsers } from '@/lib/db';
+import { listContactMessages, listUsers } from '@/lib/db';
 import { requireAuthenticatedUser } from '@/lib/route-guard';
 
 export const dynamic = 'force-dynamic';
 
 export default async function UsersPage() {
-  const { token, user } = await requireAuthenticatedUser();
+  const { user } = await requireAuthenticatedUser();
 
   if (user.role !== 'admin') {
     return (
@@ -18,13 +18,6 @@ export default async function UsersPage() {
     );
   }
 
-  const [users, messages, state] = await Promise.all([listUsers(), listContactMessages(), getState(token)]);
-  return (
-    <UsersPanel
-      initialUsers={users}
-      initialMessages={messages}
-      leaderboard={state.leaderboard}
-      currentOfficialMatches={state.summary.matchesWithOfficialResult}
-    />
-  );
+  const [users, messages] = await Promise.all([listUsers(), listContactMessages()]);
+  return <UsersPanel initialUsers={users} initialMessages={messages} />;
 }

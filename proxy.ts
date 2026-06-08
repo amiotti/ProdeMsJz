@@ -141,10 +141,10 @@ export function proxy(req: NextRequest) {
     return rejectApi(401, 'No autenticado');
   }
 
-  // 2) Geo blocking (default: only Argentina)
+  // 2) Geo blocking (default: Argentina + Dominican Republic)
   if (!isWebhook(pathname)) {
     const allowedCountries = new Set(
-      (process.env.ALLOWED_COUNTRIES ?? 'AR')
+      (process.env.ALLOWED_COUNTRIES ?? 'AR,DO')
         .split(',')
         .map((x) => x.trim().toUpperCase())
         .filter(Boolean),
