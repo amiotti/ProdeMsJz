@@ -66,7 +66,7 @@ export default async function InicioPage() {
             <h3>Premios</h3>
             <p className="muted">1°: 70% del pozo</p>
             <p className="muted">2°: 25% del pozo</p>
-            <p className="muted">Último puesto: 5% del pozo</p>
+            <p className="muted">3°: 5% del pozo</p>
           </div>
           <div className="cta-row">
             <Link href="/predictions" className="cta-link">

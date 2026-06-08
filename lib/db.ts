@@ -141,9 +141,9 @@ const CORE_STATE_TTL_MS = 30_000;
 const TRIVIA_POINTS_PER_QUESTION = 10;
 
 const TRIVIA_QUESTIONS: TriviaQuestion[] = [
-  { id: 'mvp', prompt: '¿Quién será el jugador MVP del Mundial 2026?', answerType: 'text' },
+  { id: 'golden_boot_winner', prompt: '¿Quién ganará el Botín de Oro del Mundial 2026?', answerType: 'text' },
   { id: 'champion', prompt: '¿Qué selección ganará el Mundial 2026?', answerType: 'text' },
-  { id: 'top_scorer', prompt: '¿Quién será el máximo goleador del torneo?', answerType: 'text' },
+  { id: 'top_scorer_goals', prompt: '¿Cuántos goles hará el goleador del Mundial?', answerType: 'number' },
   { id: 'golden_glove', prompt: '¿Qué arquero ganará el Guante de Oro?', answerType: 'text' },
   { id: 'argentina_goals', prompt: '¿Cuántos goles hará Argentina?', answerType: 'number' },
 ];
