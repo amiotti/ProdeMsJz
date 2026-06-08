@@ -1738,6 +1738,7 @@ select {
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.72);
   color: var(--text);
+  font-family: var(--font-body), 'Noto Sans', 'Segoe UI', Roboto, Arial, sans-serif;
   padding: 0.65rem 0.75rem;
   outline: none;
 }
@@ -2056,8 +2057,16 @@ select:focus {
 
 .score-inputs input {
   text-align: center;
+  font-family: var(--font-body), 'Noto Sans', 'Segoe UI', Roboto, Arial, sans-serif;
   font-weight: 700;
   padding: 0.55rem;
+}
+
+.predictions-board input,
+.predictions-board select,
+.predictions-board .score-inputs input {
+  font-family: var(--font-body), 'Noto Sans', 'Segoe UI', Roboto, Arial, sans-serif;
+  letter-spacing: 0.01em;
 }
 
 .match-actions {
