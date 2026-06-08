@@ -728,7 +728,11 @@ function AdminStatsDashboard({ state }: { state: StateResponse }) {
             { label: '1', value: analytics.goalsHistogram['1'], color: '#4db8e8' },
             { label: '2', value: analytics.goalsHistogram['2'], color: '#59e3d7' },
             { label: '3', value: analytics.goalsHistogram['3'], color: '#f4be1f' },
-            { label: '4+', value: analytics.goalsHistogram['4+'], color: '#ef3100' },
+            { label: '4', value: analytics.goalsHistogram['4'], color: '#f68b1f' },
+            { label: '5', value: analytics.goalsHistogram['5'], color: '#ef6b22' },
+            { label: '6', value: analytics.goalsHistogram['6'], color: '#ef4d22' },
+            { label: '7', value: analytics.goalsHistogram['7'], color: '#ef3100' },
+            { label: '8', value: analytics.goalsHistogram['8'], color: '#b51f08' },
           ]}
           height={240}
         />

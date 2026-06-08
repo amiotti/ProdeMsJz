@@ -10,6 +10,7 @@ type DraftMap = Record<string, { home: string; away: string }>;
 type TriviaDraftMap = Record<string, string>;
 type ResultsViewMode = 'results' | 'standings';
 type ResultsSortMode = 'date' | 'group';
+type ResultsStatusFilter = 'missing' | 'loaded' | 'all';
 type GroupStandingRow = {
   team: string;
   pj: number;
@@ -123,6 +124,7 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
   const [selectedGroupId, setSelectedGroupId] = useState('ALL');
   const [viewMode] = useState<ResultsViewMode>('results');
   const [sortMode, setSortMode] = useState<ResultsSortMode>('date');
+  const [statusFilter, setStatusFilter] = useState<ResultsStatusFilter>('missing');
 
   useEffect(() => {
     if (initialState) return;
@@ -179,7 +181,14 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
     const matches = state.db.matches.filter((m) => {
       const groupOk = selectedGroupId === 'ALL' || m.groupId === selectedGroupId;
       const officialOk = state.viewer.isAdmin || Boolean(m.officialResult);
-      return groupOk && officialOk;
+      const statusOk = !state.viewer.isAdmin
+        ? Boolean(m.officialResult)
+        : statusFilter === 'all'
+          ? true
+          : statusFilter === 'missing'
+            ? !m.officialResult
+            : Boolean(m.officialResult);
+      return groupOk && officialOk && statusOk;
     });
     return matches.sort((a, b) => {
       if (sortMode === 'group') {
@@ -192,7 +201,7 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
       if (kickoffDiff !== 0) return kickoffDiff;
       return a.groupId.localeCompare(b.groupId, 'es');
     });
-  }, [state, selectedGroupId, sortMode]);
+  }, [state, selectedGroupId, sortMode, statusFilter]);
 
   const standingsByGroup = useMemo(() => (state ? buildGroupStandings(state) : new Map<string, GroupStandingRow[]>()), [state]);
   const visibleGroups = useMemo(
@@ -320,6 +329,12 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
     }
   }
 
+  function canSaveSingleMatch(match: Match, draft: { home: string; away: string }) {
+    const hasFullResult = draft.home !== '' && draft.away !== '';
+    const clearsExistingResult = draft.home === '' && draft.away === '' && Boolean(match.officialResult);
+    return hasFullResult || clearsExistingResult;
+  }
+
   if (loading || !state) {
     return <div className="panel">Cargando panel de resultados...</div>;
   }
@@ -348,6 +363,23 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
             <option value="group">Grupo / etapa</option>
           </select>
         </label>
+
+        {state.viewer.isAdmin ? (
+          <label>
+            Estado
+            <select
+              id="results-status-filter"
+              name="resultsStatusFilter"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as ResultsStatusFilter)}
+              disabled={selectedGroupId === 'TRIVIA'}
+            >
+              <option value="missing">Sin resultado</option>
+              <option value="loaded">Con resultado</option>
+              <option value="all">Todos</option>
+            </select>
+          </label>
+        ) : null}
 
         {state.viewer.isAdmin ? (
           <button className="btn btn-primary" type="button" onClick={save} disabled={saving}>
@@ -421,7 +453,7 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
                             className="btn btn-primary btn-small"
                             type="button"
                             onClick={() => saveSingleResult(match.id)}
-                            disabled={savingMatchId === match.id || ((draft.home === '' || draft.away === '') && !(draft.home === '' && draft.away === '' && Boolean(match.officialResult)))}
+                            disabled={savingMatchId === match.id || !canSaveSingleMatch(match, draft)}
                           >
                             {savingMatchId === match.id ? 'Guardando...' : 'Guardar partido'}
                           </button>
@@ -493,7 +525,7 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
                             className="btn btn-primary btn-small"
                             type="button"
                             onClick={() => saveSingleResult(match.id)}
-                            disabled={savingMatchId === match.id || draft.home === '' || draft.away === ''}
+                            disabled={savingMatchId === match.id || !canSaveSingleMatch(match, draft)}
                           >
                             {savingMatchId === match.id ? 'Guardando...' : 'Guardar partido'}
                           </button>
@@ -536,7 +568,7 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
                           className="btn btn-primary btn-small"
                           type="button"
                           onClick={() => saveSingleResult(match.id)}
-                          disabled={savingMatchId === match.id || draft.home === '' || draft.away === ''}
+                          disabled={savingMatchId === match.id || !canSaveSingleMatch(match, draft)}
                         >
                           {savingMatchId === match.id ? 'Guardando...' : 'Guardar partido'}
                         </button>

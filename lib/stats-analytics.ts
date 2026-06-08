@@ -3,11 +3,12 @@ import { calculatePredictionPoints } from '@/lib/prode';
 import type { Prediction, ProdeDB, StateResponse } from '@/lib/types';
 
 type ExactBucket = { exacts: number; evals: number };
+type GoalsHistogramKey = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8';
 
 export type StatsAnalyticsSnapshot = {
   predictionsByGroup: Array<{ groupId: string; groupName: string; count: number }>;
   officialOutcome: { local: number; empate: number; visitante: number };
-  goalsHistogram: Record<'0' | '1' | '2' | '3' | '4+', number>;
+  goalsHistogram: Record<GoalsHistogramKey, number>;
   totalOfficialGoals: number;
   avgGoals: number;
   scoredPredictions: number;
@@ -58,7 +59,17 @@ export function getStatsAnalytics(state: StateResponse): StatsAnalyticsSnapshot 
   const matchById = new Map(state.db.matches.map((m) => [m.id, m] as const));
   const predictionsByGroupMap = new Map<string, number>();
   const officialOutcome = { local: 0, empate: 0, visitante: 0 };
-  const goalsHistogram: Record<'0' | '1' | '2' | '3' | '4+', number> = { '0': 0, '1': 0, '2': 0, '3': 0, '4+': 0 };
+  const goalsHistogram: Record<GoalsHistogramKey, number> = {
+    '0': 0,
+    '1': 0,
+    '2': 0,
+    '3': 0,
+    '4': 0,
+    '5': 0,
+    '6': 0,
+    '7': 0,
+    '8': 0,
+  };
   const exactsByUser = new Map<string, ExactBucket>();
   const predictionPatternFrequency = new Map<string, number>();
   let totalOfficialGoals = 0;
@@ -80,8 +91,8 @@ export function getStatsAnalytics(state: StateResponse): StatsAnalyticsSnapshot 
     if (match.officialResult.home > match.officialResult.away) officialOutcome.local += 1;
     else if (match.officialResult.home < match.officialResult.away) officialOutcome.visitante += 1;
     else officialOutcome.empate += 1;
-    if (total >= 4) goalsHistogram['4+'] += 1;
-    else goalsHistogram[String(total) as '0' | '1' | '2' | '3'] += 1;
+    const bucket = String(Math.min(total, 8)) as GoalsHistogramKey;
+    goalsHistogram[bucket] += 1;
   }
 
   const predsByMatch = new Map<string, Prediction[]>();
@@ -178,7 +189,6 @@ export function getStatsAnalytics(state: StateResponse): StatsAnalyticsSnapshot 
   };
   return snapshot;
 }
-
 
 
 
