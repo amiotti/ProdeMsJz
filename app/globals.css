@@ -295,13 +295,13 @@ select {
 }
 
 .title-cup-icon-header {
-  width: 1.65rem;
-  height: 1.65rem;
+  width: 1.95rem;
+  height: 1.95rem;
 }
 
 .title-cup-icon-hero {
-  width: 2.35rem;
-  height: 2.35rem;
+  width: 2.75rem;
+  height: 2.75rem;
 }
 
 .brand-subtitle {
@@ -3012,13 +3012,13 @@ select:focus {
   }
 
   .title-cup-icon-header {
-    width: 1.35rem;
-    height: 1.35rem;
+    width: 1.55rem;
+    height: 1.55rem;
   }
 
   .title-cup-icon-hero {
-    width: 1.85rem;
-    height: 1.85rem;
+    width: 2.05rem;
+    height: 2.05rem;
   }
 
   .theme-toggle:not(.theme-toggle-icon-only) {
