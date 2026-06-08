@@ -1,6 +1,7 @@
 ﻿'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 type EvolutionSeries = {
   userId: string;
@@ -84,7 +85,12 @@ export function UserEvolutionComparisonChart({
   const [compareUserIds, setCompareUserIds] = useState<string[]>([]);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [mounted, setMounted] = useState(false);
   const currentUser = users.find((u) => u.userId === currentUserId) ?? null;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const compareOptions = useMemo(() => users.filter((u) => u.userId !== currentUserId), [users, currentUserId]);
 
@@ -142,7 +148,8 @@ export function UserEvolutionComparisonChart({
 
       </div>
 
-      {isPickerOpen ? (
+      {isPickerOpen && mounted
+        ? createPortal(
         <div className="compare-picker-backdrop" role="dialog" aria-modal="true" aria-label="Seleccionar usuarios para comparar">
           <div className="compare-picker-modal panel stack-md">
             <div className="section-head">
@@ -188,8 +195,10 @@ export function UserEvolutionComparisonChart({
               </button>
             </div>
           </div>
-        </div>
-      ) : null}
+        </div>,
+            document.body,
+          )
+        : null}
 
       <LineChart labels={labels} series={series} />
     </div>

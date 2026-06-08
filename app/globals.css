@@ -4474,8 +4474,9 @@ html[data-theme='dark'] .admin-alert-badge {
   background: rgba(6, 8, 14, 0.52);
   backdrop-filter: none;
   display: grid;
-  place-items: center;
-  padding: 1rem;
+  place-items: start center;
+  align-content: start;
+  padding: clamp(0.75rem, 5vh, 3rem) 1rem 1rem;
 }
 
 .compare-picker-modal {
