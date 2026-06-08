@@ -401,11 +401,11 @@ export function PredictionsBoard({
           <span>{state?.trivia.pointsPerQuestion ?? 10} puntos por cada respuesta correcta</span>
         </div>
         <p className="muted">
-          Puedes responder la trivia en cualquier momento antes de que inicie la fase de llaves.
+          Puedes responder la trivia hasta antes del comienzo del primer partido del Mundial.
           {triviaCutoffAt ? ` Cierre: ${formatKickoffArgentina(triviaCutoffAt)}.` : ''}
         </p>
         {!triviaEditable ? (
-          <p className="status">La trivia está cerrada porque ya comenzó la fase de llaves.</p>
+          <p className="status">La trivia está cerrada porque ya comenzó el primer partido del Mundial.</p>
         ) : null}
         {readOnly ? (
           <p className="status">Vista de solo lectura: habilita tu inscripción para editar y guardar.</p>
@@ -583,7 +583,7 @@ export function PredictionsBoard({
           {triviaCutoffAt ? (
             <>
               {' '}
-              La trivia debe completarse antes del comienzo de la fase de llaves ({formatKickoffArgentina(triviaCutoffAt)}).
+              La trivia debe completarse antes del comienzo del primer partido del Mundial ({formatKickoffArgentina(triviaCutoffAt)}).
             </>
           ) : null}
         </p>

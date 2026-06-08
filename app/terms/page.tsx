@@ -90,8 +90,8 @@ export default function TermsPage() {
           para cada partido.
         </p>
         <p className="muted">
-          La sección de trivia podrá responderse hasta el cierre de la fase de grupos; una vez iniciada la fase de
-          llaves, las respuestas quedarán bloqueadas.
+          La sección de trivia podrá responderse hasta antes del comienzo del primer partido del Mundial; una vez
+          iniciado el torneo, las respuestas quedarán bloqueadas.
         </p>
         <p className="muted">
           Los resultados oficiales utilizados para calcular los puntajes serán cargados por la organización.

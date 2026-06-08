@@ -149,14 +149,13 @@ const TRIVIA_QUESTIONS: TriviaQuestion[] = [
 ];
 
 function getTriviaCutoffAt(matches: Match[]): string | null {
-  const firstKnockoutMs = matches
-    .filter((match) => match.groupId === 'KO')
+  const firstMatchMs = matches
     .map((match) => new Date(match.kickoffAt).getTime())
     .filter((value) => Number.isFinite(value))
     .sort((a, b) => a - b)[0];
 
-  if (!Number.isFinite(firstKnockoutMs)) return null;
-  return new Date(firstKnockoutMs).toISOString();
+  if (!Number.isFinite(firstMatchMs)) return null;
+  return new Date(firstMatchMs).toISOString();
 }
 
 function isTriviaWindowOpen(matches: Match[], nowMs = Date.now()) {
@@ -1010,7 +1009,7 @@ export async function saveTriviaPredictions(
 
   const seed = getSeedDbTemplate();
   if (!isTriviaWindowOpen(seed.matches)) {
-    throw new Error('La trivia ya está cerrada: debía completarse antes del inicio de la fase de llaves');
+    throw new Error('La trivia ya está cerrada: debía completarse antes del comienzo del primer partido del Mundial');
   }
 
   const questionById = new Map(TRIVIA_QUESTIONS.map((question) => [question.id, question] as const));

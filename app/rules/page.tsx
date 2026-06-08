@@ -24,7 +24,7 @@ export default async function RulesPage() {
           <li>Registrate / iniciá sesión con tu cuenta.</li>
           <li>Realizá la inscripción para habilitar la carga de predicciones.</li>
           <li>Entrá en `PRODE` y cargá resultados partido por partido.</li>
-          <li>Respondé la `Trivia` dentro de `PRODE` antes del inicio de la fase de llaves.</li>
+          <li>Respondé la `Trivia` dentro de `PRODE` antes del comienzo de la fase de grupos.</li>
           <li>Podés editar cada predicción hasta 1 hora antes del inicio de ese partido.</li>
           <li>Cuando se cargan resultados oficiales, la tabla se recalcula automáticamente.</li>
         </ol>
@@ -130,7 +130,7 @@ export default async function RulesPage() {
           <li>El calendario muestra el fixture completo del Mundial 2026.</li>
           <li>Las probabilidades de `Predicciones` son estimaciones internas de la app.</li>
           <li>La carga de resultados oficiales se realiza desde `Resultados Oficiales`.</li>
-          <li>La trivia se puede responder hasta el cierre de la fase de grupos; luego queda bloqueada.</li>
+          <li>La trivia se puede responder hasta antes del comienzo del primer partido del Mundial; luego queda bloqueada.</li>
         </ul>
       </div>
     </section>

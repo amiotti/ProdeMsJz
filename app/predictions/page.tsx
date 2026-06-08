@@ -25,7 +25,7 @@ export default async function PredictionsPage() {
         <h2>Predicciones</h2>
         <p className="muted">
           Inicia sesion para cargar tus pronosticos. Cada partido puede editarse hasta 1 hora antes de su inicio,
-          y las trivias deben responderse antes de que comience la fase de llaves. Los horarios se muestran en hora de Argentina.
+          y las trivias deben responderse antes de que comience el primer partido del Mundial. Los horarios se muestran en hora de Argentina.
         </p>
       </div>
       <PredictionsBoard initialState={state} registrationAmountArs={registrationAmountArs} />
