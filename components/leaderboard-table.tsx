@@ -208,6 +208,7 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
 
           <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
             <select
+              className="leaderboard-group-select"
               id="leaderboard-group-filter"
               name="leaderboardGroupFilter"
               value={activeGroupId}
@@ -248,6 +249,9 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
                 <th>Puntos</th>
                 <th>Exactos</th>
                 <th>Ganador/Empate</th>
+                <th>Goles</th>
+                <th>Incorrectos</th>
+                <th>Efectividad</th>
               </tr>
             </thead>
             <tbody>
@@ -268,11 +272,14 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
                     <td>{row.totalPoints}</td>
                     <td>{row.exactHits}</td>
                     <td>{row.outcomeHits}</td>
+                    <td>{row.sideGoalsHits}</td>
+                    <td>{row.incorrectPredictions}</td>
+                    <td>{row.accuracyRate}%</td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="muted" style={{ textAlign: 'center' }}>
+                  <td colSpan={8} className="muted" style={{ textAlign: 'center' }}>
                     El grupo seleccionado no tiene integrantes.
                   </td>
                 </tr>

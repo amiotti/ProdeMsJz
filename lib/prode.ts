@@ -58,6 +58,9 @@ export function computeLeaderboard(db: ProdeDB): LeaderboardRow[] {
       totalPoints: 0,
       exactHits: 0,
       outcomeHits: 0,
+      sideGoalsHits: 0,
+      incorrectPredictions: 0,
+      accuracyRate: 0,
       scoredPredictions: 0,
       totalPredictions: 0,
     });
@@ -75,6 +78,8 @@ export function computeLeaderboard(db: ProdeDB): LeaderboardRow[] {
     row.totalPoints += result.points;
     row.exactHits += result.exactHit ? 1 : 0;
     row.outcomeHits += result.outcomeHit ? 1 : 0;
+    row.sideGoalsHits += result.sideGoalsHit ? 1 : 0;
+    row.incorrectPredictions += result.points === 0 ? 1 : 0;
     row.scoredPredictions += 1;
   }
 
@@ -90,7 +95,12 @@ export function computeLeaderboard(db: ProdeDB): LeaderboardRow[] {
     }
   }
 
-  const rows = [...rowsByUserId.values()];
+  const rows = [...rowsByUserId.values()].map((row) => ({
+    ...row,
+    accuracyRate: row.scoredPredictions > 0
+      ? Math.round(((row.exactHits + row.outcomeHits) / row.scoredPredictions) * 100)
+      : 0,
+  }));
 
   rows.sort((a, b) => {
     if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;

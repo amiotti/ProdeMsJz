@@ -773,6 +773,26 @@ function UserStatsDashboard({ state, user }: { state: StateResponse; user: User 
             <span className="muted compact-text">Tu métrica de "adicto al detalle".</span>
           </div>
           <div className="detail-card">
+            <span className="detail-label">Aciertos de signo</span>
+            <strong>{userRow?.outcomeHits ?? 0}</strong>
+            <span className="muted compact-text">Ganador o empate correcto sin marcador exacto.</span>
+          </div>
+          <div className="detail-card">
+            <span className="detail-label">Aciertos de goles</span>
+            <strong>{userRow?.sideGoalsHits ?? 0}</strong>
+            <span className="muted compact-text">Goles acertados de local o visitante.</span>
+          </div>
+          <div className="detail-card">
+            <span className="detail-label">Pronósticos incorrectos</span>
+            <strong>{userRow?.incorrectPredictions ?? 0}</strong>
+            <span className="muted compact-text">Predicciones evaluadas sin puntos.</span>
+          </div>
+          <div className="detail-card">
+            <span className="detail-label">Efectividad de signo</span>
+            <strong>{userRow?.accuracyRate ?? 0}%</strong>
+            <span className="muted compact-text">Exactos + signos sobre partidos evaluados.</span>
+          </div>
+          <div className="detail-card">
             <span className="detail-label">Predicciones evaluadas</span>
             <strong>{totalScored}</strong>
             <span className="muted compact-text">Se actualiza cuando el admin carga resultados oficiales.</span>

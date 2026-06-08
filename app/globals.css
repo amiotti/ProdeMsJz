@@ -2115,6 +2115,39 @@ select:focus {
   white-space: nowrap;
 }
 
+.leaderboard-group-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  font-family: var(--font-body), 'Noto Sans', 'Segoe UI', Roboto, Arial, sans-serif;
+  font-size: 0.94rem;
+  font-weight: 800;
+  letter-spacing: 0.005em;
+  color: #1d2740;
+  padding-right: 2.6rem;
+  background-image:
+    linear-gradient(45deg, transparent 50%, rgba(29, 39, 64, 0.72) 50%),
+    linear-gradient(135deg, rgba(29, 39, 64, 0.72) 50%, transparent 50%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(247, 250, 255, 0.78));
+  background-position:
+    calc(100% - 18px) 50%,
+    calc(100% - 12px) 50%,
+    0 0;
+  background-size:
+    6px 6px,
+    6px 6px,
+    100% 100%;
+  background-repeat: no-repeat;
+}
+
+.leaderboard-group-select option {
+  font-family: var(--font-body), 'Noto Sans', 'Segoe UI', Roboto, Arial, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1d2740;
+  background: #f8fbff;
+}
+
 .table-wrap {
   overflow: auto;
 }
@@ -2141,6 +2174,38 @@ select:focus {
 
 .table tbody tr:hover {
   background: rgba(255, 255, 255, 0.42);
+}
+
+.historical-prode-table {
+  min-width: 1120px;
+  font-size: 0.82rem;
+}
+
+.historical-prode-table th,
+.historical-prode-table td {
+  text-align: center;
+  vertical-align: middle;
+  padding: 0.52rem 0.42rem;
+}
+
+.historical-prode-table thead th {
+  color: #111014;
+  background: linear-gradient(135deg, #fff200, #f4be1f);
+  border-bottom-color: rgba(17, 16, 20, 0.28);
+}
+
+.historical-prode-table tbody th {
+  text-align: left;
+  color: var(--text);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.historical-prode-total-row th,
+.historical-prode-total-row td {
+  color: #111014;
+  background: linear-gradient(135deg, #fff200, #f4be1f);
+  font-weight: 900;
 }
 
 .match-code-nowrap {
@@ -3640,6 +3705,21 @@ html[data-theme='dark'] .toolbar-grid select {
 
 html[data-theme='dark'] .toolbar-grid label {
   color: #c5d5ea;
+}
+
+html[data-theme='dark'] .leaderboard-group-select {
+  color: #fff2e7;
+  border-color: rgba(255, 255, 255, 0.16);
+  background-color: rgba(14, 13, 24, 0.88);
+  background-image:
+    linear-gradient(45deg, transparent 50%, rgba(89, 227, 215, 0.9) 50%),
+    linear-gradient(135deg, rgba(89, 227, 215, 0.9) 50%, transparent 50%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.045));
+}
+
+html[data-theme='dark'] .leaderboard-group-select option {
+  color: #fff2e7;
+  background: #16121f;
 }
 
 html[data-theme='dark'] .match-card {

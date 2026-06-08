@@ -105,6 +105,9 @@ export type LeaderboardRow = {
   totalPoints: number;
   exactHits: number;
   outcomeHits: number;
+  sideGoalsHits: number;
+  incorrectPredictions: number;
+  accuracyRate: number;
   scoredPredictions: number;
   totalPredictions: number;
 };
