@@ -158,12 +158,12 @@ export function UsersPanel({ initialUsers, initialMessages }: { initialUsers: Us
                   {user.role === 'admin' ? (
                     <span className="muted">No editable</span>
                   ) : (
-                    <div className="inline-actions">
+                    <div className="inline-actions user-row-actions">
                       <a
                         className="btn btn-primary btn-small"
                         href={`/api/profile/predictions-pdf?userId=${encodeURIComponent(user.id)}`}
                       >
-                        Descargar Predicciones
+                        Predicciones
                       </a>
                       <button
                         className="btn btn-danger btn-small"

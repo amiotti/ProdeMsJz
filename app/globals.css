@@ -2102,6 +2102,19 @@ select:focus {
   font-size: 0.82rem;
 }
 
+.user-row-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.user-row-actions .btn-small {
+  min-height: 2.05rem;
+  padding: 0.42rem 0.58rem;
+  white-space: nowrap;
+}
+
 .table-wrap {
   overflow: auto;
 }
