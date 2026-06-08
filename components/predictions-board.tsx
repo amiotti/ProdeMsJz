@@ -197,11 +197,6 @@ export function PredictionsBoard({
     return buildDateSections(flat);
   }, [visibleSections]);
 
-  const firstKnockoutSectionIndex = useMemo(
-    () => visibleSections.findIndex((section) => section.id.startsWith('KO-')),
-    [visibleSections],
-  );
-
   const dateSectionsByPhase = useMemo(() => {
     const flat: DateMatch[] = visibleSections.flatMap((section) =>
       section.matches.map((match) => ({ ...match, _meta: section.title })),
@@ -591,15 +586,14 @@ export function PredictionsBoard({
 
       {message ? <p className="status">{message}</p> : null}
 
+      {selectedGroupId === 'ALL' || selectedGroupId === 'TRIVIA'
+        ? renderTriviaPanel('trivia-first', !hasApprovedPayment)
+        : null}
+
       {selectedGroupId === 'TRIVIA' ? (
-        renderTriviaPanel('trivia-only', !hasApprovedPayment)
+        null
       ) : viewMode === 'group' ? (
-        visibleSections.flatMap((section, index) => {
-          const nodes = [];
-          if (selectedGroupId === 'ALL' && index === firstKnockoutSectionIndex) {
-            nodes.push(renderTriviaPanel('trivia-between-group-and-ko', !hasApprovedPayment));
-          }
-          nodes.push(
+        visibleSections.map((section) => (
             <div key={section.id} className="panel stack-md">
               <div className="section-head">
                 <h3>{section.title}</h3>
@@ -617,10 +611,8 @@ export function PredictionsBoard({
               </div>
 
               <div className="match-list">{section.matches.map((match) => renderMatchCard(match, !hasApprovedPayment))}</div>
-            </div>,
-          );
-          return nodes;
-        })
+            </div>
+        ))
       ) : (
         selectedGroupId === 'ALL' ? (
           <>
@@ -635,7 +627,6 @@ export function PredictionsBoard({
                 </div>
               </div>
             ))}
-            {renderTriviaPanel('trivia-between-group-and-ko-date', !hasApprovedPayment)}
             {dateSectionsByPhase.knockout.map((section) => (
               <div key={`ko-${section.label}`} className="panel stack-md">
                 <div className="section-head">

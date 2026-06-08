@@ -241,7 +241,7 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
         ) : null}
 
         <div className="panel table-wrap">
-          <table className="table">
+          <table className="table leaderboard-table">
             <thead>
               <tr>
                 <th>#</th>

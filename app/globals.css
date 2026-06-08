@@ -2261,6 +2261,12 @@ select:focus {
   background: rgba(255, 255, 255, 0.42);
 }
 
+.leaderboard-table th:nth-child(n + 3),
+.leaderboard-table td:nth-child(n + 3) {
+  text-align: center;
+  vertical-align: middle;
+}
+
 .historical-prode-table {
   min-width: 1120px;
   font-size: 0.82rem;
