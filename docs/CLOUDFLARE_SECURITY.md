@@ -15,8 +15,9 @@
 
 ## 4) Geographic restriction
 - Security > WAF > Custom rules:
-  - Regla: `(ip.geoip.country ne "AR" and ip.geoip.country ne "DO")` -> **Block**.`r`n  - `AR` permite Argentina y `DO` permite Republica Dominicana.
-  - Si necesitás permitir admin desde otro país, agregar excepción por IP.
+  - Regla: `(ip.geoip.country ne "AR" and ip.geoip.country ne "DO" and ip.geoip.country ne "MX")` -> **Block**.
+  - `AR` permite Argentina, `DO` permite Republica Dominicana y `MX` permite Mexico.
+  - Si necesitas permitir admin desde otro pais, agregar excepcion por IP.
 
 ## 5) Rate limiting (edge)
 - Security > WAF > Rate limiting rules:

@@ -64,7 +64,10 @@ export async function AppShell({ children }: { children: ReactNode }) {
               </div>
               <div className="brand-meta">
                 <p className="eyebrow">Mundial 2026 USA | MEX | CAN</p>
-                <h1 className="brand">Prode MSJZ</h1>
+                <h1 className="brand brand-with-cup">
+                  <img className="title-cup-icon title-cup-icon-header" src="/world-cup.png" alt="" width={32} height={32} />
+                  <span>Prode MSJZ</span>
+                </h1>
                 <p className="brand-subtitle">Predicciones, ranking y estadísticas del Mundial FIFA 2026</p>
               </div>
               <ThemeToggle />

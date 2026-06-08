@@ -40,7 +40,10 @@ export default async function InicioPage() {
       <div className="hero">
         <div className="panel stack-md">
           <p className="eyebrow hero-kicker">FIFA WORLD CUP 26</p>
-          <h2 className="hero-title">PRODE Mundial 2026</h2>
+          <h2 className="hero-title hero-title-with-cup">
+            <img className="title-cup-icon title-cup-icon-hero" src="/world-cup.png" alt="" width={42} height={42} />
+            <span>PRODE Mundial 2026</span>
+          </h2>
           <p className="muted">
             Registro de participantes, predicciones por partido, resultados oficiales y tabla de posiciones para el
             torneo de 48 selecciones.
