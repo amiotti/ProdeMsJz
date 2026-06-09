@@ -2101,6 +2101,12 @@ select:focus {
   box-shadow: 0 0 0 1px rgba(239, 49, 0, 0.22), 0 10px 20px rgba(12, 13, 20, 0.2) !important;
 }
 
+.pred-save-all-btn {
+  align-self: end;
+  min-height: 2.8rem;
+  white-space: nowrap;
+}
+
 .readonly-note {
   color: var(--muted);
   display: flex;

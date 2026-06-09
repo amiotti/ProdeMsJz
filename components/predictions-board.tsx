@@ -570,6 +570,15 @@ export function PredictionsBoard({
             <option value="date">Fecha de partido</option>
           </select>
         </label>
+
+        <button
+          className="btn btn-primary pred-save-all-btn"
+          type="button"
+          onClick={() => savePredictions()}
+          disabled={!hasApprovedPayment || saving || Boolean(savingMatchId) || Boolean(savingSectionId) || selectedGroupId === 'TRIVIA'}
+        >
+          {saving ? 'Guardando...' : 'Guardar Todo'}
+        </button>
       </div>
 
       <div className="panel">
