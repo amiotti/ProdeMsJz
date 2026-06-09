@@ -581,18 +581,6 @@ export function PredictionsBoard({
         </button>
       </div>
 
-      <div className="panel">
-        <p className="muted">
-          Regla de cierre: las predicciones se pueden crear o editar hasta <strong>1 hora antes</strong> del inicio de cada partido.
-          {triviaCutoffAt ? (
-            <>
-              {' '}
-              La trivia debe completarse antes del comienzo del primer partido del Mundial ({formatKickoffArgentina(triviaCutoffAt)}).
-            </>
-          ) : null}
-        </p>
-      </div>
-
       {message ? <p className="status">{message}</p> : null}
 
       {selectedGroupId === 'ALL' || selectedGroupId === 'TRIVIA'

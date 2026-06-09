@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 
 import { PredictionsBoard } from '@/components/predictions-board';
 import { getSessionCookieName } from '@/lib/auth';
+import { formatKickoffArgentina } from '@/lib/datetime';
 import { getPredictionsScreenState } from '@/lib/db';
 import { getRegistrationAmountArs } from '@/lib/public-config';
 import { requireAuthenticatedUser } from '@/lib/route-guard';
@@ -24,8 +25,16 @@ export default async function PredictionsPage() {
       <div className="panel">
         <h2>Predicciones</h2>
         <p className="muted">
-          Inicia sesion para cargar tus pronosticos. Cada partido puede editarse hasta 1 hora antes de su inicio,
-          y las trivias deben responderse antes de que comience el primer partido del Mundial. Los horarios se muestran en hora de Argentina.
+          Inicia sesión para cargar tus pronósticos. Los horarios se muestran en hora de Argentina.
+        </p>
+        <p className="muted">
+          Regla de cierre: las predicciones se pueden crear o editar hasta <strong>1 hora antes</strong> del inicio de cada partido.
+          {state.trivia.cutoffAt ? (
+            <>
+              {' '}
+              La trivia debe completarse antes del comienzo del primer partido del Mundial ({formatKickoffArgentina(state.trivia.cutoffAt)}).
+            </>
+          ) : null}
         </p>
       </div>
       <PredictionsBoard initialState={state} registrationAmountArs={registrationAmountArs} />
