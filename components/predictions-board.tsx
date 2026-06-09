@@ -549,10 +549,10 @@ export function PredictionsBoard({
 
       <div className="panel toolbar-grid">
         <label>
-          Filtrar grupo
+          Filtrar por
           <select id="pred-filter-group" name="predFilterGroup" value={selectedGroupId} onChange={(e) => setSelectedGroupId(e.target.value)}>
             <option value="ALL">Todos</option>
-            <option value="UNPREDICTED">Sin Predicción</option>
+            <option value="UNPREDICTED">Pendientes</option>
             <option value="KO">Fase final</option>
             <option value="TRIVIA">Trivia</option>
             {state.db.groups.map((group) => (
