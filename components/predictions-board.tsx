@@ -457,7 +457,7 @@ export function PredictionsBoard({
           ) : null}
           {match.officialResult ? (
             <p className="official-result">
-              Oficial: {match.officialResult.home} - {match.officialResult.away}
+              Resultado oficial: {match.officialResult.home} - {match.officialResult.away}
             </p>
           ) : null}
         </div>
