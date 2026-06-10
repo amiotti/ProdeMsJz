@@ -1,7 +1,6 @@
 ﻿
 import { NextMatchCountdown } from '@/components/next-match-countdown';
 import { TeamName } from '@/components/team-name';
-import { formatDateTimeArgentina } from '@/lib/datetime';
 import { getHomePageState } from '@/lib/db';
 import { requireAuthenticatedUser } from '@/lib/route-guard';
 import { getTeamDisplayName } from '@/lib/worldcup26';
@@ -32,16 +31,12 @@ export default async function InicioPage() {
   const nextMatch = [...state.matches]
     .filter((m) => new Date(m.kickoffAt).getTime() > Date.now())
     .sort((a, b) => new Date(a.kickoffAt).getTime() - new Date(b.kickoffAt).getTime())[0];
-  const currentLeader = state.leaderboard[0] ?? null;
-  const hasLeaderWithPoints = Boolean(currentLeader && currentLeader.totalPoints > 0 && resultsLoaded > 0);
-  const leaderName = hasLeaderWithPoints && currentLeader ? `${currentLeader.firstName} ${currentLeader.lastName}` : 'Sin resultados oficiales cargados';
-  const leaderMeta = hasLeaderWithPoints && currentLeader ? `${currentLeader.totalPoints} pts` : 'Se actualiza cuando haya resultados oficiales y puntajes';
   const prizePool = PRIZE_BASE_AMOUNT_ARS * state.paidParticipants;
   const firstPrize = Math.round(prizePool * 0.7);
   const secondPrize = Math.round(prizePool * 0.25);
   const thirdPrize = prizePool - firstPrize - secondPrize;
   const formatPrize = (value: number) => `$${value.toLocaleString('es-AR')}`;
-  const topFiveLeaderboard = state.leaderboard.slice(0, 5);
+  const topThreeLeaderboard = resultsLoaded > 0 ? state.leaderboard.filter((row) => row.totalPoints > 0).slice(0, 3) : [];
 
   return (
     <section className="stack-lg">
@@ -111,61 +106,25 @@ export default async function InicioPage() {
           </div>
           <div className="detail-grid">
             <div className="detail-card">
-              <span className="detail-label">Partidos del torneo</span>
-              <strong>{totalMatches}</strong>
-              <span className="muted compact-text">Fixture completo del Mundial 2026 cargado en la sección Fixture.</span>
-            </div>
-            <div className="detail-card">
-              <span className="detail-label">Líder provisional</span>
-              <strong>{leaderName}</strong>
-              <span className="muted compact-text">{leaderMeta}</span>
-            </div>
-            <div className="detail-card">
-              <span className="detail-label">Próximo partido</span>
-              <strong>
-                {nextMatch
-                  ? `${getTeamDisplayName(nextMatch.homeTeam)} vs ${getTeamDisplayName(nextMatch.awayTeam)}`
-                  : 'Sin partidos pendientes'}
-              </strong>
-              <span className="muted compact-text">
-                {nextMatch ? formatDateTimeArgentina(nextMatch.kickoffAt) : 'El fixture no tiene fechas futuras'}
-              </span>
+              <span className="detail-label">Top 3</span>
+              {topThreeLeaderboard.length > 0 ? (
+                <div className="home-top3-list">
+                  {topThreeLeaderboard.map((row, index) => (
+                    <span key={row.userId}>
+                      <strong>{index + 1}° {row.firstName} {row.lastName}</strong>
+                      <span>{row.totalPoints} pts</span>
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <>
+                  <strong>Sin resultados oficiales cargados</strong>
+                  <span className="muted compact-text">Se actualiza cuando haya resultados oficiales y puntajes.</span>
+                </>
+              )}
             </div>
           </div>
         </div>
-      </div>
-
-      <div className="panel stack-md home-top5-panel">
-        <div className="section-head">
-          <h3>Top 5 tabla de posiciones</h3>
-          <span>Resumen actual</span>
-        </div>
-        {topFiveLeaderboard.length > 0 ? (
-          <div className="table-wrap home-top5-wrap">
-            <table className="table home-top5-table">
-              <thead>
-                <tr>
-                  <th>Pos.</th>
-                  <th>Participante</th>
-                  <th>Puntos</th>
-                  <th>Exactos</th>
-                </tr>
-              </thead>
-              <tbody>
-                {topFiveLeaderboard.map((row, index) => (
-                  <tr key={row.userId}>
-                    <td>{index + 1}</td>
-                    <td>{row.firstName} {row.lastName}</td>
-                    <td>{row.totalPoints}</td>
-                    <td>{row.exactHits}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <p className="muted">Todavía no hay participantes con pago aprobado para mostrar en la tabla.</p>
-        )}
       </div>
 
       <div className="panel stack-md">
