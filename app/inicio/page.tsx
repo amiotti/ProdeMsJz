@@ -8,6 +8,8 @@ import { getTeamDisplayName } from '@/lib/worldcup26';
 
 export const dynamic = 'force-dynamic';
 
+const PRIZE_BASE_AMOUNT_ARS = 25000;
+
 function getRegistrationAmountArs() {
   const isProd = process.env.VERCEL_ENV === 'production' || process.env.NODE_ENV === 'production';
   const scoped = isProd
@@ -34,6 +36,11 @@ export default async function InicioPage() {
   const hasLeaderWithPoints = Boolean(currentLeader && currentLeader.totalPoints > 0 && resultsLoaded > 0);
   const leaderName = hasLeaderWithPoints && currentLeader ? `${currentLeader.firstName} ${currentLeader.lastName}` : 'Sin resultados oficiales cargados';
   const leaderMeta = hasLeaderWithPoints && currentLeader ? `${currentLeader.totalPoints} pts` : 'Se actualiza cuando haya resultados oficiales y puntajes';
+  const prizePool = PRIZE_BASE_AMOUNT_ARS * state.paidParticipants;
+  const firstPrize = Math.round(prizePool * 0.7);
+  const secondPrize = Math.round(prizePool * 0.25);
+  const thirdPrize = prizePool - firstPrize - secondPrize;
+  const formatPrize = (value: number) => `$${value.toLocaleString('es-AR')}`;
 
   return (
     <section className="stack-lg">
@@ -67,9 +74,12 @@ export default async function InicioPage() {
           ) : null}
           <div className="panel prizes-panel">
             <h3>Premios</h3>
-            <p className="muted">1°: 70% del pozo</p>
-            <p className="muted">2°: 25% del pozo</p>
-            <p className="muted">3°: 5% del pozo</p>
+            <p className="muted">
+              Pozo total actual: <strong>{formatPrize(prizePool)}</strong> ({formatPrize(PRIZE_BASE_AMOUNT_ARS)} x {state.paidParticipants} usuarios con pago aprobado)
+            </p>
+            <p className="muted">1°: 70% del pozo - <strong>{formatPrize(firstPrize)}</strong></p>
+            <p className="muted">2°: 25% del pozo - <strong>{formatPrize(secondPrize)}</strong></p>
+            <p className="muted">3°: 5% del pozo - <strong>{formatPrize(thirdPrize)}</strong></p>
           </div>
           <div className="cta-row">
             <Link href="/predictions" className="cta-link">

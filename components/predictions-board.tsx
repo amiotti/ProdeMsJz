@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { TeamName } from '@/components/team-name';
 import { formatDateArgentinaShort, formatKickoffArgentina } from '@/lib/datetime';
+import { calculatePredictionPoints } from '@/lib/prode';
 import type { Match, StateResponse, TriviaQuestion } from '@/lib/types';
 import { estimateMatchProbabilities, getTeamDisplayName } from '@/lib/worldcup26';
 
@@ -436,9 +437,19 @@ export function PredictionsBoard({
     const draft = drafts[match.id] ?? { home: '', away: '' };
     const kickoff = formatKickoffArgentina(match.kickoffAt);
     const headerMeta = match.groupId === 'KO' ? match.stage ?? 'Fase final' : `Grupo ${match.groupId} - Fecha ${match.matchday}`;
+    const pointsConfig = state?.db.pointsConfig;
+    const earnedPoints =
+      pointsConfig && match.officialResult && draft.home !== '' && draft.away !== ''
+        ? calculatePredictionPoints(
+            { homeGoals: Number(draft.home), awayGoals: Number(draft.away) },
+            match.officialResult,
+            pointsConfig,
+          ).points
+        : null;
 
     return (
       <div key={match.id} className="match-card">
+        {earnedPoints !== null ? <span className="prediction-points-badge">{earnedPoints} pts</span> : null}
         <div>
           <p className="match-meta">{headerMeta} - {kickoff}</p>
           <div className="fixture-row">

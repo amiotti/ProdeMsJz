@@ -39,7 +39,7 @@ export async function AppShell({ children }: { children: ReactNode }) {
     { href: '/calendar', label: 'Fixture' },
     { href: '/rules', label: 'Reglas' },
     ...(isAdmin ? [] : [{ href: '/predictions', label: 'PRODE' }]),
-    { href: '/results', label: 'Resultados Oficiales' },
+    ...(isAdmin ? [{ href: '/results', label: 'Resultados Oficiales' }] : []),
     { href: '/leaderboard', label: 'Tabla' },
     { href: '/stats', label: 'Estadísticas' },
     ...(isAdmin ? [{ href: '/users', label: 'Usuarios' }] : []),
@@ -70,10 +70,17 @@ export async function AppShell({ children }: { children: ReactNode }) {
                 </h1>
                 <p className="brand-subtitle">Predicciones, ranking y estadísticas del Mundial FIFA 2026</p>
               </div>
-              <ThemeToggle />
+              <div className="theme-toggle-mobile-slot">
+                <ThemeToggle />
+              </div>
             </div>
 
+            <HeaderNav items={nav} />
+
             <div className="topbar-actions">
+              <div className="theme-toggle-desktop-slot">
+                <ThemeToggle />
+              </div>
               {isAdmin ? (
                 <Link className="admin-alert-link" href="/users" aria-label="Ver consultas de contacto" title="Ver consultas de contacto">
                   <BellIcon />
@@ -90,8 +97,6 @@ export async function AppShell({ children }: { children: ReactNode }) {
               />
             </div>
           </div>
-
-          <HeaderNav items={nav} />
         </header>
       ) : null}
 

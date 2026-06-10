@@ -136,7 +136,7 @@ select {
 .topbar-main {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 1rem;
 }
 
@@ -146,7 +146,17 @@ select {
   align-items: center;
   gap: 0.85rem;
   position: relative;
-  flex: 1 1 auto;
+  flex: 0 1 auto;
+}
+
+.theme-toggle-mobile-slot {
+  display: none;
+}
+
+.theme-toggle-desktop-slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .brand-logo-panel {
@@ -241,6 +251,7 @@ select {
   justify-content: flex-end;
   min-height: 44px;
   min-width: 120px;
+  margin-left: auto;
 }
 
 .brand-wrap > .theme-toggle.theme-toggle-icon-only {
@@ -316,6 +327,12 @@ select {
   flex-wrap: wrap;
   gap: 0.5rem;
   justify-content: flex-start;
+}
+
+.topbar-main .nav-desktop {
+  flex: 1 1 auto;
+  align-items: center;
+  min-width: 0;
 }
 
 .nav-link {
@@ -1904,6 +1921,33 @@ select:focus {
   background:
     radial-gradient(circle at 0% 0%, rgba(214, 255, 46, 0.05), transparent 40%),
     rgba(255, 255, 255, 0.42);
+  position: relative;
+}
+
+.prediction-points-badge {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.55rem;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.1rem;
+  min-height: 1.55rem;
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(244, 190, 31, 0.72);
+  color: #18110a;
+  background:
+    linear-gradient(135deg, rgba(255, 239, 161, 0.98), rgba(244, 190, 31, 0.96) 54%, rgba(239, 49, 0, 0.82)),
+    radial-gradient(circle at 20% 10%, rgba(255, 255, 255, 0.72), transparent 45%);
+  box-shadow:
+    0 10px 22px rgba(244, 190, 31, 0.22),
+    0 0 0 1px rgba(255, 255, 255, 0.42) inset;
+  font-size: 0.76rem;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .match-main {
@@ -3007,6 +3051,16 @@ select:focus {
     align-items: center;
     gap: 0.65rem;
     padding-right: 0;
+    flex: 1 1 auto;
+  }
+
+  .theme-toggle-mobile-slot {
+    display: inline-flex;
+    margin-left: auto;
+  }
+
+  .theme-toggle-desktop-slot {
+    display: none;
   }
 
   .topbar-actions {
