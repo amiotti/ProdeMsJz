@@ -1556,6 +1556,34 @@ select {
   margin: 0.18rem 0;
 }
 
+.home-top5-panel {
+  gap: 0.65rem;
+}
+
+.home-top5-wrap {
+  padding: 0;
+  overflow: hidden;
+}
+
+.home-top5-table th,
+.home-top5-table td {
+  padding: 0.56rem 0.7rem;
+}
+
+.home-top5-table th:first-child,
+.home-top5-table td:first-child,
+.home-top5-table th:nth-child(3),
+.home-top5-table td:nth-child(3),
+.home-top5-table th:nth-child(4),
+.home-top5-table td:nth-child(4) {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.home-top5-table td:nth-child(2) {
+  font-weight: 800;
+}
+
 .next-match-countdown {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -2053,7 +2081,9 @@ select:focus {
   border: 1px solid var(--line);
   border-radius: 14px;
   padding: 0.72rem;
-  background: rgba(255, 255, 255, 0.22);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(214, 255, 46, 0.05), transparent 40%),
+    rgba(255, 255, 255, 0.42);
 }
 
 .trivia-question-card.has-points-badge {
@@ -4173,7 +4203,8 @@ html[data-theme='dark'] .users-payment-select {
   background-size: 14px 14px, 100% 100% !important;
 }
 
-html[data-theme='dark'] .match-card {
+html[data-theme='dark'] .match-card,
+html[data-theme='dark'] .trivia-question-card {
   background:
     radial-gradient(circle at 0% 0%, rgba(214, 255, 46, 0.05), transparent 40%),
     rgba(255, 255, 255, 0.01);

@@ -41,6 +41,7 @@ export default async function InicioPage() {
   const secondPrize = Math.round(prizePool * 0.25);
   const thirdPrize = prizePool - firstPrize - secondPrize;
   const formatPrize = (value: number) => `$${value.toLocaleString('es-AR')}`;
+  const topFiveLeaderboard = state.leaderboard.slice(0, 5);
 
   return (
     <section className="stack-lg">
@@ -132,6 +133,39 @@ export default async function InicioPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="panel stack-md home-top5-panel">
+        <div className="section-head">
+          <h3>Top 5 tabla de posiciones</h3>
+          <span>Resumen actual</span>
+        </div>
+        {topFiveLeaderboard.length > 0 ? (
+          <div className="table-wrap home-top5-wrap">
+            <table className="table home-top5-table">
+              <thead>
+                <tr>
+                  <th>Pos.</th>
+                  <th>Participante</th>
+                  <th>Puntos</th>
+                  <th>Exactos</th>
+                </tr>
+              </thead>
+              <tbody>
+                {topFiveLeaderboard.map((row, index) => (
+                  <tr key={row.userId}>
+                    <td>{index + 1}</td>
+                    <td>{row.firstName} {row.lastName}</td>
+                    <td>{row.totalPoints}</td>
+                    <td>{row.exactHits}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="muted">Todavía no hay participantes con pago aprobado para mostrar en la tabla.</p>
+        )}
       </div>
 
       <div className="panel stack-md">
