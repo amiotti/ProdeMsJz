@@ -198,46 +198,55 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
   return (
     <>
       <div className="stack-md">
-        {isLoggedIn ? (
-        <div className="panel stack-md">
-          <div className="stack-xs">
-            <h3>Grupos de posiciones</h3>
-            <p className="muted">Crea grupos propios y filtra la tabla para ver solo sus integrantes.</p>
+        {isLoggedIn && groups.length === 0 ? (
+          <div className="leaderboard-create-group-row">
             {groupsError ? <p className="field-error">{groupsError}</p> : null}
-          </div>
-
-          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
-            <select
-              className="leaderboard-group-select"
-              id="leaderboard-group-filter"
-              name="leaderboardGroupFilter"
-              value={activeGroupId}
-              onChange={(event) => setActiveGroupId(event.target.value)}
-              aria-label="Grupo activo de la tabla"
-              style={{ minWidth: 260 }}
-              disabled={!isLoggedIn || groupsLoading}
-            >
-              <option value="all">Tabla general (todos)</option>
-              {groups.map((group) => (
-                <option key={group.id} value={group.id}>
-                  {group.name}
-                </option>
-              ))}
-            </select>
-
-            <button type="button" className="btn btn-primary btn-small" onClick={openCreateModal} disabled={!isLoggedIn || groupMutationLoading || groupsLoading}>
+            <button type="button" className="btn btn-primary btn-small" onClick={openCreateModal} disabled={groupMutationLoading || groupsLoading}>
               Crear grupo
             </button>
-
-            <button type="button" className="btn btn-small" onClick={deleteActiveGroup} disabled={!isLoggedIn || !activeGroup || groupMutationLoading}>
-              Eliminar grupo activo
-            </button>
-
-            <span className="muted">
-              {activeGroup ? `${filteredRows.length} integrante(s) en "${activeGroup.name}"` : `${rows.length} participante(s)`}
-            </span>
           </div>
-        </div>
+        ) : null}
+
+        {isLoggedIn && groups.length > 0 ? (
+          <div className="panel stack-md">
+            <div className="stack-xs">
+              <h3>Grupos de posiciones</h3>
+              <p className="muted">Crea grupos propios y filtra la tabla para ver solo sus integrantes.</p>
+              {groupsError ? <p className="field-error">{groupsError}</p> : null}
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+              <select
+                className="leaderboard-group-select"
+                id="leaderboard-group-filter"
+                name="leaderboardGroupFilter"
+                value={activeGroupId}
+                onChange={(event) => setActiveGroupId(event.target.value)}
+                aria-label="Grupo activo de la tabla"
+                style={{ minWidth: 260 }}
+                disabled={!isLoggedIn || groupsLoading}
+              >
+                <option value="all">Tabla general (todos)</option>
+                {groups.map((group) => (
+                  <option key={group.id} value={group.id}>
+                    {group.name}
+                  </option>
+                ))}
+              </select>
+
+              <button type="button" className="btn btn-primary btn-small" onClick={openCreateModal} disabled={!isLoggedIn || groupMutationLoading || groupsLoading}>
+                Crear grupo
+              </button>
+
+              <button type="button" className="btn btn-small" onClick={deleteActiveGroup} disabled={!isLoggedIn || !activeGroup || groupMutationLoading}>
+                Eliminar grupo activo
+              </button>
+
+              <span className="muted">
+                {activeGroup ? `${filteredRows.length} integrante(s) en "${activeGroup.name}"` : `${rows.length} participante(s)`}
+              </span>
+            </div>
+          </div>
         ) : null}
 
         <div className="panel table-wrap">

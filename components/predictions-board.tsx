@@ -448,7 +448,7 @@ export function PredictionsBoard({
         : null;
 
     return (
-      <div key={match.id} className="match-card">
+      <div key={match.id} className={`match-card${earnedPoints !== null ? ' has-points-badge' : ''}`}>
         {earnedPoints !== null ? <span className="prediction-points-badge">{earnedPoints} pts</span> : null}
         <div>
           <p className="match-meta">{headerMeta} - {kickoff}</p>

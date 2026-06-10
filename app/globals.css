@@ -134,9 +134,9 @@ select {
 }
 
 .topbar-main {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(0, auto) minmax(280px, 1fr);
   align-items: center;
-  justify-content: flex-start;
   gap: 1rem;
 }
 
@@ -146,7 +146,8 @@ select {
   align-items: center;
   gap: 0.85rem;
   position: relative;
-  flex: 0 1 auto;
+  justify-self: start;
+  max-width: 520px;
 }
 
 .theme-toggle-mobile-slot {
@@ -251,7 +252,7 @@ select {
   justify-content: flex-end;
   min-height: 44px;
   min-width: 120px;
-  margin-left: auto;
+  justify-self: end;
 }
 
 .brand-wrap > .theme-toggle.theme-toggle-icon-only {
@@ -330,9 +331,11 @@ select {
 }
 
 .topbar-main .nav-desktop {
-  flex: 1 1 auto;
   align-items: center;
+  justify-content: center;
+  justify-self: center;
   min-width: 0;
+  flex-wrap: wrap;
 }
 
 .nav-link {
@@ -1926,9 +1929,9 @@ select:focus {
 
 .prediction-points-badge {
   position: absolute;
-  top: 0.55rem;
-  right: 0.55rem;
-  z-index: 1;
+  top: 0.65rem;
+  right: 0.65rem;
+  z-index: 3;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1948,6 +1951,10 @@ select:focus {
   font-weight: 900;
   line-height: 1;
   white-space: nowrap;
+}
+
+.predictions-board .match-card.has-points-badge {
+  padding-right: 4.6rem;
 }
 
 .match-main {
@@ -2324,6 +2331,14 @@ select:focus {
 .leaderboard-table td:nth-child(n + 3) {
   text-align: center;
   vertical-align: middle;
+}
+
+.leaderboard-create-group-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
 }
 
 .historical-prode-table {
@@ -2955,6 +2970,11 @@ select:focus {
     gap: 0.65rem;
   }
 
+  .predictions-board .match-card.has-points-badge {
+    padding: 0.7rem;
+    padding-top: 2.35rem;
+  }
+
   .score-inputs {
     width: max-content;
     gap: 0.35rem;
@@ -3025,6 +3045,7 @@ select:focus {
   }
 
   .topbar-main {
+    display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.6rem;
@@ -3057,6 +3078,18 @@ select:focus {
   .theme-toggle-mobile-slot {
     display: inline-flex;
     margin-left: auto;
+  }
+
+  .theme-toggle-mobile-slot > .theme-toggle.theme-toggle-icon-only {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    min-height: 42px;
+    flex: 0 0 42px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .theme-toggle-desktop-slot {
