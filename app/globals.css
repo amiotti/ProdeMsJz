@@ -1543,13 +1543,92 @@ select {
 }
 
 .prizes-panel {
-  margin-top: 0.25rem;
+  margin-top: 0;
   border-radius: 16px;
-  padding: 0.85rem;
+  padding: 0.62rem 0.75rem;
 }
 
 .prizes-panel h3 {
-  margin: 0 0 0.35rem;
+  margin: 0 0 0.24rem;
+}
+
+.prizes-panel p {
+  margin: 0.18rem 0;
+}
+
+.next-match-countdown {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.85rem;
+  border: 1px solid rgba(244, 190, 31, 0.24);
+  border-radius: 18px;
+  padding: 0.85rem;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(244, 190, 31, 0.18), transparent 42%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.34));
+  box-shadow:
+    0 14px 28px rgba(18, 28, 52, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.22) inset;
+}
+
+.countdown-copy {
+  display: grid;
+  gap: 0.18rem;
+  min-width: 0;
+}
+
+.countdown-copy strong {
+  color: var(--text);
+  font-family: var(--font-title), sans-serif;
+  font-size: clamp(1.05rem, 2vw, 1.32rem);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.countdown-copy span,
+.countdown-label {
+  margin: 0;
+  color: var(--accent-2);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.countdown-clock {
+  display: flex;
+  gap: 0.42rem;
+}
+
+.countdown-clock span {
+  min-width: 4.2rem;
+  border-radius: 14px;
+  padding: 0.55rem 0.5rem;
+  text-align: center;
+  color: #17110a;
+  background:
+    linear-gradient(135deg, rgba(255, 239, 161, 0.98), rgba(244, 190, 31, 0.94) 58%, rgba(239, 49, 0, 0.7)),
+    radial-gradient(circle at 20% 10%, rgba(255, 255, 255, 0.7), transparent 45%);
+  box-shadow:
+    0 10px 22px rgba(244, 190, 31, 0.18),
+    0 0 0 1px rgba(255, 255, 255, 0.38) inset;
+}
+
+.countdown-clock strong {
+  display: block;
+  font-family: var(--font-title), sans-serif;
+  font-size: 1.45rem;
+  line-height: 0.95;
+}
+
+.countdown-clock small {
+  display: block;
+  margin-top: 0.18rem;
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .pending-payment-panel {
@@ -2766,6 +2845,21 @@ select:focus {
     grid-template-columns: 1fr;
   }
 
+  .next-match-countdown {
+    grid-template-columns: 1fr;
+    gap: 0.7rem;
+  }
+
+  .countdown-clock {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .countdown-clock span {
+    min-width: 0;
+    flex: 1 1 0;
+  }
+
   .group-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -3963,6 +4057,16 @@ html[data-theme='dark'] .group-card {
 
 html[data-theme='dark'] .group-card h4 {
   color: #fff2de;
+}
+
+html[data-theme='dark'] .next-match-countdown {
+  background:
+    radial-gradient(circle at 0% 0%, rgba(244, 190, 31, 0.16), transparent 42%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.04));
+  border-color: rgba(244, 190, 31, 0.28);
+  box-shadow:
+    0 14px 28px rgba(5, 8, 16, 0.18),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
 }
 
 html[data-theme='dark'] input,

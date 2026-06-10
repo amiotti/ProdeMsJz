@@ -1,5 +1,5 @@
-﻿import Link from 'next/link';
-
+﻿
+import { NextMatchCountdown } from '@/components/next-match-countdown';
 import { TeamName } from '@/components/team-name';
 import { formatDateTimeArgentina } from '@/lib/datetime';
 import { getHomePageState } from '@/lib/db';
@@ -72,6 +72,11 @@ export default async function InicioPage() {
               </div>
             </div>
           ) : null}
+          <NextMatchCountdown
+            kickoffAt={nextMatch?.kickoffAt ?? null}
+            homeTeam={nextMatch ? getTeamDisplayName(nextMatch.homeTeam) : null}
+            awayTeam={nextMatch ? getTeamDisplayName(nextMatch.awayTeam) : null}
+          />
           <div className="panel prizes-panel">
             <h3>Premios</h3>
             <p className="muted">
@@ -80,17 +85,6 @@ export default async function InicioPage() {
             <p className="muted">1°: 70% del pozo - <strong>{formatPrize(firstPrize)}</strong></p>
             <p className="muted">2°: 25% del pozo - <strong>{formatPrize(secondPrize)}</strong></p>
             <p className="muted">3°: 5% del pozo - <strong>{formatPrize(thirdPrize)}</strong></p>
-          </div>
-          <div className="cta-row">
-            <Link href="/predictions" className="cta-link">
-              Cargar predicciones
-            </Link>
-            <Link href="/leaderboard" className="cta-link">
-              Ver tabla
-            </Link>
-            <Link href="/calendar" className="cta-link">
-              Ver fixture
-            </Link>
           </div>
         </div>
 
@@ -160,3 +154,4 @@ export default async function InicioPage() {
     </section>
   );
 }
+
