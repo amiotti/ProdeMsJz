@@ -4,6 +4,7 @@ import { getState } from '@/lib/db';
 import { calculatePredictionPoints } from '@/lib/prode';
 import { getStatsAnalytics, type StatsAnalyticsSnapshot } from '@/lib/stats-analytics';
 import type { LeaderboardRow, Match, Prediction, ProdeDB, Score, StateResponse, User } from '@/lib/types';
+import { getTeamDisplayName } from '@/lib/worldcup26';
 
 export const dynamic = 'force-dynamic';
 
@@ -340,11 +341,6 @@ function LineChart({
   );
 }
 
-function formatDateShort(iso: string) {
-  const d = new Date(iso);
-  return `${String(d.getUTCDate()).padStart(2, '0')}/${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
-}
-
 function scoreOutcome(score: Score) {
   if (score.home > score.away) return 'home' as const;
   if (score.home < score.away) return 'away' as const;
@@ -530,9 +526,8 @@ function getOfficialMatchInsights(state: StateResponse): OfficialMatchInsights {
       }
 
       return {
-        label: `${match.homeTeam} ${match.officialResult?.home} - ${match.officialResult?.away} ${match.awayTeam}`,
+        label: `${getTeamDisplayName(match.homeTeam)} ${match.officialResult?.home} - ${match.officialResult?.away} ${getTeamDisplayName(match.awayTeam)}`,
         value: total,
-        note: `${formatDateShort(match.kickoffAt)} | ${match.groupId}`,
       };
     })
     .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label, 'es'))
@@ -540,9 +535,8 @@ function getOfficialMatchInsights(state: StateResponse): OfficialMatchInsights {
 
   const biggestMargins = playedMatches
     .map((match) => ({
-      label: `${match.homeTeam} ${match.officialResult?.home} - ${match.officialResult?.away} ${match.awayTeam}`,
+      label: `${getTeamDisplayName(match.homeTeam)} ${match.officialResult?.home} - ${match.officialResult?.away} ${getTeamDisplayName(match.awayTeam)}`,
       value: Math.abs((match.officialResult?.home ?? 0) - (match.officialResult?.away ?? 0)),
-      note: `${formatDateShort(match.kickoffAt)} | ${match.groupId}`,
     }))
     .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label, 'es'))
     .slice(0, 5);
@@ -558,7 +552,7 @@ function getOfficialMatchInsights(state: StateResponse): OfficialMatchInsights {
       const accuracy = predictions.length > 0 ? Math.round((accurateOutcome / predictions.length) * 100) : 0;
 
       return {
-        label: `${match.homeTeam} ${match.officialResult?.home} - ${match.officialResult?.away} ${match.awayTeam}`,
+        label: `${getTeamDisplayName(match.homeTeam)} ${match.officialResult?.home} - ${match.officialResult?.away} ${getTeamDisplayName(match.awayTeam)}`,
         value: 100 - accuracy,
         note:
           predictions.length > 0
@@ -797,11 +791,13 @@ function UserStatsDashboard({ state, user }: { state: StateResponse; user: User 
   const montecarlo = monteCarloResults
     .sort((a, b) => b.probability - a.probability)
     .slice(0, 8)
-    .map((r) => ({ label: r.name, value: r.probability, note: 'prob. ganar' }));
+    .map((r) => ({ label: r.name, value: r.probability }));
 
   const userProb = monteCarloResults.find((r) => r.userId === user.id)?.probability ?? 0;
   const riskPct = getUniquePredictionRiskScore(user.id, state.db, analytics.predictionPatternFrequency);
   const positionDelta = getPositionDeltaFromLastDate(state, analytics, user.id);
+  const nextHomeName = nextMatch ? getTeamDisplayName(nextMatch.homeTeam) : '';
+  const nextAwayName = nextMatch ? getTeamDisplayName(nextMatch.awayTeam) : '';
 
   const badges: string[] = [];
   if (exactPct >= 25) badges.push('Nostradamus');
@@ -856,16 +852,16 @@ function UserStatsDashboard({ state, user }: { state: StateResponse; user: User 
         <div className="panel stack-md">
           <div className="section-head">
             <h3>Predicciones del próximo partido</h3>
-            <span>{nextMatch ? `${nextMatch.homeTeam} vs ${nextMatch.awayTeam}` : 'Sin partidos futuros'}</span>
+            <span>{nextMatch ? `${nextHomeName} vs ${nextAwayName}` : 'Sin partidos futuros'}</span>
           </div>
           {nextMatch ? (
             <>
               <DonutChart
                 centerLabel="pred."
                 segments={[
-                  { label: `Gana ${nextMatch.homeTeam}`, value: analytics.nextMatchDist.home, color: '#3850dd' },
+                  { label: `Gana ${nextHomeName}`, value: analytics.nextMatchDist.home, color: '#3850dd' },
                   { label: 'Empate', value: analytics.nextMatchDist.draw, color: '#f4be1f' },
-                  { label: `Gana ${nextMatch.awayTeam}`, value: analytics.nextMatchDist.away, color: '#ef3100' },
+                  { label: `Gana ${nextAwayName}`, value: analytics.nextMatchDist.away, color: '#ef3100' },
                 ]}
               />
               <p className="muted">Distribución de signos pronosticados por el grupo para el próximo partido disponible.</p>

@@ -34,6 +34,10 @@ function LineChart({
     return safeValues.map((v, i) => `${i === 0 ? 'M' : 'L'} ${i * xStep} ${pointY(v)}`).join(' ');
   }
 
+  function pointX(index: number) {
+    return labels.length > 1 ? index * xStep : innerW / 2;
+  }
+
   return (
     <div className="line-chart-wrap">
       <svg className="chart-svg" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Grafico de evolucion">
@@ -43,19 +47,30 @@ function LineChart({
             return <line key={i} x1={0} y1={y} x2={innerW} y2={y} className="chart-grid-line" />;
           })}
           {series.map((s) => (
-            <path
-              key={s.label}
-              d={path(s.values)}
-              fill="none"
-              stroke={s.color}
-              strokeWidth={s.emphasized ? 3.5 : 2.1}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              opacity={s.emphasized ? 1 : 0.72}
-            />
+            <g key={s.label} opacity={s.emphasized ? 1 : 0.72}>
+              <path
+                d={path(s.values)}
+                fill="none"
+                stroke={s.color}
+                strokeWidth={s.emphasized ? 3.5 : 2.1}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              {(s.values.length ? s.values : [0]).map((value, index) => (
+                <circle
+                  key={`${s.label}-${index}`}
+                  cx={pointX(index)}
+                  cy={pointY(value)}
+                  r={s.emphasized ? 4.2 : 3.2}
+                  fill={s.color}
+                  stroke="rgba(255,255,255,0.82)"
+                  strokeWidth="1.2"
+                />
+              ))}
+            </g>
           ))}
           {labels.map((label, i) => (
-            <text key={`${label}-${i}`} x={i * xStep} y={innerH + 18} textAnchor="middle" className="chart-axis-label">
+            <text key={`${label}-${i}`} x={pointX(i)} y={innerH + 18} textAnchor="middle" className="chart-axis-label">
               {label}
             </text>
           ))}

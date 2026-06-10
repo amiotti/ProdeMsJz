@@ -15,7 +15,35 @@ function normalizeTriviaAnswer(value: string) {
   return trimmed
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase();
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function triviaTokens(value: string) {
+  const stopWords = new Set(['de', 'del', 'la', 'las', 'los', 'el', 'y']);
+  return normalizeTriviaAnswer(value)
+    .split(' ')
+    .filter((token) => token.length >= 3 && !stopWords.has(token));
+}
+
+function isTriviaAnswerMatch(predictionAnswer: string, officialAnswer: string) {
+  const predicted = normalizeTriviaAnswer(predictionAnswer);
+  const official = normalizeTriviaAnswer(officialAnswer);
+  if (!predicted || !official) return false;
+  if (/^\d+$/.test(predicted) || /^\d+$/.test(official)) return predicted === official;
+  if (predicted === official) return true;
+
+  const predictedTokens = triviaTokens(predicted);
+  const officialTokens = triviaTokens(official);
+  if (!predictedTokens.length || !officialTokens.length) return false;
+
+  const shorter = predictedTokens.length <= officialTokens.length ? predictedTokens : officialTokens;
+  const longer = predictedTokens.length <= officialTokens.length ? officialTokens : predictedTokens;
+  const longerSet = new Set(longer);
+
+  return shorter.every((token) => longerSet.has(token));
 }
 
 export function calculatePredictionPoints(
@@ -90,7 +118,7 @@ export function computeLeaderboard(db: ProdeDB): LeaderboardRow[] {
     const official = triviaResultByQuestionId.get(prediction.questionId);
     if (!official) continue;
 
-    if (normalizeTriviaAnswer(prediction.answer) === normalizeTriviaAnswer(official.answer)) {
+    if (isTriviaAnswerMatch(prediction.answer, official.answer)) {
       row.totalPoints += TRIVIA_POINTS_PER_CORRECT;
     }
   }
