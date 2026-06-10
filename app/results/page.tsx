@@ -15,7 +15,7 @@ export default async function ResultsPage() {
   return (
     <section className="stack-lg">
       <div className="panel">
-        <h2>Resultados oficiales</h2>
+        <h2>Resultados</h2>
         <p className="muted">
           Todos los usuarios pueden consultar los resultados. Solo el perfil administrador puede cargarlos o editarlos.
         </p>

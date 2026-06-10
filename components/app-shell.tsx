@@ -39,7 +39,7 @@ export async function AppShell({ children }: { children: ReactNode }) {
     { href: '/calendar', label: 'Fixture' },
     { href: '/rules', label: 'Reglas' },
     ...(isAdmin ? [] : [{ href: '/predictions', label: 'PRODE' }]),
-    ...(isAdmin ? [{ href: '/results', label: 'Resultados Oficiales' }] : []),
+    ...(isAdmin ? [{ href: '/results', label: 'Resultados' }] : []),
     { href: '/leaderboard', label: 'Tabla' },
     { href: '/stats', label: 'Estadísticas' },
     ...(isAdmin ? [{ href: '/users', label: 'Usuarios' }] : []),
@@ -75,7 +75,9 @@ export async function AppShell({ children }: { children: ReactNode }) {
               </div>
             </div>
 
-            <HeaderNav items={nav} />
+            <div className="header-nav-desktop-slot">
+              <HeaderNav items={nav} />
+            </div>
 
             <div className="topbar-actions">
               <div className="theme-toggle-desktop-slot">
@@ -96,6 +98,10 @@ export async function AppShell({ children }: { children: ReactNode }) {
                 }}
               />
             </div>
+          </div>
+
+          <div className="header-nav-mobile-slot">
+            <HeaderNav items={nav} />
           </div>
         </header>
       ) : null}
