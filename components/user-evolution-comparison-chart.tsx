@@ -9,6 +9,14 @@ type EvolutionSeries = {
   values: number[];
 };
 
+function getChartMax(value: number) {
+  if (value <= 10) return 10;
+  if (value <= 25) return 25;
+  if (value <= 50) return 50;
+  if (value <= 100) return 100;
+  return Math.ceil(value / 50) * 50;
+}
+
 function LineChart({
   labels,
   series,
@@ -19,10 +27,12 @@ function LineChart({
   height?: number;
 }) {
   const width = 760;
-  const padding = { top: 18, right: 16, bottom: 54, left: 48 };
+  const padding = { top: 18, right: 16, bottom: 54, left: 44 };
   const innerW = width - padding.left - padding.right;
   const innerH = height - padding.top - padding.bottom;
-  const max = Math.max(1, ...series.flatMap((s) => (s.values.length ? s.values : [0])));
+  const rawMax = Math.max(1, ...series.flatMap((s) => (s.values.length ? s.values : [0])));
+  const max = getChartMax(rawMax);
+  const yTicks = [0, 0.25, 0.5, 0.75, 1].map((ratio) => Math.round(max * ratio));
   const xStep = labels.length > 1 ? innerW / (labels.length - 1) : innerW;
 
   function pointY(v: number) {
@@ -41,19 +51,17 @@ function LineChart({
   return (
     <div className="line-chart-wrap">
       <svg className="chart-svg" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Grafico de evolucion">
-        <text
-          x={14}
-          y={height / 2}
-          textAnchor="middle"
-          className="chart-axis-label chart-y-axis-title"
-          transform={`rotate(-90 14 ${height / 2})`}
-        >
-          Puntos acumulados
-        </text>
         <g transform={`translate(${padding.left},${padding.top})`}>
-          {Array.from({ length: 5 }).map((_, i) => {
-            const y = (innerH / 4) * i;
-            return <line key={i} x1={0} y1={y} x2={innerW} y2={y} className="chart-grid-line" />;
+          {yTicks.map((tick) => {
+            const y = pointY(tick);
+            return (
+              <g key={tick}>
+                <line x1={0} y1={y} x2={innerW} y2={y} className="chart-grid-line" />
+                <text x={-10} y={y + 4} textAnchor="end" className="chart-axis-label chart-y-tick">
+                  {tick}
+                </text>
+              </g>
+            );
           })}
           {series.map((s) => (
             <g key={s.label} opacity={s.emphasized ? 1 : 0.72}>

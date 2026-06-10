@@ -42,7 +42,7 @@ const HISTORICAL_COLUMNS = ['Brasil 2014', 'Rusia 2018', 'Copa Ame/Eu', 'Mini Am
 
 const HISTORICAL_PRODE_ROWS: HistoricalProdeRow[] = [
   { name: 'BOSSA', values: [20, 27, 36, 8, 29, 36, 13], played: 299 },
-  { name: 'BOTACIN', values: [23, 28, 34, 10, 27, 32, 12], played: 299 },
+  { name: 'BOTTACIN', values: [23, 28, 34, 10, 27, 32, 12], played: 299 },
   { name: 'MIOTTI', values: [21, 26, 'X', 'X', 28, 35, 14], played: 227 },
   { name: 'CALVO', values: [20, 27, 33, 'X', 29, 'X', 'X'], played: 200 },
   { name: 'ZIELINSKI', values: [22, 28, 34, 10, 24, 30, 'X'], played: 276 },

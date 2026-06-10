@@ -2048,6 +2048,23 @@ select:focus {
   white-space: nowrap;
 }
 
+.trivia-question-card {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0.72rem;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.trivia-question-card.has-points-badge {
+  padding-top: 2.35rem;
+}
+
+.trivia-points-badge {
+  top: 0.55rem;
+  right: 0.55rem;
+}
+
 .predictions-board .match-card.has-points-badge {
   padding-right: 0.8rem;
 }
@@ -2671,11 +2688,9 @@ select:focus {
   font-weight: 600;
 }
 
-.chart-y-axis-title {
+.chart-y-tick {
   fill: var(--accent-2);
-  font-size: 12px;
   font-weight: 800;
-  letter-spacing: 0.04em;
 }
 
 .chart-value-label {
