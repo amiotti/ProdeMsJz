@@ -28,7 +28,7 @@ function triviaTokens(value: string) {
     .filter((token) => token.length >= 3 && !stopWords.has(token));
 }
 
-function isTriviaAnswerMatch(predictionAnswer: string, officialAnswer: string) {
+export function isTriviaAnswerMatch(predictionAnswer: string, officialAnswer: string) {
   const predicted = normalizeTriviaAnswer(predictionAnswer);
   const official = normalizeTriviaAnswer(officialAnswer);
   if (!predicted || !official) return false;

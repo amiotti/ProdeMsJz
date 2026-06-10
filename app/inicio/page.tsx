@@ -75,7 +75,7 @@ export default async function InicioPage() {
           <div className="panel prizes-panel">
             <h3>Premios</h3>
             <p className="muted">
-              Pozo total actual: <strong>{formatPrize(prizePool)}</strong> ({formatPrize(PRIZE_BASE_AMOUNT_ARS)} x {state.paidParticipants} usuarios con pago aprobado)
+              Pozo total actual: <strong>{formatPrize(prizePool)}</strong>
             </p>
             <p className="muted">1°: 70% del pozo - <strong>{formatPrize(firstPrize)}</strong></p>
             <p className="muted">2°: 25% del pozo - <strong>{formatPrize(secondPrize)}</strong></p>

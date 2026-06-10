@@ -19,7 +19,7 @@ function LineChart({
   height?: number;
 }) {
   const width = 760;
-  const padding = { top: 18, right: 16, bottom: 54, left: 28 };
+  const padding = { top: 18, right: 16, bottom: 54, left: 48 };
   const innerW = width - padding.left - padding.right;
   const innerH = height - padding.top - padding.bottom;
   const max = Math.max(1, ...series.flatMap((s) => (s.values.length ? s.values : [0])));
@@ -41,6 +41,15 @@ function LineChart({
   return (
     <div className="line-chart-wrap">
       <svg className="chart-svg" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Grafico de evolucion">
+        <text
+          x={14}
+          y={height / 2}
+          textAnchor="middle"
+          className="chart-axis-label chart-y-axis-title"
+          transform={`rotate(-90 14 ${height / 2})`}
+        >
+          Puntos acumulados
+        </text>
         <g transform={`translate(${padding.left},${padding.top})`}>
           {Array.from({ length: 5 }).map((_, i) => {
             const y = (innerH / 4) * i;

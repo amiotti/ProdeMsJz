@@ -135,7 +135,7 @@ select {
 
 .topbar-main {
   display: grid;
-  grid-template-columns: minmax(280px, 1fr) minmax(0, auto) minmax(280px, 1fr);
+  grid-template-columns: minmax(280px, auto) minmax(0, 1fr) auto;
   align-items: center;
   gap: 1rem;
 }
@@ -161,8 +161,11 @@ select {
 }
 
 .header-nav-desktop-slot {
+  width: 100%;
   min-width: 0;
-  justify-self: center;
+  justify-self: stretch;
+  display: flex;
+  justify-content: center;
 }
 
 .header-nav-mobile-slot {
@@ -1967,7 +1970,7 @@ select:focus {
 }
 
 .predictions-board .match-card.has-points-badge {
-  padding-right: 4.6rem;
+  padding-right: 0.8rem;
 }
 
 .match-main {
@@ -2587,6 +2590,13 @@ select:focus {
   fill: var(--muted);
   font-size: 12px;
   font-weight: 600;
+}
+
+.chart-y-axis-title {
+  fill: var(--accent-2);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
 }
 
 .chart-value-label {

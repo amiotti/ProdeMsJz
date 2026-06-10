@@ -1,5 +1,5 @@
-import { formatDateArgentinaShort } from '@/lib/datetime';
-import { calculatePredictionPoints } from '@/lib/prode';
+﻿import { formatDateArgentinaShort } from '@/lib/datetime';
+import { calculatePredictionPoints, isTriviaAnswerMatch } from '@/lib/prode';
 import type { Prediction, ProdeDB, StateResponse } from '@/lib/types';
 
 type ExactBucket = { exacts: number; evals: number };
@@ -39,6 +39,8 @@ function cacheKey(state: StateResponse) {
     state.summary.predictions,
     state.summary.matchesWithOfficialResult,
     state.db.matches.length,
+    state.db.triviaResults.filter((result) => result.answer.trim()).length,
+    state.db.triviaPredictions.length,
   ].join('|');
 }
 
@@ -158,11 +160,31 @@ export function getStatsAnalytics(state: StateResponse): StatsAnalyticsSnapshot 
     }
   }
 
+  const officialTriviaByQuestionId = new Map(
+    state.db.triviaResults.filter((result) => result.answer.trim()).map((result) => [result.questionId, result] as const),
+  );
+  if (officialTriviaByQuestionId.size > 0) {
+    for (const prediction of state.db.triviaPredictions) {
+      const official = officialTriviaByQuestionId.get(prediction.questionId);
+      if (!official) continue;
+      if (isTriviaAnswerMatch(prediction.answer, official.answer)) {
+        running.set(prediction.userId, (running.get(prediction.userId) ?? 0) + 10);
+      }
+    }
+    for (const [uid, arr] of cumulativeByUser.entries()) {
+      arr.push(running.get(uid) ?? 0);
+    }
+  }
+
   const predictionsByGroup = state.db.groups.map((g) => ({
     groupId: g.id,
     groupName: g.name,
     count: predictionsByGroupMap.get(g.id) ?? 0,
   }));
+  const cumulativeLabels = [
+    ...scoredMatches.map((m, i) => `${formatDateArgentinaShort(m.kickoffAt)} - M${i + 1}`),
+    ...(officialTriviaByQuestionId.size > 0 ? ['Trivia'] : []),
+  ];
 
   const snapshot: StatsAnalyticsSnapshot = {
     predictionsByGroup,
@@ -178,7 +200,7 @@ export function getStatsAnalytics(state: StateResponse): StatsAnalyticsSnapshot 
     predictionPatternFrequency,
     nextMatchId: nextMatch?.id ?? null,
     nextMatchDist,
-    cumulativeLabels: scoredMatches.map((m, i) => `${formatDateArgentinaShort(m.kickoffAt)} · M${i + 1}`),
+    cumulativeLabels,
     cumulativeByUser,
   };
 
