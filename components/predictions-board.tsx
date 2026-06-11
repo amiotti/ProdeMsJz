@@ -66,6 +66,9 @@ export function PredictionsBoard({
   const [drafts, setDrafts] = useState<DraftMap>({});
   const [triviaDrafts, setTriviaDrafts] = useState<TriviaDraftMap>({});
   const awayInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+  const dirtyMatchIdsRef = useRef<Set<string>>(new Set());
+  const dirtyTriviaQuestionIdsRef = useRef<Set<string>>(new Set());
+  const syncedUserIdRef = useRef<string | null>(initialState?.viewer.user?.id ?? null);
 
   async function loadState() {
     setLoading(true);
@@ -86,20 +89,42 @@ export function PredictionsBoard({
 
   useEffect(() => {
     if (!state?.viewer.user) return;
+    const userId = state.viewer.user.id;
+    const userChanged = syncedUserIdRef.current !== userId;
+    if (userChanged) {
+      dirtyMatchIdsRef.current.clear();
+      dirtyTriviaQuestionIdsRef.current.clear();
+      syncedUserIdRef.current = userId;
+    }
+
     const nextDrafts: DraftMap = {};
-    for (const prediction of state.db.predictions.filter((p) => p.userId === state.viewer.user?.id)) {
+    for (const prediction of state.db.predictions.filter((p) => p.userId === userId)) {
       nextDrafts[prediction.matchId] = {
         home: String(prediction.homeGoals),
         away: String(prediction.awayGoals),
       };
     }
-    setDrafts(nextDrafts);
+    setDrafts((prev) => {
+      if (userChanged) return nextDrafts;
+      const merged = { ...nextDrafts };
+      for (const matchId of dirtyMatchIdsRef.current) {
+        if (prev[matchId]) merged[matchId] = prev[matchId];
+      }
+      return merged;
+    });
 
     const nextTriviaDrafts: TriviaDraftMap = {};
-    for (const prediction of state.db.triviaPredictions.filter((p) => p.userId === state.viewer.user?.id)) {
+    for (const prediction of state.db.triviaPredictions.filter((p) => p.userId === userId)) {
       nextTriviaDrafts[prediction.questionId] = prediction.answer;
     }
-    setTriviaDrafts(nextTriviaDrafts);
+    setTriviaDrafts((prev) => {
+      if (userChanged) return nextTriviaDrafts;
+      const merged = { ...nextTriviaDrafts };
+      for (const questionId of dirtyTriviaQuestionIdsRef.current) {
+        if (prev[questionId] !== undefined) merged[questionId] = prev[questionId];
+      }
+      return merged;
+    });
   }, [state]);
 
   const currentUser = state?.viewer.user ?? null;
@@ -214,6 +239,7 @@ export function PredictionsBoard({
     if (lockedMatchIds.has(matchId)) return;
     if (value && !/^\d+$/.test(value)) return;
 
+    dirtyMatchIdsRef.current.add(matchId);
     setDrafts((prev) => ({
       ...prev,
       [matchId]: {
@@ -233,6 +259,7 @@ export function PredictionsBoard({
 
   function setTriviaDraft(questionId: string, value: string) {
     if (!hasApprovedPayment) return;
+    dirtyTriviaQuestionIdsRef.current.add(questionId);
     setTriviaDrafts((prev) => ({ ...prev, [questionId]: value }));
   }
 
@@ -278,6 +305,9 @@ export function PredictionsBoard({
       const data = await response.json();
       if (!response.ok || !data.ok) throw new Error(data.error || 'No se pudo guardar');
 
+      for (const prediction of predictions) {
+        dirtyMatchIdsRef.current.delete(prediction.matchId);
+      }
       setState(data.state as StateResponse);
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new Event('prode-predictions-changed'));
@@ -329,6 +359,9 @@ export function PredictionsBoard({
       const data = await response.json();
       if (!response.ok || !data.ok) throw new Error(data.error || 'No se pudo guardar');
 
+      for (const prediction of predictions) {
+        dirtyMatchIdsRef.current.delete(prediction.matchId);
+      }
       setState(data.state as StateResponse);
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new Event('prode-predictions-changed'));
@@ -377,6 +410,9 @@ export function PredictionsBoard({
       const data = await response.json();
       if (!response.ok || !data.ok) throw new Error(data.error || 'No se pudo guardar la trivia');
 
+      for (const answer of triviaAnswers) {
+        dirtyTriviaQuestionIdsRef.current.delete(answer.questionId);
+      }
       setState(data.state as StateResponse);
       setMessage('Trivia guardada correctamente.');
     } catch (error) {
