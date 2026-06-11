@@ -1170,6 +1170,57 @@ const TEAM_CURIOUS_FACT_OVERRIDES: Record<string, string> = {
   Uzbekistan: 'Dato curioso: jugará su primer Mundial en 2026.',
 };
 
+const TEAM_RELEVANT_FACT_OVERRIDES: Record<string, string> = {
+  'Arabia Saudita': 'Dato relevante: llega desde AFC y suele competir con bloque compacto, transiciones rápidas y partidos de bajo margen.',
+  Argelia: 'Dato relevante: vuelve a la escena mundialista con una base física y técnica que puede complicar partidos cerrados.',
+  Argentina: 'Dato relevante: entra como campeona vigente y con puntaje alto en el modelo interno, por eso sus partidos suelen mover fuerte las predicciones.',
+  Australia: 'Dato relevante: su perfil físico y experiencia en torneos la vuelve peligrosa en cruces directos y partidos de ritmo alto.',
+  Austria: 'Dato relevante: regresa al Mundial tras su ausencia desde 1998, con una identidad de presión alta y mucha intensidad sin pelota.',
+  Alemania: 'Dato relevante: su jerarquía histórica y profundidad de plantel la mantienen como rival de máxima exigencia aunque venga de ciclos irregulares.',
+  Belgica: 'Dato relevante: combina experiencia internacional con talento ofensivo, por lo que sus partidos suelen tener alta expectativa de gol.',
+  'Bosnia y Herzegovina': 'Dato relevante: llega desde el repechaje UEFA y puede ser un rival incómodo por juego físico y orden defensivo.',
+  Brasil: 'Dato relevante: es pentacampeona mundial y una de las selecciones con mayor peso ofensivo en cualquier simulación del torneo.',
+  Canada: 'Dato relevante: como anfitrión, tendrá localía en fase de grupos y un contexto emocional que puede elevar su rendimiento.',
+  'Cabo Verde': 'Dato relevante: debuta en un Mundial, por lo que su rendimiento tendrá más incertidumbre estadística que el de selecciones habituales.',
+  Colombia: 'Dato relevante: su fortaleza está en el desequilibrio ofensivo y el talento individual, especialmente en partidos de ida y vuelta.',
+  'Corea del Sur': 'Dato relevante: trae una racha larga de presencias mundialistas consecutivas y suele competir bien en partidos de alta velocidad.',
+  'Costa de Marfil': 'Dato relevante: vuelve con potencia física y talento ofensivo, dos factores importantes para pronósticos de goles.',
+  Croacia: 'Dato relevante: su experiencia reciente en fases finales la vuelve una selección difícil de descartar en partidos equilibrados.',
+  Curazao: 'Dato relevante: al ser debutante mundialista, puede generar partidos de alta variabilidad para el PRODE.',
+  Chequia: 'Dato relevante: regresa al Mundial tras 20 años y suele apoyarse en estructura, pelota parada y orden táctico.',
+  Ecuador: 'Dato relevante: su intensidad sin pelota y su velocidad en transiciones pueden incomodar a rivales técnicamente superiores.',
+  Egipto: 'Dato relevante: su peso ofensivo depende mucho de la eficacia en pocos ataques, algo clave para marcadores ajustados.',
+  Espana: 'Dato relevante: su modelo de posesión y presión alta suele producir control territorial y muchos partidos con dominio de pelota.',
+  'Estados Unidos': 'Dato relevante: como anfitrión, tendrá apoyo local y una generación con muchos jugadores formados en ligas europeas.',
+  Escocia: 'Dato relevante: vuelve al Mundial desde 1998 y suele competir con intensidad, duelos físicos y juego directo.',
+  Francia: 'Dato relevante: llega con uno de los planteles más profundos del torneo y capacidad para sostener nivel aun rotando titulares.',
+  Ghana: 'Dato relevante: su velocidad en ataque y despliegue físico suelen hacerla peligrosa incluso ante rivales mejor rankeados.',
+  Haiti: 'Dato relevante: regresa tras su única participación previa en 1974, por lo que será una de las selecciones con mayor componente emocional.',
+  Iran: 'Dato relevante: acostumbra partidos tácticos, con bloque bajo y contragolpe, algo importante para estimar marcadores cortos.',
+  Irak: 'Dato relevante: vuelve al Mundial después de 1986 y llega con un recorrido clasificatorio largo y competitivo.',
+  Inglaterra: 'Dato relevante: combina una generación de alto valor internacional con la presión histórica de volver a ganar desde 1966.',
+  Japon: 'Dato relevante: su disciplina táctica y velocidad colectiva lo convierten en uno de los rivales asiáticos más consistentes.',
+  Jordania: 'Dato relevante: debuta en la Copa del Mundo, con un perfil de crecimiento reciente y poca referencia histórica mundialista.',
+  Marruecos: 'Dato relevante: tras ser semifinalista en 2022, ya no llega como sorpresa sino como selección de referencia africana.',
+  Mexico: 'Dato relevante: abrirá el torneo como anfitrión y la localía puede pesar especialmente en Ciudad de México.',
+  'Nueva Zelanda': 'Dato relevante: representa a OFC y suele competir desde el orden defensivo y el juego aéreo.',
+  Noruega: 'Dato relevante: vuelve al Mundial desde 1998 con un ataque de enorme atractivo para pronósticos de goles.',
+  Panama: 'Dato relevante: jugará su segundo Mundial y llega con más experiencia competitiva que en su debut de 2018.',
+  Paraguay: 'Dato relevante: regresa tras no jugar desde 2010 y suele ser fuerte en partidos cerrados, duelos y pelota parada.',
+  'Paises Bajos': 'Dato relevante: tiene tradición de fases finales y un estilo que suele combinar posesión, laterales largos y presión alta.',
+  Portugal: 'Dato relevante: llega con gran profundidad ofensiva y varias alternativas de gol, no solo una figura principal.',
+  Qatar: 'Dato relevante: será su primera clasificación obtenida en eliminatorias, a diferencia de su debut como anfitrión en 2022.',
+  'RD Congo': 'Dato relevante: vuelve al Mundial después de 1974 y puede ser un equipo incómodo por potencia física y transición.',
+  Suecia: 'Dato relevante: regresa al Mundial con una identidad históricamente asociada a orden defensivo y fortaleza aérea.',
+  Senegal: 'Dato relevante: es una de las selecciones africanas más competitivas de los últimos ciclos y suele sostener partidos físicos.',
+  Sudafrica: 'Dato relevante: vuelve después de 2010 y su rendimiento puede depender mucho del primer partido ante el anfitrión.',
+  Suiza: 'Dato relevante: suele avanzar con regularidad desde fase de grupos gracias a estructura defensiva y oficio competitivo.',
+  Turquia: 'Dato relevante: regresa desde 2002 y llega como posible equipo incómodo por talento joven y ritmo ofensivo.',
+  Tunez: 'Dato relevante: su fortaleza suele estar en el orden defensivo y en reducir espacios, clave para marcadores bajos.',
+  Uruguay: 'Dato relevante: combina historia mundialista con competitividad sudamericana, ideal para partidos intensos y de pocos detalles.',
+  Uzbekistan: 'Dato relevante: debuta en un Mundial y representa una de las grandes novedades competitivas de Asia Central.',
+};
+
 export function buildTeamEditorialNotes(teamName: string, groupId?: string, groupTeams?: string[]): TeamEditorialNotes {
   const team = getTeamInfo(teamName);
   const sportFacts = buildTeamSportFacts(teamName, groupTeams);
@@ -1209,7 +1260,8 @@ export function buildTeamEditorialNotes(teamName: string, groupId?: string, grou
   );
 
   const relevantFact = normalizeSpanishDisplayText(
-    `Dato relevante: ${sportFacts[2] ?? sportFacts[1] ?? `la app la valora con Ã­ndice ${team.fifaStrength} para estimar probabilidades prepartido.`}`,
+    TEAM_RELEVANT_FACT_OVERRIDES[team.name] ??
+      `Dato relevante: ${sportFacts[1] ?? `la app la valora con Ã­ndice ${team.fifaStrength} para estimar probabilidades prepartido.`}`,
   );
 
   const curiousFact = normalizeSpanishDisplayText(

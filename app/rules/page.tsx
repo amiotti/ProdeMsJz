@@ -67,6 +67,10 @@ export default async function RulesPage() {
           Cada pregunta de trivia suma <strong>10 puntos</strong> si coincide con el resultado oficial cargado por
           admin.
         </p>
+        <p className="muted">
+          En fase de llaves, el resultado que se evalúa para el puntaje es el marcador al finalizar los <strong>120 minutos</strong>
+          de juego. Los penales no modifican el resultado del PRODE.
+        </p>
       </div>
 
       <div className="panel stack-md">
