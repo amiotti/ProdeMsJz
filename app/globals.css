@@ -1561,6 +1561,10 @@ select {
   gap: 0.34rem;
 }
 
+.home-top3-card {
+  grid-column: 1 / -1;
+}
+
 .home-top3-list > span {
   display: flex;
   justify-content: space-between;

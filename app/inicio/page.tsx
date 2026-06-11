@@ -105,7 +105,7 @@ export default async function InicioPage() {
             </div>
           </div>
           <div className="detail-grid">
-            <div className="detail-card">
+            <div className="detail-card home-top3-card">
               <span className="detail-label">Top 3</span>
               {topThreeLeaderboard.length > 0 ? (
                 <div className="home-top3-list">
