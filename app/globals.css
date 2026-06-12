@@ -2095,7 +2095,7 @@ select:focus {
 }
 
 .predictions-board .match-card.has-points-badge .prediction-points-badge {
-  top: 0.42rem;
+  top: -0.48rem;
   right: 0.55rem;
 }
 
@@ -2285,13 +2285,11 @@ select:focus {
 }
 
 .predictions-board .score-inputs.score-inputs-with-action {
-  grid-template-columns: 52px 14px 52px;
+  grid-template-columns: 52px 14px 52px auto;
   width: auto;
 }
 
 .predictions-board .score-inputs.score-inputs-with-action .btn.btn-primary.btn-small {
-  grid-column: 1 / -1;
-  width: 100%;
   padding: 0.48rem 0.72rem !important;
   border-radius: 10px !important;
   min-height: 2.05rem;
@@ -3159,8 +3157,8 @@ select:focus {
   }
 
   .predictions-board .score-inputs.score-inputs-with-action {
-    grid-template-columns: 3rem 12px 3rem;
-    width: max-content;
+    grid-template-columns: 3rem 12px 3rem auto;
+    width: 100%;
   }
 
   .score-inputs input {
