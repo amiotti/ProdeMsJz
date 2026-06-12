@@ -7,7 +7,6 @@ import { TeamName } from '@/components/team-name';
 import { formatDateArgentinaShort, formatKickoffArgentina } from '@/lib/datetime';
 import { calculatePredictionPoints, isTriviaAnswerMatch } from '@/lib/prode';
 import type { Match, StateResponse, TriviaQuestion } from '@/lib/types';
-import { estimateMatchProbabilities, getTeamDisplayName } from '@/lib/worldcup26';
 
 type DraftMap = Record<string, { home: string; away: string }>;
 type TriviaDraftMap = Record<string, string>;
@@ -521,15 +520,6 @@ export function PredictionsBoard({
             <span className="vs">vs</span>
             <TeamName teamName={match.awayTeam} linkToTeam />
           </div>
-          {match.groupId !== 'KO' ? (
-            <p className="prob-row">
-              Probabilidades:{' '}
-              {(() => {
-                const p = estimateMatchProbabilities(match.homeTeam, match.awayTeam);
-                return `${p.homeWinPct}% ${getTeamDisplayName(match.homeTeam)} | ${p.drawPct}% empate | ${p.awayWinPct}% ${getTeamDisplayName(match.awayTeam)}`;
-              })()}
-            </p>
-          ) : null}
           {match.officialResult ? (
             <p className="official-result">
               Resultado oficial: {match.officialResult.home} - {match.officialResult.away}
