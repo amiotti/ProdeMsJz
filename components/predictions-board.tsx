@@ -513,7 +513,7 @@ export function PredictionsBoard({
     return (
       <div key={match.id} className={`match-card${earnedPoints !== null ? ' has-points-badge' : ''}`}>
         {earnedPoints !== null ? <span className="prediction-points-badge">{earnedPoints} pts</span> : null}
-        <div>
+        <div className="match-main">
           <p className="match-meta">{headerMeta} - {kickoff}</p>
           <div className="fixture-row">
             <TeamName teamName={match.homeTeam} linkToTeam />

@@ -2091,7 +2091,12 @@ select:focus {
 }
 
 .predictions-board .match-card.has-points-badge {
-  padding-right: 5.25rem;
+  padding-right: 0.8rem;
+}
+
+.predictions-board .match-card.has-points-badge .prediction-points-badge {
+  top: 0.42rem;
+  right: 0.55rem;
 }
 
 .match-main {
@@ -2110,6 +2115,10 @@ select:focus {
   align-items: center;
   flex-wrap: wrap;
   font-weight: 700;
+}
+
+.predictions-board .fixture-row .team-inline {
+  padding-left: 0;
 }
 
 .fixture-inline {
