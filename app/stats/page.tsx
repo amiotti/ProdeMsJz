@@ -34,7 +34,6 @@ type OfficialMatchInsights = {
 
 type HistoricalProdeRow = {
   name: string;
-  displayName?: string;
   aliases?: string[];
   values: Array<number | 'X'>;
   played: number;
@@ -55,7 +54,7 @@ const HISTORICAL_PRODE_ROWS: HistoricalProdeRow[] = [
   { name: 'BODELLO', values: [14, 26, 29, 8, 25, 36, 13], played: 299 },
   { name: 'ROSSANIGO', values: [19, 'X', 27, 6, 31, 32, 10], played: 251 },
   { name: 'FRAIZ', values: [20, 24, 30, 4, 26, 36, 8], played: 299 },
-  { name: 'LAMBER', displayName: 'Santiago Lambertucci', aliases: ['SANTIAGO LAMBERTUCCI', 'LAMBERTUCCI'], values: [18, 21, 27, 'X', 27, 29, 13], played: 283 },
+  { name: 'LAMBER', aliases: ['SANTIAGO LAMBERTUCCI', 'LAMBERTUCCI'], values: [18, 21, 27, 'X', 27, 29, 13], played: 283 },
 ];
 
 const HISTORICAL_MATCH_COUNTS = [48, 48, 56, 16, 48, 60, 23] as const;
@@ -126,10 +125,7 @@ function HistoricalProdeTable({ state }: { state: StateResponse }) {
 
               return (
                 <tr key={row.name}>
-                  <th scope="row">
-                    {row.name}
-                    {row.displayName ? <span className="historical-name-alias">{row.displayName}</span> : null}
-                  </th>
+                  <th scope="row">{row.name}</th>
                   {row.values.map((value, index) => (
                     <td key={`${row.name}-${HISTORICAL_COLUMNS[index]}`}>{value}</td>
                   ))}
@@ -405,9 +401,11 @@ function simulateWinProbabilities(state: StateResponse, iterations = 250) {
 
   const unresolvedMatches = state.db.matches.filter((m) => !m.officialResult);
   const predsByMatch = new Map<string, Prediction[]>();
+  const predByUserAndMatch = new Map<string, Prediction>();
   for (const p of state.db.predictions) {
     if (!predsByMatch.has(p.matchId)) predsByMatch.set(p.matchId, []);
     predsByMatch.get(p.matchId)!.push(p);
+    predByUserAndMatch.set(`${p.userId}|${p.matchId}`, p);
   }
 
   const pointsBase = new Map<string, number>(rows.map((r) => [r.userId, r.totalPoints]));
@@ -435,12 +433,23 @@ function simulateWinProbabilities(state: StateResponse, iterations = 250) {
               })()
             : sampleFallbackScore();
 
-        for (const p of matchPreds) {
-          const res = calculatePredictionPoints(p, sampled, state.db.pointsConfig);
-          points.set(p.userId, (points.get(p.userId) ?? 0) + res.points);
-          if (res.exactHit) exact.set(p.userId, (exact.get(p.userId) ?? 0) + 1);
-          if (res.outcomeHit) outcome.set(p.userId, (outcome.get(p.userId) ?? 0) + 1);
-          if (res.sideGoalsHit) sideGoals.set(p.userId, (sideGoals.get(p.userId) ?? 0) + 1);
+        for (const row of rows) {
+          const savedPrediction = predByUserAndMatch.get(`${row.userId}|${match.id}`);
+          const simulatedPrediction = savedPrediction ?? {
+            userId: row.userId,
+            matchId: match.id,
+            ...(() => {
+              const score = sampleFallbackScore();
+              return { homeGoals: score.home, awayGoals: score.away };
+            })(),
+            id: `sim-${row.userId}-${match.id}`,
+            updatedAt: '',
+          };
+          const res = calculatePredictionPoints(simulatedPrediction, sampled, state.db.pointsConfig);
+          points.set(row.userId, (points.get(row.userId) ?? 0) + res.points);
+          if (res.exactHit) exact.set(row.userId, (exact.get(row.userId) ?? 0) + 1);
+          if (res.outcomeHit) outcome.set(row.userId, (outcome.get(row.userId) ?? 0) + 1);
+          if (res.sideGoalsHit) sideGoals.set(row.userId, (sideGoals.get(row.userId) ?? 0) + 1);
         }
       }
 
@@ -477,7 +486,8 @@ function recommendMonteCarloIterations(userCount: number, predictionCount: numbe
   if (userCount >= 1500 || predictionCount >= 120_000) return 18;
   if (userCount >= 1000 || predictionCount >= 80_000) return 28;
   if (userCount >= 500 || predictionCount >= 40_000) return 40;
-  return 90;
+  if (userCount >= 100 || predictionCount >= 10_000) return 120;
+  return 500;
 }
 
 function getPositionDeltaFromLastDate(state: StateResponse, analytics: StatsAnalyticsSnapshot, userId: string) {

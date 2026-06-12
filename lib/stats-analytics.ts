@@ -142,6 +142,13 @@ export function getStatsAnalytics(state: StateResponse): StatsAnalyticsSnapshot 
   const scoredMatches = [...state.db.matches]
     .filter((m) => m.officialResult)
     .sort((a, b) => new Date(a.kickoffAt).getTime() - new Date(b.kickoffAt).getTime());
+  const scoredMatchesByDate = new Map<string, typeof scoredMatches>();
+  for (const match of scoredMatches) {
+    const dateKey = formatDateArgentinaShort(match.kickoffAt);
+    const list = scoredMatchesByDate.get(dateKey) ?? [];
+    list.push(match);
+    scoredMatchesByDate.set(dateKey, list);
+  }
   const cumulativeByUser = new Map<string, number[]>();
   const running = new Map<string, number>();
   for (const u of state.db.users) {
@@ -149,11 +156,13 @@ export function getStatsAnalytics(state: StateResponse): StatsAnalyticsSnapshot 
     cumulativeByUser.set(u.id, []);
     running.set(u.id, 0);
   }
-  for (const match of scoredMatches) {
-    for (const p of predsByMatch.get(match.id) ?? []) {
-      if (!match.officialResult) continue;
-      const pts = calculatePredictionPoints(p, match.officialResult, state.db.pointsConfig);
-      running.set(p.userId, (running.get(p.userId) ?? 0) + pts.points);
+  for (const matchesOfDate of scoredMatchesByDate.values()) {
+    for (const match of matchesOfDate) {
+      for (const p of predsByMatch.get(match.id) ?? []) {
+        if (!match.officialResult) continue;
+        const pts = calculatePredictionPoints(p, match.officialResult, state.db.pointsConfig);
+        running.set(p.userId, (running.get(p.userId) ?? 0) + pts.points);
+      }
     }
     for (const [uid, arr] of cumulativeByUser.entries()) {
       arr.push(running.get(uid) ?? 0);
@@ -182,7 +191,7 @@ export function getStatsAnalytics(state: StateResponse): StatsAnalyticsSnapshot 
     count: predictionsByGroupMap.get(g.id) ?? 0,
   }));
   const cumulativeLabels = [
-    ...scoredMatches.map((m, i) => `${formatDateArgentinaShort(m.kickoffAt)} - M${i + 1}`),
+    ...scoredMatchesByDate.keys(),
     ...(officialTriviaByQuestionId.size > 0 ? ['Trivia'] : []),
   ];
 

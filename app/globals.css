@@ -2503,15 +2503,6 @@ select:focus {
   white-space: nowrap;
 }
 
-.historical-name-alias {
-  display: block;
-  margin-top: 0.12rem;
-  color: var(--muted);
-  font-size: 0.68rem;
-  font-weight: 700;
-  line-height: 1.1;
-}
-
 .historical-prode-total-row th,
 .historical-prode-total-row td {
   color: #111014;
