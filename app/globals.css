@@ -2091,7 +2091,7 @@ select:focus {
 }
 
 .predictions-board .match-card.has-points-badge {
-  padding-right: 0.8rem;
+  padding-right: 5.25rem;
 }
 
 .match-main {
@@ -3128,8 +3128,18 @@ select:focus {
   }
 
   .predictions-board .match-card.has-points-badge {
-    padding: 0.7rem;
-    padding-top: 2.35rem;
+    padding: 0.62rem;
+    padding-top: 1.55rem;
+  }
+
+  .predictions-board .match-card.has-points-badge .match-meta {
+    margin-top: -0.08rem;
+    padding-right: 3.75rem;
+  }
+
+  .predictions-board .match-card.has-points-badge .prediction-points-badge {
+    top: 0.42rem;
+    right: 0.52rem;
   }
 
   .score-inputs {
