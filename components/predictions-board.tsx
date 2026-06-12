@@ -69,6 +69,7 @@ export function PredictionsBoard({
   const dirtyMatchIdsRef = useRef<Set<string>>(new Set());
   const dirtyTriviaQuestionIdsRef = useRef<Set<string>>(new Set());
   const syncedUserIdRef = useRef<string | null>(initialState?.viewer.user?.id ?? null);
+  const [optimisticSavedMatchIds, setOptimisticSavedMatchIds] = useState<Set<string>>(new Set());
 
   async function loadState() {
     setLoading(true);
@@ -95,6 +96,7 @@ export function PredictionsBoard({
       dirtyMatchIdsRef.current.clear();
       dirtyTriviaQuestionIdsRef.current.clear();
       syncedUserIdRef.current = userId;
+      setOptimisticSavedMatchIds(new Set());
     }
 
     const nextDrafts: DraftMap = {};
@@ -181,22 +183,23 @@ export function PredictionsBoard({
   }, [allMatches]);
 
   const savedPredictedMatchIds = useMemo(() => {
-    if (!currentUser) return new Set<string>();
-    return new Set(
+    const saved = new Set(
       state?.db.predictions
-        .filter((prediction) => prediction.userId === currentUser.id)
+        .filter((prediction) => prediction.userId === currentUser?.id)
         .map((prediction) => prediction.matchId) ?? [],
     );
-  }, [currentUser, state?.db.predictions]);
+    for (const matchId of optimisticSavedMatchIds) saved.add(matchId);
+    return saved;
+  }, [currentUser?.id, optimisticSavedMatchIds, state?.db.predictions]);
 
   const visibleSections = useMemo(() => {
-    const withoutPrediction = (matchId: string) => !savedPredictedMatchIds.has(matchId);
+    const withoutPrediction = (match: Match) => !lockedMatchIds.has(match.id) && !savedPredictedMatchIds.has(match.id);
 
     const filterUnpredicted = (sections: MatchSection[]) =>
       sections
         .map((section) => ({
           ...section,
-          matches: section.matches.filter((match) => withoutPrediction(match.id)),
+          matches: section.matches.filter((match) => withoutPrediction(match)),
         }))
         .filter((section) => section.matches.length > 0);
 
@@ -213,7 +216,7 @@ export function PredictionsBoard({
       sections.push(...groupSections.filter((section) => section.id === selectedGroupId));
     }
     return sections;
-  }, [groupSections, knockoutSections, savedPredictedMatchIds, selectedGroupId]);
+  }, [groupSections, knockoutSections, lockedMatchIds, savedPredictedMatchIds, selectedGroupId]);
 
   const visibleDateSections = useMemo(() => {
     const flat: DateMatch[] = visibleSections.flatMap((section) =>
@@ -308,6 +311,11 @@ export function PredictionsBoard({
       for (const prediction of predictions) {
         dirtyMatchIdsRef.current.delete(prediction.matchId);
       }
+      setOptimisticSavedMatchIds((prev) => {
+        const next = new Set(prev);
+        for (const prediction of predictions) next.add(prediction.matchId);
+        return next;
+      });
       setState(data.state as StateResponse);
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new Event('prode-predictions-changed'));
@@ -362,6 +370,11 @@ export function PredictionsBoard({
       for (const prediction of predictions) {
         dirtyMatchIdsRef.current.delete(prediction.matchId);
       }
+      setOptimisticSavedMatchIds((prev) => {
+        const next = new Set(prev);
+        for (const prediction of predictions) next.add(prediction.matchId);
+        return next;
+      });
       setState(data.state as StateResponse);
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new Event('prode-predictions-changed'));
