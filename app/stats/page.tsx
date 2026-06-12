@@ -802,7 +802,6 @@ function UserStatsDashboard({ state, user }: { state: StateResponse; user: User 
     if (result.exactHit) bucket.exacts += 1;
   }
 
-  const nextMatch = analytics.nextMatchId ? state.db.matches.find((m) => m.id === analytics.nextMatchId) : undefined;
   const evolutionLabels = analytics.cumulativeLabels.length ? analytics.cumulativeLabels : ['Sin fechas'];
   const evolutionUsers = state.leaderboard.map((row) => ({
     userId: row.userId,
@@ -819,8 +818,6 @@ function UserStatsDashboard({ state, user }: { state: StateResponse; user: User 
   const userProb = monteCarloResults.find((r) => r.userId === user.id)?.probability ?? 0;
   const riskPct = getUniquePredictionRiskScore(user.id, state.db, analytics.predictionPatternFrequency);
   const positionDelta = getPositionDeltaFromLastDate(state, analytics, user.id);
-  const nextHomeName = nextMatch ? getTeamDisplayName(nextMatch.homeTeam) : '';
-  const nextAwayName = nextMatch ? getTeamDisplayName(nextMatch.awayTeam) : '';
 
   const badges: string[] = [];
   if (exactPct >= 25) badges.push('Nostradamus');
@@ -872,28 +869,6 @@ function UserStatsDashboard({ state, user }: { state: StateResponse; user: User 
       </div>
 
       <div className="stats-grid">
-        <div className="panel stack-md">
-          <div className="section-head">
-            <h3>Predicciones del próximo partido</h3>
-            <span>{nextMatch ? `${nextHomeName} vs ${nextAwayName}` : 'Sin partidos futuros'}</span>
-          </div>
-          {nextMatch ? (
-            <>
-              <DonutChart
-                centerLabel="pred."
-                segments={[
-                  { label: `Gana ${nextHomeName}`, value: analytics.nextMatchDist.home, color: '#3850dd' },
-                  { label: 'Empate', value: analytics.nextMatchDist.draw, color: '#f4be1f' },
-                  { label: `Gana ${nextAwayName}`, value: analytics.nextMatchDist.away, color: '#ef3100' },
-                ]}
-              />
-              <p className="muted">Distribución de signos pronosticados por el grupo para el próximo partido disponible.</p>
-            </>
-          ) : (
-            <p className="muted">No hay partidos futuros para calcular distribucion de predicciones.</p>
-          )}
-        </div>
-
         <div className="panel stack-md">
           <div className="section-head">
             <h3>Probabilidad de ganar</h3>
