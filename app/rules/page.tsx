@@ -24,7 +24,7 @@ export default async function RulesPage() {
           <li>Registrate / iniciá sesión con tu cuenta.</li>
           <li>Realizá la inscripción para habilitar la carga de predicciones.</li>
           <li>Entrá en `PRODE` y cargá resultados partido por partido.</li>
-          <li>Respondé la `Trivia` dentro de `PRODE` antes del comienzo de la fase de grupos.</li>
+          <li>Respondé la `Trivia` dentro de `PRODE` antes del comienzo del primer partido del Mundial.</li>
           <li>Podés editar cada predicción hasta 1 hora antes del inicio de ese partido.</li>
           <li>Cuando se cargan resultados oficiales, la tabla se recalcula automáticamente.</li>
         </ol>

@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 
 import { PredictionsBoard } from '@/components/predictions-board';
 import { getSessionCookieName } from '@/lib/auth';
+import { formatKickoffArgentina } from '@/lib/datetime';
 import { getPredictionsScreenState } from '@/lib/db';
 import { getRegistrationAmountArs } from '@/lib/public-config';
 import { requireAuthenticatedUser } from '@/lib/route-guard';
@@ -28,7 +29,7 @@ export default async function PredictionsPage() {
           {state.trivia.cutoffAt ? (
             <>
               {' '}
-              La trivia debe completarse antes del comienzo del primer partido del Mundial (11/6/26 16:00 hs).
+              La trivia debe completarse antes del comienzo del primer partido del Mundial ({formatKickoffArgentina(state.trivia.cutoffAt)}).
             </>
           ) : null}
         </p>

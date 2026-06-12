@@ -54,7 +54,7 @@ export function calculatePredictionPoints(
   const predictedScore: Score = { home: prediction.homeGoals, away: prediction.awayGoals };
 
   if (predictedScore.home === official.home && predictedScore.away === official.away) {
-    return { points: pointsConfig.exactScore, exactHit: true, outcomeHit: false, sideGoalsHit: true };
+    return { points: pointsConfig.exactScore, exactHit: true, outcomeHit: false, sideGoalsHit: false };
   }
 
   const outcomeHit = outcome(predictedScore) === outcome(official);
@@ -134,6 +134,7 @@ export function computeLeaderboard(db: ProdeDB): LeaderboardRow[] {
     if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
     if (b.exactHits !== a.exactHits) return b.exactHits - a.exactHits;
     if (b.outcomeHits !== a.outcomeHits) return b.outcomeHits - a.outcomeHits;
+    if (b.sideGoalsHits !== a.sideGoalsHits) return b.sideGoalsHits - a.sideGoalsHits;
     return a.userName.localeCompare(b.userName, 'es');
   });
 

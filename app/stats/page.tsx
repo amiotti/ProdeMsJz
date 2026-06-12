@@ -34,6 +34,8 @@ type OfficialMatchInsights = {
 
 type HistoricalProdeRow = {
   name: string;
+  displayName?: string;
+  aliases?: string[];
   values: Array<number | 'X'>;
   played: number;
 };
@@ -53,7 +55,7 @@ const HISTORICAL_PRODE_ROWS: HistoricalProdeRow[] = [
   { name: 'BODELLO', values: [14, 26, 29, 8, 25, 36, 13], played: 299 },
   { name: 'ROSSANIGO', values: [19, 'X', 27, 6, 31, 32, 10], played: 251 },
   { name: 'FRAIZ', values: [20, 24, 30, 4, 26, 36, 8], played: 299 },
-  { name: 'LAMBER', values: [18, 21, 27, 'X', 27, 29, 13], played: 283 },
+  { name: 'LAMBER', displayName: 'Santiago Lambertucci', aliases: ['SANTIAGO LAMBERTUCCI', 'LAMBERTUCCI'], values: [18, 21, 27, 'X', 27, 29, 13], played: 283 },
 ];
 
 const HISTORICAL_MATCH_COUNTS = [48, 48, 56, 16, 48, 60, 23] as const;
@@ -115,7 +117,8 @@ function HistoricalProdeTable({ state }: { state: StateResponse }) {
           </thead>
           <tbody>
             {HISTORICAL_PRODE_ROWS.map((row) => {
-              const currentHits = currentSignHitsByName.get(normalizeHistoricalName(row.name)) ?? 0;
+              const lookupNames = [row.name, ...(row.aliases ?? [])].map(normalizeHistoricalName);
+              const currentHits = lookupNames.reduce((max, key) => Math.max(max, currentSignHitsByName.get(key) ?? 0), 0);
               const totalHits = historicalValueTotal(row.values) + currentHits;
               const played = row.played + currentOfficialMatches;
               const hitPct = played > 0 ? Math.round((totalHits / played) * 100) : 0;
@@ -123,7 +126,10 @@ function HistoricalProdeTable({ state }: { state: StateResponse }) {
 
               return (
                 <tr key={row.name}>
-                  <th scope="row">{row.name}</th>
+                  <th scope="row">
+                    {row.name}
+                    {row.displayName ? <span className="historical-name-alias">{row.displayName}</span> : null}
+                  </th>
                   {row.values.map((value, index) => (
                     <td key={`${row.name}-${HISTORICAL_COLUMNS[index]}`}>{value}</td>
                   ))}
@@ -407,6 +413,7 @@ function simulateWinProbabilities(state: StateResponse, iterations = 250) {
   const pointsBase = new Map<string, number>(rows.map((r) => [r.userId, r.totalPoints]));
   const exactBase = new Map<string, number>(rows.map((r) => [r.userId, r.exactHits]));
   const outcomeBase = new Map<string, number>(rows.map((r) => [r.userId, r.outcomeHits]));
+  const sideGoalsBase = new Map<string, number>(rows.map((r) => [r.userId, r.sideGoalsHits]));
   const winScore = new Map<string, number>(rows.map((r) => [r.userId, 0]));
 
   if (unresolvedMatches.length === 0) {
@@ -416,6 +423,7 @@ function simulateWinProbabilities(state: StateResponse, iterations = 250) {
       const points = new Map(pointsBase);
       const exact = new Map(exactBase);
       const outcome = new Map(outcomeBase);
+      const sideGoals = new Map(sideGoalsBase);
 
       for (const match of unresolvedMatches) {
         const matchPreds = predsByMatch.get(match.id) ?? [];
@@ -432,6 +440,7 @@ function simulateWinProbabilities(state: StateResponse, iterations = 250) {
           points.set(p.userId, (points.get(p.userId) ?? 0) + res.points);
           if (res.exactHit) exact.set(p.userId, (exact.get(p.userId) ?? 0) + 1);
           if (res.outcomeHit) outcome.set(p.userId, (outcome.get(p.userId) ?? 0) + 1);
+          if (res.sideGoalsHit) sideGoals.set(p.userId, (sideGoals.get(p.userId) ?? 0) + 1);
         }
       }
 
@@ -445,6 +454,9 @@ function simulateWinProbabilities(state: StateResponse, iterations = 250) {
         const ob = outcome.get(b.userId) ?? 0;
         const oa = outcome.get(a.userId) ?? 0;
         if (ob !== oa) return ob - oa;
+        const gb = sideGoals.get(b.userId) ?? 0;
+        const ga = sideGoals.get(a.userId) ?? 0;
+        if (gb !== ga) return gb - ga;
         return a.userName.localeCompare(b.userName, 'es');
       });
 
@@ -479,6 +491,7 @@ function getPositionDeltaFromLastDate(state: StateResponse, analytics: StatsAnal
       if (pb !== pa) return pb - pa;
       if (b.exactHits !== a.exactHits) return b.exactHits - a.exactHits;
       if (b.outcomeHits !== a.outcomeHits) return b.outcomeHits - a.outcomeHits;
+      if (b.sideGoalsHits !== a.sideGoalsHits) return b.sideGoalsHits - a.sideGoalsHits;
       return a.userName.localeCompare(b.userName, 'es');
     });
 
