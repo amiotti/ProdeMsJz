@@ -7,6 +7,7 @@ import { TeamName } from '@/components/team-name';
 import { formatDateArgentinaShort, formatKickoffArgentina } from '@/lib/datetime';
 import { calculatePredictionPoints, isTriviaAnswerMatch } from '@/lib/prode';
 import type { Match, StateResponse, TriviaQuestion } from '@/lib/types';
+import { estimateMatchProbabilities, getTeamDisplayName } from '@/lib/worldcup26';
 
 type DraftMap = Record<string, { home: string; away: string }>;
 type TriviaDraftMap = Record<string, string>;
@@ -500,6 +501,8 @@ export function PredictionsBoard({
     const matchReadOnly = readOnly || lockedMatchIds.has(match.id);
     const kickoff = formatKickoffArgentina(match.kickoffAt);
     const headerMeta = match.groupId === 'KO' ? match.stage ?? 'Fase final' : `Grupo ${match.groupId} - Fecha ${match.matchday}`;
+    const showProbabilities = lockedMatchIds.has(match.id);
+    const probabilities = showProbabilities ? estimateMatchProbabilities(match.homeTeam, match.awayTeam) : null;
     const pointsConfig = state?.db.pointsConfig;
     const earnedPoints =
       pointsConfig && match.officialResult && draft.home !== '' && draft.away !== ''
@@ -520,6 +523,12 @@ export function PredictionsBoard({
             <span className="vs">vs</span>
             <TeamName teamName={match.awayTeam} linkToTeam />
           </div>
+          {probabilities ? (
+            <p className="prob-row">
+              Probabilidades: {getTeamDisplayName(match.homeTeam)} {probabilities.homeWinPct}% · Empate {probabilities.drawPct}% ·{' '}
+              {getTeamDisplayName(match.awayTeam)} {probabilities.awayWinPct}%
+            </p>
+          ) : null}
           {match.officialResult ? (
             <p className="official-result">
               Resultado oficial: {match.officialResult.home} - {match.officialResult.away}

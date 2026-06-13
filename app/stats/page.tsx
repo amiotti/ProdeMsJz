@@ -1,6 +1,7 @@
 ﻿import { UserEvolutionComparisonChart } from '@/components/user-evolution-comparison-chart';
 import { requireAuthenticatedUser } from '@/lib/route-guard';
 import { getState } from '@/lib/db';
+import { formatKickoffArgentina } from '@/lib/datetime';
 import { calculatePredictionPoints } from '@/lib/prode';
 import { getStatsAnalytics, type StatsAnalyticsSnapshot } from '@/lib/stats-analytics';
 import type { LeaderboardRow, Match, Prediction, ProdeDB, Score, StateResponse, User } from '@/lib/types';
@@ -58,6 +59,12 @@ const HISTORICAL_PRODE_ROWS: HistoricalProdeRow[] = [
 ];
 
 const HISTORICAL_MATCH_COUNTS = [48, 48, 56, 16, 48, 60, 23] as const;
+
+function isPredictionEditable(kickoffAt: string, nowMs = Date.now()) {
+  const kickoffMs = new Date(kickoffAt).getTime();
+  if (!Number.isFinite(kickoffMs)) return false;
+  return nowMs < kickoffMs - 60 * 60 * 1000;
+}
 
 function normalizeHistoricalName(value: string) {
   return value
@@ -673,6 +680,45 @@ function OfficialMatchStatsPanel({ state }: { state: StateResponse }) {
   );
 }
 
+function NextMatchPredictionsPanel({
+  state,
+  analytics,
+}: {
+  state: StateResponse;
+  analytics: StatsAnalyticsSnapshot;
+}) {
+  const nextMatch = analytics.nextMatchId ? state.db.matches.find((match) => match.id === analytics.nextMatchId) : null;
+  if (!nextMatch || isPredictionEditable(nextMatch.kickoffAt)) return null;
+
+  const total = analytics.nextMatchDist.home + analytics.nextMatchDist.draw + analytics.nextMatchDist.away;
+  const homeName = getTeamDisplayName(nextMatch.homeTeam);
+  const awayName = getTeamDisplayName(nextMatch.awayTeam);
+
+  return (
+    <div className="panel stack-md">
+      <div className="section-head">
+        <h3>Predicciones del próximo partido</h3>
+        <span>{formatKickoffArgentina(nextMatch.kickoffAt)}</span>
+      </div>
+      <p className="muted compact-text">
+        {homeName} vs {awayName}. Se muestra porque la edición ya está cerrada para este partido.
+      </p>
+      {total > 0 ? (
+        <DonutChart
+          centerLabel="pred."
+          segments={[
+            { label: homeName, value: analytics.nextMatchDist.home, color: '#3850dd' },
+            { label: 'Empate', value: analytics.nextMatchDist.draw, color: '#f4be1f' },
+            { label: awayName, value: analytics.nextMatchDist.away, color: '#ef3100' },
+          ]}
+        />
+      ) : (
+        <p className="muted">Todavía no hay predicciones cargadas para este partido.</p>
+      )}
+    </div>
+  );
+}
+
 function AdminStatsDashboard({ state }: { state: StateResponse }) {
   const analytics = getStatsAnalytics(state);
   const predictionsByGroup = analytics.predictionsByGroup.map((g) => ({ label: g.groupId, value: g.count, note: g.groupName }));
@@ -702,6 +748,7 @@ function AdminStatsDashboard({ state }: { state: StateResponse }) {
           <div className="section-head"><h3>Predicciones por grupo</h3><span>Carga acumulada</span></div>
           <BarChart data={predictionsByGroup} />
         </div>
+        <NextMatchPredictionsPanel state={state} analytics={analytics} />
         <div className="panel stack-md">
           <div className="section-head"><h3>Resultados oficiales</h3><span>Distribución de signos</span></div>
           <DonutChart
@@ -867,6 +914,8 @@ function UserStatsDashboard({ state, user }: { state: StateResponse; user: User 
         </div>
         <UserEvolutionComparisonChart labels={evolutionLabels} users={evolutionUsers} currentUserId={user.id} />
       </div>
+
+      <NextMatchPredictionsPanel state={state} analytics={analytics} />
 
       <div className="stats-grid">
         <div className="panel stack-md">
