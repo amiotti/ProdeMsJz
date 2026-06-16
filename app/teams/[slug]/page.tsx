@@ -169,7 +169,7 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
               <th>Fecha</th>
               <th>Sede</th>
               <th className="fixture-col-header">Fixture</th>
-              <th>Resultado oficial</th>
+              <th className="team-result-col">Resultado oficial</th>
             </tr>
           </thead>
           <tbody>
@@ -189,7 +189,7 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
                     </span>
                   </span>
                 </td>
-                <td>{match.officialResult ? `${match.officialResult.home} - ${match.officialResult.away}` : '-'}</td>
+                <td className="team-result-col">{match.officialResult ? `${match.officialResult.home} - ${match.officialResult.away}` : '-'}</td>
               </tr>
             ))}
           </tbody>

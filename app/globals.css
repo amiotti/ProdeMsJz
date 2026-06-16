@@ -2137,11 +2137,13 @@ select:focus {
 }
 
 .fixture-inline-table .fixture-home {
-  justify-self: start;
+  justify-self: end;
+  text-align: right;
 }
 
 .fixture-inline-table .fixture-away {
   justify-self: start;
+  text-align: left;
 }
 
 .fixture-inline-table .team-inline {
@@ -2149,7 +2151,7 @@ select:focus {
 }
 
 .fixture-inline-table .fixture-home .team-inline {
-  justify-content: flex-start;
+  justify-content: flex-end;
 }
 
 .fixture-inline-table .fixture-home .team-inline,
@@ -2158,7 +2160,8 @@ select:focus {
 }
 
 .fixture-col-header,
-.fixture-col-cell {
+.fixture-col-cell,
+.team-result-col {
   text-align: center !important;
 }
 

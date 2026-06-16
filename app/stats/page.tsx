@@ -1,4 +1,4 @@
-﻿import { UserEvolutionComparisonChart } from '@/components/user-evolution-comparison-chart';
+import { UserEvolutionComparisonChart } from '@/components/user-evolution-comparison-chart';
 import { requireAuthenticatedUser } from '@/lib/route-guard';
 import { getState } from '@/lib/db';
 import { formatKickoffArgentina } from '@/lib/datetime';
@@ -356,13 +356,6 @@ function scoreOutcome(score: Score) {
   return 'draw' as const;
 }
 
-function sampleFallbackScore() {
-  const values = [0, 1, 1, 1, 2, 2, 2, 3, 3, 4];
-  const home = values[Math.floor(Math.random() * values.length)] ?? 1;
-  const away = values[Math.floor(Math.random() * values.length)] ?? 1;
-  return { home, away };
-}
-
 function getUniquePredictionRiskScore(userId: string, db: ProdeDB, frequency?: Map<string, number>) {
   const userPreds = db.predictions.filter((p) => p.userId === userId);
   if (userPreds.length === 0) return 0;
@@ -400,101 +393,6 @@ function buildCumulativeSeries(state: StateResponse, analytics: StatsAnalyticsSn
     }, []);
 
   return { labels: labels.length ? labels : ['Sin fechas'], series };
-}
-
-function simulateWinProbabilities(state: StateResponse, iterations = 250) {
-  const rows = state.leaderboard;
-  if (rows.length === 0) return [] as Array<{ userId: string; name: string; probability: number }>;
-
-  const unresolvedMatches = state.db.matches.filter((m) => !m.officialResult);
-  const predsByMatch = new Map<string, Prediction[]>();
-  const predByUserAndMatch = new Map<string, Prediction>();
-  for (const p of state.db.predictions) {
-    if (!predsByMatch.has(p.matchId)) predsByMatch.set(p.matchId, []);
-    predsByMatch.get(p.matchId)!.push(p);
-    predByUserAndMatch.set(`${p.userId}|${p.matchId}`, p);
-  }
-
-  const pointsBase = new Map<string, number>(rows.map((r) => [r.userId, r.totalPoints]));
-  const exactBase = new Map<string, number>(rows.map((r) => [r.userId, r.exactHits]));
-  const outcomeBase = new Map<string, number>(rows.map((r) => [r.userId, r.outcomeHits]));
-  const sideGoalsBase = new Map<string, number>(rows.map((r) => [r.userId, r.sideGoalsHits]));
-  const winScore = new Map<string, number>(rows.map((r) => [r.userId, 0]));
-
-  if (unresolvedMatches.length === 0) {
-    if (rows[0]) winScore.set(rows[0].userId, iterations);
-  } else {
-    for (let i = 0; i < iterations; i++) {
-      const points = new Map(pointsBase);
-      const exact = new Map(exactBase);
-      const outcome = new Map(outcomeBase);
-      const sideGoals = new Map(sideGoalsBase);
-
-      for (const match of unresolvedMatches) {
-        const matchPreds = predsByMatch.get(match.id) ?? [];
-        const sampled =
-          matchPreds.length > 0
-            ? (() => {
-                const p = matchPreds[Math.floor(Math.random() * matchPreds.length)]!;
-                return { home: p.homeGoals, away: p.awayGoals };
-              })()
-            : sampleFallbackScore();
-
-        for (const row of rows) {
-          const savedPrediction = predByUserAndMatch.get(`${row.userId}|${match.id}`);
-          const simulatedPrediction = savedPrediction ?? {
-            userId: row.userId,
-            matchId: match.id,
-            ...(() => {
-              const score = sampleFallbackScore();
-              return { homeGoals: score.home, awayGoals: score.away };
-            })(),
-            id: `sim-${row.userId}-${match.id}`,
-            updatedAt: '',
-          };
-          const res = calculatePredictionPoints(simulatedPrediction, sampled, state.db.pointsConfig);
-          points.set(row.userId, (points.get(row.userId) ?? 0) + res.points);
-          if (res.exactHit) exact.set(row.userId, (exact.get(row.userId) ?? 0) + 1);
-          if (res.outcomeHit) outcome.set(row.userId, (outcome.get(row.userId) ?? 0) + 1);
-          if (res.sideGoalsHit) sideGoals.set(row.userId, (sideGoals.get(row.userId) ?? 0) + 1);
-        }
-      }
-
-      const sorted = [...rows].sort((a, b) => {
-        const pb = points.get(b.userId) ?? 0;
-        const pa = points.get(a.userId) ?? 0;
-        if (pb !== pa) return pb - pa;
-        const eb = exact.get(b.userId) ?? 0;
-        const ea = exact.get(a.userId) ?? 0;
-        if (eb !== ea) return eb - ea;
-        const ob = outcome.get(b.userId) ?? 0;
-        const oa = outcome.get(a.userId) ?? 0;
-        if (ob !== oa) return ob - oa;
-        const gb = sideGoals.get(b.userId) ?? 0;
-        const ga = sideGoals.get(a.userId) ?? 0;
-        if (gb !== ga) return gb - ga;
-        return a.userName.localeCompare(b.userName, 'es');
-      });
-
-      if (sorted[0]) {
-        winScore.set(sorted[0].userId, (winScore.get(sorted[0].userId) ?? 0) + 1);
-      }
-    }
-  }
-
-  return rows.map((r) => ({
-    userId: r.userId,
-    name: `${r.firstName} ${r.lastName}`,
-    probability: Math.round(((winScore.get(r.userId) ?? 0) / Math.max(1, iterations)) * 100),
-  }));
-}
-
-function recommendMonteCarloIterations(userCount: number, predictionCount: number) {
-  if (userCount >= 1500 || predictionCount >= 120_000) return 18;
-  if (userCount >= 1000 || predictionCount >= 80_000) return 28;
-  if (userCount >= 500 || predictionCount >= 40_000) return 40;
-  if (userCount >= 100 || predictionCount >= 10_000) return 120;
-  return 500;
 }
 
 function getPositionDeltaFromLastDate(state: StateResponse, analytics: StatsAnalyticsSnapshot, userId: string) {
@@ -855,14 +753,6 @@ function UserStatsDashboard({ state, user }: { state: StateResponse; user: User 
     label: `${row.firstName} ${row.lastName}`.trim() || row.userName,
     values: analytics.cumulativeByUser.get(row.userId) ?? [],
   }));
-  const monteCarloIterations = recommendMonteCarloIterations(state.summary.users, state.summary.predictions);
-  const monteCarloResults = simulateWinProbabilities(state, monteCarloIterations);
-  const montecarlo = monteCarloResults
-    .sort((a, b) => b.probability - a.probability)
-    .slice(0, 8)
-    .map((r) => ({ label: r.name, value: r.probability }));
-
-  const userProb = monteCarloResults.find((r) => r.userId === user.id)?.probability ?? 0;
   const riskPct = getUniquePredictionRiskScore(user.id, state.db, analytics.predictionPatternFrequency);
   const positionDelta = getPositionDeltaFromLastDate(state, analytics, user.id);
 
@@ -892,11 +782,6 @@ function UserStatsDashboard({ state, user }: { state: StateResponse; user: User 
             <span className="muted compact-text">{leader ? `Líder: ${leader.firstName} ${leader.lastName}` : 'Sin líder aun'}</span>
           </div>
           <div className="detail-card">
-            <span className="detail-label">Probabilidad de ganar</span>
-            <strong>{userProb}%</strong>
-            <span className="muted compact-text">Estimación en base a partidos pendientes.</span>
-          </div>
-          <div className="detail-card">
             <span className="detail-label">Posiciones ganadas</span>
             <strong>
               {positionDelta == null ? '-' : positionDelta > 0 ? `+${positionDelta}` : String(positionDelta)}
@@ -916,16 +801,6 @@ function UserStatsDashboard({ state, user }: { state: StateResponse; user: User 
       </div>
 
       <NextMatchPredictionsPanel state={state} analytics={analytics} />
-
-      <div className="stats-grid">
-        <div className="panel stack-md">
-          <div className="section-head">
-            <h3>Probabilidad de ganar</h3>
-            <span>Top 8 (simulación)</span>
-          </div>
-          <HorizontalBars percent data={montecarlo} />
-        </div>
-      </div>
 
       <div className="panel stack-md">
         <div className="section-head">

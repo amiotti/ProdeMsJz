@@ -61,7 +61,7 @@ export function PredictionsBoard({
   const [savingSectionId, setSavingSectionId] = useState<string | null>(null);
   const [savingTrivia, setSavingTrivia] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const [selectedGroupId, setSelectedGroupId] = useState('ALL');
+  const [selectedGroupId, setSelectedGroupId] = useState('TODAY');
   const [viewMode, setViewMode] = useState<ViewMode>('date');
   const [drafts, setDrafts] = useState<DraftMap>({});
   const [triviaDrafts, setTriviaDrafts] = useState<TriviaDraftMap>({});
@@ -193,6 +193,7 @@ export function PredictionsBoard({
   }, [currentUser?.id, optimisticSavedMatchIds, state?.db.predictions]);
 
   const visibleSections = useMemo(() => {
+    const todayKey = formatDateArgentinaShort(new Date().toISOString());
     const withoutPrediction = (match: Match) => !lockedMatchIds.has(match.id) && !savedPredictedMatchIds.has(match.id);
 
     const filterUnpredicted = (sections: MatchSection[]) =>
@@ -204,7 +205,17 @@ export function PredictionsBoard({
         .filter((section) => section.matches.length > 0);
 
     const sections: MatchSection[] = [];
-    if (selectedGroupId === 'ALL') {
+    if (selectedGroupId === 'TODAY') {
+      const todayMatches = allMatches.filter((match) => formatDateArgentinaShort(match.kickoffAt) === todayKey);
+      if (todayMatches.length > 0) {
+        sections.push({
+          id: 'TODAY',
+          title: 'Hoy',
+          matches: todayMatches,
+          saveLabel: 'Guardar partidos de hoy',
+        });
+      }
+    } else if (selectedGroupId === 'ALL') {
       sections.push(...groupSections);
       sections.push(...knockoutSections);
     } else if (selectedGroupId === 'UNPREDICTED') {
@@ -216,7 +227,7 @@ export function PredictionsBoard({
       sections.push(...groupSections.filter((section) => section.id === selectedGroupId));
     }
     return sections;
-  }, [groupSections, knockoutSections, lockedMatchIds, savedPredictedMatchIds, selectedGroupId]);
+  }, [allMatches, groupSections, knockoutSections, lockedMatchIds, savedPredictedMatchIds, selectedGroupId]);
 
   const visibleDateSections = useMemo(() => {
     const flat: DateMatch[] = visibleSections.flatMap((section) =>
@@ -629,6 +640,7 @@ export function PredictionsBoard({
         <label>
           Filtrar por
           <select id="pred-filter-group" name="predFilterGroup" value={selectedGroupId} onChange={(e) => setSelectedGroupId(e.target.value)}>
+            <option value="TODAY">Hoy</option>
             <option value="ALL">Todos</option>
             <option value="UNPREDICTED">Pendientes</option>
             <option value="KO">Fase final</option>
