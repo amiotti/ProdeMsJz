@@ -96,6 +96,15 @@ function HistoricalProdeTable({ state }: { state: StateResponse }) {
   const historicalTotalMatches = HISTORICAL_MATCH_COUNTS.reduce((sum, value) => sum + value, 0);
   const currentOfficialMatches = state.summary.matchesWithOfficialResult;
   const totalMatchesWithCurrent = historicalTotalMatches + currentOfficialMatches;
+  const historicalRows = HISTORICAL_PRODE_ROWS.map((row) => {
+    const lookupNames = [row.name, ...(row.aliases ?? [])].map(normalizeHistoricalName);
+    const currentHits = lookupNames.reduce((max, key) => Math.max(max, currentSignHitsByName.get(key) ?? 0), 0);
+    const totalHits = historicalValueTotal(row.values) + currentHits;
+    const played = row.played + currentOfficialMatches;
+    const hitPct = played > 0 ? Math.round((totalHits / played) * 100) : 0;
+    const playedPct = totalMatchesWithCurrent > 0 ? Math.round((played / totalMatchesWithCurrent) * 100) : 0;
+    return { row, currentHits, totalHits, played, hitPct, playedPct };
+  }).sort((a, b) => b.hitPct - a.hitPct || b.totalHits - a.totalHits || a.row.name.localeCompare(b.row.name, 'es'));
 
   return (
     <div className="panel stack-md historical-prode-panel">
@@ -122,14 +131,7 @@ function HistoricalProdeTable({ state }: { state: StateResponse }) {
             </tr>
           </thead>
           <tbody>
-            {HISTORICAL_PRODE_ROWS.map((row) => {
-              const lookupNames = [row.name, ...(row.aliases ?? [])].map(normalizeHistoricalName);
-              const currentHits = lookupNames.reduce((max, key) => Math.max(max, currentSignHitsByName.get(key) ?? 0), 0);
-              const totalHits = historicalValueTotal(row.values) + currentHits;
-              const played = row.played + currentOfficialMatches;
-              const hitPct = played > 0 ? Math.round((totalHits / played) * 100) : 0;
-              const playedPct = totalMatchesWithCurrent > 0 ? Math.round((played / totalMatchesWithCurrent) * 100) : 0;
-
+            {historicalRows.map(({ row, currentHits, totalHits, played, hitPct, playedPct }) => {
               return (
                 <tr key={row.name}>
                   <th scope="row">{row.name}</th>
