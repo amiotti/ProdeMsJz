@@ -18,9 +18,11 @@ export async function POST(request: Request) {
     if (!parsed.ok) return parsed.response;
     const body = parsed.data;
 
-    const token = (await cookies()).get(getSessionCookieName())?.value ?? null;
+    const cookieStore = await cookies();
+    const token = cookieStore.get(getSessionCookieName())?.value ?? null;
     const user = await getUserFromSessionToken(token);
     if (!user) {
+      cookieStore.delete(getSessionCookieName());
       return noStoreJson({ ok: false, error: 'Debes iniciar sesion para cargar predicciones' }, { status: 401 });
     }
     const ip = getClientIdentifier(request);

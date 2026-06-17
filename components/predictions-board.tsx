@@ -37,6 +37,19 @@ function isPredictionEditable(kickoffAt: string, nowMs = Date.now()) {
   return nowMs < kickoffMs - 60 * 60 * 1000;
 }
 
+function redirectToLoginAfterExpiredSession() {
+  if (typeof window === 'undefined') return;
+  window.location.assign('/login');
+}
+
+async function readJsonResponse(response: Response) {
+  if (response.status === 401) {
+    redirectToLoginAfterExpiredSession();
+    throw new Error('Tu sesión venció. Volvé a iniciar sesión para guardar predicciones.');
+  }
+  return response.json();
+}
+
 function normalizeTriviaInput(value: string, question: TriviaQuestion) {
   const trimmed = value.trim();
   if (!trimmed) return '';
@@ -74,7 +87,11 @@ export function PredictionsBoard({
   async function loadState() {
     setLoading(true);
     const response = await fetch('/api/predictions/state', { cache: 'no-store' });
-    const data = (await response.json()) as StateResponse;
+    const data = (await readJsonResponse(response)) as StateResponse;
+    if (!data.viewer.user && state?.viewer.user) {
+      redirectToLoginAfterExpiredSession();
+      throw new Error('Tu sesión venció. Volvé a iniciar sesión.');
+    }
     setState(data);
     setLoading(false);
     return data;
@@ -316,7 +333,7 @@ export function PredictionsBoard({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ predictions }),
       });
-      const data = await response.json();
+      const data = await readJsonResponse(response);
       if (!response.ok || !data.ok) throw new Error(data.error || 'No se pudo guardar');
 
       for (const prediction of predictions) {
@@ -375,7 +392,7 @@ export function PredictionsBoard({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ predictions }),
       });
-      const data = await response.json();
+      const data = await readJsonResponse(response);
       if (!response.ok || !data.ok) throw new Error(data.error || 'No se pudo guardar');
 
       for (const prediction of predictions) {
@@ -431,7 +448,7 @@ export function PredictionsBoard({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ triviaAnswers }),
       });
-      const data = await response.json();
+      const data = await readJsonResponse(response);
       if (!response.ok || !data.ok) throw new Error(data.error || 'No se pudo guardar la trivia');
 
       for (const answer of triviaAnswers) {
