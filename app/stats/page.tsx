@@ -98,12 +98,14 @@ function HistoricalProdeTable({ state }: { state: StateResponse }) {
   const totalMatchesWithCurrent = historicalTotalMatches + currentOfficialMatches;
   const historicalRows = HISTORICAL_PRODE_ROWS.map((row) => {
     const lookupNames = [row.name, ...(row.aliases ?? [])].map(normalizeHistoricalName);
+    const currentParticipant = lookupNames.some((key) => currentSignHitsByName.has(key));
     const currentHits = lookupNames.reduce((max, key) => Math.max(max, currentSignHitsByName.get(key) ?? 0), 0);
-    const totalHits = historicalValueTotal(row.values) + currentHits;
-    const played = row.played + currentOfficialMatches;
-    const hitPct = played > 0 ? Math.round((totalHits / played) * 100) : 0;
+    const currentValue: number | 'X' = currentParticipant ? currentHits : 'X';
+    const totalHits = historicalValueTotal(row.values) + (currentParticipant ? currentHits : 0);
+    const played = row.played + (currentParticipant ? currentOfficialMatches : 0);
+    const hitPct = played > 0 ? Math.round((totalHits / played) * 1000) / 10 : 0;
     const playedPct = totalMatchesWithCurrent > 0 ? Math.round((played / totalMatchesWithCurrent) * 100) : 0;
-    return { row, currentHits, totalHits, played, hitPct, playedPct };
+    return { row, currentValue, totalHits, played, hitPct, playedPct };
   }).sort((a, b) => b.hitPct - a.hitPct || b.totalHits - a.totalHits || a.row.name.localeCompare(b.row.name, 'es'));
 
   return (
@@ -131,16 +133,16 @@ function HistoricalProdeTable({ state }: { state: StateResponse }) {
             </tr>
           </thead>
           <tbody>
-            {historicalRows.map(({ row, currentHits, totalHits, played, hitPct, playedPct }) => {
+            {historicalRows.map(({ row, currentValue, totalHits, played, hitPct, playedPct }) => {
               return (
                 <tr key={row.name}>
                   <th scope="row">{row.name}</th>
                   {row.values.map((value, index) => (
                     <td key={`${row.name}-${HISTORICAL_COLUMNS[index]}`}>{value}</td>
                   ))}
-                  <td>{currentHits}</td>
+                  <td>{currentValue}</td>
                   <td>{totalHits}</td>
-                  <td>{hitPct}%</td>
+                  <td>{hitPct.toFixed(1)}%</td>
                   <td>{played}</td>
                   <td>{playedPct}%</td>
                 </tr>
