@@ -1,7 +1,8 @@
 ﻿
+import { ExactHitConfetti } from '@/components/exact-hit-confetti';
 import { NextMatchCountdown } from '@/components/next-match-countdown';
 import { TeamName } from '@/components/team-name';
-import { getHomePageState } from '@/lib/db';
+import { getHomePageState, getPendingExactCelebrations } from '@/lib/db';
 import { requireAuthenticatedUser } from '@/lib/route-guard';
 import { getTeamDisplayName } from '@/lib/worldcup26';
 
@@ -21,7 +22,10 @@ function getRegistrationAmountArs() {
 
 export default async function InicioPage() {
   const { user } = await requireAuthenticatedUser();
-  const state = await getHomePageState();
+  const [state, pendingExactMatchIds] = await Promise.all([
+    getHomePageState(),
+    user.role === 'admin' ? Promise.resolve([]) : getPendingExactCelebrations(user.id),
+  ]);
   const hasApprovedPayment = user.role === 'admin' || user.registrationPaymentStatus === 'approved';
   const registrationAmountArs = getRegistrationAmountArs();
 
@@ -40,6 +44,7 @@ export default async function InicioPage() {
 
   return (
     <section className="stack-lg">
+      <ExactHitConfetti pendingMatchIds={pendingExactMatchIds} />
       <div className="hero">
         <div className="panel stack-md">
           <p className="eyebrow hero-kicker">FIFA WORLD CUP 26</p>

@@ -53,6 +53,13 @@ type InstantUserTriviaPredictionsDoc = {
   updatedAt: string;
 };
 
+type InstantUserExactCelebrationsDoc = {
+  id: string;
+  userId: string;
+  seenMatchIds: string[];
+  updatedAt: string;
+};
+
 type InstantOfficialResultDoc = {
   id: string;
   matchId: string;
@@ -111,6 +118,7 @@ type InstantQueryResult = {
   prode_users?: InstantUserDoc[];
   prode_user_predictions?: InstantUserPredictionsDoc[];
   prode_user_trivia_predictions?: InstantUserTriviaPredictionsDoc[];
+  prode_user_exact_celebrations?: InstantUserExactCelebrationsDoc[];
   prode_official_results?: InstantOfficialResultDoc[];
   prode_official_trivia_results?: InstantOfficialTriviaResultDoc[];
   prode_config?: InstantConfigDoc[];
@@ -839,6 +847,14 @@ export async function getUserById(userId: string): Promise<User | null> {
   return user;
 }
 
+async function queryUserExactCelebrationsDocByUserOnly(userId: string) {
+  const db = getInstantAdminDb();
+  const data = (await db.query({
+    prode_user_exact_celebrations: { $: { where: { userId } } },
+  })) as InstantQueryResult;
+  return (data.prode_user_exact_celebrations ?? [])[0] ?? null;
+}
+
 export async function resetPasswordWithRecoveryData(input: {
   email: string;
   phone: string;
@@ -989,6 +1005,58 @@ export async function savePredictions(
   }
 
   return { lockedMatches };
+}
+
+async function getUserExactMatchIds(userId: string) {
+  const [predictionsDoc, officialResults] = await Promise.all([
+    queryUserPredictionsDocByUserOnly(userId),
+    queryOfficialResultsOnly(),
+  ]);
+  const predictions = predictionsDoc?.predictions ?? {};
+
+  return officialResults
+    .filter((result) => {
+      const prediction = predictions[result.matchId];
+      return prediction?.homeGoals === result.home && prediction?.awayGoals === result.away;
+    })
+    .sort((a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime())
+    .map((result) => result.matchId);
+}
+
+export async function getPendingExactCelebrations(userId: string): Promise<string[]> {
+  await ensureBaseData();
+  const [exactMatchIds, celebrationsDoc] = await Promise.all([
+    getUserExactMatchIds(userId),
+    queryUserExactCelebrationsDocByUserOnly(userId),
+  ]);
+  const seen = new Set(celebrationsDoc?.seenMatchIds ?? []);
+  return exactMatchIds.filter((matchId) => !seen.has(matchId));
+}
+
+export async function acknowledgeExactCelebrations(userId: string, matchIds: string[]): Promise<void> {
+  await ensureBaseData();
+  const requestedIds = Array.from(new Set(matchIds.filter((matchId) => typeof matchId === 'string' && matchId.length <= 64)));
+  if (requestedIds.length === 0) return;
+
+  const [exactMatchIds, celebrationsDoc] = await Promise.all([
+    getUserExactMatchIds(userId),
+    queryUserExactCelebrationsDocByUserOnly(userId),
+  ]);
+  const validExactIds = new Set(exactMatchIds);
+  const seen = new Set(celebrationsDoc?.seenMatchIds ?? []);
+  for (const matchId of requestedIds) {
+    if (validExactIds.has(matchId)) seen.add(matchId);
+  }
+
+  const id = celebrationsDoc?.id ?? userId;
+  await getInstantAdminDb().transact([
+    tx.prode_user_exact_celebrations[id].update({
+      id,
+      userId,
+      seenMatchIds: Array.from(seen),
+      updatedAt: nowIso(),
+    }),
+  ]);
 }
 
 export async function saveTriviaPredictions(
@@ -1162,9 +1230,15 @@ export async function deleteUserAccount(userId: string) {
   if (userTriviaPredDoc) {
     operations.push(tx.prode_user_trivia_predictions[userTriviaPredDoc.id].delete());
   }
-  const userGroups = await queryUserLeaderboardGroupsOnly(userId);
+  const [userGroups, celebrationsDoc] = await Promise.all([
+    queryUserLeaderboardGroupsOnly(userId),
+    queryUserExactCelebrationsDocByUserOnly(userId),
+  ]);
   for (const group of userGroups) {
     operations.push(tx.prode_user_leaderboard_groups[group.id].delete());
+  }
+  if (celebrationsDoc) {
+    operations.push(tx.prode_user_exact_celebrations[celebrationsDoc.id].delete());
   }
   operations.push(tx.prode_users[userId].delete());
 
@@ -1194,9 +1268,15 @@ export async function adminDeleteUser(targetUserId: string) {
   if (userTriviaPredDoc) {
     operations.push(tx.prode_user_trivia_predictions[userTriviaPredDoc.id].delete());
   }
-  const userGroups = await queryUserLeaderboardGroupsOnly(targetUserId);
+  const [userGroups, celebrationsDoc] = await Promise.all([
+    queryUserLeaderboardGroupsOnly(targetUserId),
+    queryUserExactCelebrationsDocByUserOnly(targetUserId),
+  ]);
   for (const group of userGroups) {
     operations.push(tx.prode_user_leaderboard_groups[group.id].delete());
+  }
+  if (celebrationsDoc) {
+    operations.push(tx.prode_user_exact_celebrations[celebrationsDoc.id].delete());
   }
   operations.push(tx.prode_users[targetUserId].delete());
   await getInstantAdminDb().transact(operations);
