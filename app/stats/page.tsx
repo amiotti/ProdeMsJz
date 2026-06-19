@@ -1,3 +1,4 @@
+import { HistoricalProdeSortableTable, type HistoricalProdeSortableRow } from '@/components/historical-prode-sortable-table';
 import { UserEvolutionComparisonChart } from '@/components/user-evolution-comparison-chart';
 import { requireAuthenticatedUser } from '@/lib/route-guard';
 import { getState } from '@/lib/db';
@@ -96,7 +97,7 @@ function HistoricalProdeTable({ state }: { state: StateResponse }) {
   const historicalTotalMatches = HISTORICAL_MATCH_COUNTS.reduce((sum, value) => sum + value, 0);
   const currentOfficialMatches = state.summary.matchesWithOfficialResult;
   const totalMatchesWithCurrent = historicalTotalMatches + currentOfficialMatches;
-  const historicalRows = HISTORICAL_PRODE_ROWS.map((row) => {
+  const historicalRows: HistoricalProdeSortableRow[] = HISTORICAL_PRODE_ROWS.map((row) => {
     const lookupNames = [row.name, ...(row.aliases ?? [])].map(normalizeHistoricalName);
     const currentParticipant = lookupNames.some((key) => currentSignHitsByName.has(key));
     const currentHits = lookupNames.reduce((max, key) => Math.max(max, currentSignHitsByName.get(key) ?? 0), 0);
@@ -105,8 +106,8 @@ function HistoricalProdeTable({ state }: { state: StateResponse }) {
     const played = row.played + (currentParticipant ? currentOfficialMatches : 0);
     const hitPct = played > 0 ? Math.round((totalHits / played) * 1000) / 10 : 0;
     const playedPct = totalMatchesWithCurrent > 0 ? Math.round((played / totalMatchesWithCurrent) * 100) : 0;
-    return { row, currentValue, totalHits, played, hitPct, playedPct };
-  }).sort((a, b) => b.hitPct - a.hitPct || b.totalHits - a.totalHits || a.row.name.localeCompare(b.row.name, 'es'));
+    return { name: row.name, values: row.values, currentValue, totalHits, played, hitPct, playedPct };
+  });
 
   return (
     <div className="panel stack-md historical-prode-panel">
@@ -117,51 +118,13 @@ function HistoricalProdeTable({ state }: { state: StateResponse }) {
       <p className="muted">
         Comparativa histórica de prodes anteriores, continuada con los aciertos por signo del Mundial 2026.
       </p>
-      <div className="table-wrap">
-        <table className="table historical-prode-table">
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              {HISTORICAL_COLUMNS.map((column) => (
-                <th key={column}>{column}</th>
-              ))}
-              <th>USA MEX CAN 2026</th>
-              <th>Total aciertos</th>
-              <th>% acierto</th>
-              <th>Jugados</th>
-              <th>% jugados</th>
-            </tr>
-          </thead>
-          <tbody>
-            {historicalRows.map(({ row, currentValue, totalHits, played, hitPct, playedPct }) => {
-              return (
-                <tr key={row.name}>
-                  <th scope="row">{row.name}</th>
-                  {row.values.map((value, index) => (
-                    <td key={`${row.name}-${HISTORICAL_COLUMNS[index]}`}>{value}</td>
-                  ))}
-                  <td>{currentValue}</td>
-                  <td>{totalHits}</td>
-                  <td>{hitPct.toFixed(1)}%</td>
-                  <td>{played}</td>
-                  <td>{playedPct}%</td>
-                </tr>
-              );
-            })}
-            <tr className="historical-prode-total-row">
-              <th scope="row">PARTIDOS</th>
-              {HISTORICAL_MATCH_COUNTS.map((value, index) => (
-                <td key={`matches-${HISTORICAL_COLUMNS[index]}`}>{value}</td>
-              ))}
-              <td>{currentOfficialMatches}</td>
-              <td>{totalMatchesWithCurrent}</td>
-              <td>-</td>
-              <td>{totalMatchesWithCurrent}</td>
-              <td>100%</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <HistoricalProdeSortableTable
+        columns={HISTORICAL_COLUMNS}
+        rows={historicalRows}
+        matchCounts={HISTORICAL_MATCH_COUNTS}
+        currentOfficialMatches={currentOfficialMatches}
+        totalMatches={totalMatchesWithCurrent}
+      />
       <p className="muted compact-text">* La columna USA MEX CAN 2026 se actualiza con resultados oficiales cargados.</p>
     </div>
   );
@@ -713,6 +676,12 @@ function AdminStatsDashboard({ state }: { state: StateResponse }) {
 
 function UserStatsDashboard({ state, user }: { state: StateResponse; user: User }) {
   const analytics = getStatsAnalytics(state);
+  const predictionsByGroup = analytics.predictionsByGroup.map((group) => ({
+    label: group.groupId,
+    value: group.count,
+    note: group.groupName,
+  }));
+  const avgGoals = analytics.avgGoals.toFixed(2);
   const matchById = new Map(state.db.matches.map((m) => [m.id, m] as const));
   const userRow = state.leaderboard.find((r) => r.userId === user.id);
   const leader = state.leaderboard[0] ?? null;
@@ -805,6 +774,70 @@ function UserStatsDashboard({ state, user }: { state: StateResponse; user: User 
       </div>
 
       <NextMatchPredictionsPanel state={state} analytics={analytics} />
+
+      <div className="panel">
+        <h2>Estadísticas generales del PRODE</h2>
+        <p className="muted">Panorama general de participación, resultados y precisión del torneo.</p>
+      </div>
+
+      <div className="cards">
+        <div className="stat-card"><div className="muted">Usuarios activos</div><div className="value">{state.summary.users}</div></div>
+        <div className="stat-card"><div className="muted">Predicciones cargadas</div><div className="value">{state.summary.predictions}</div></div>
+        <div className="stat-card"><div className="muted">Resultados cargados</div><div className="value">{state.summary.matchesWithOfficialResult}</div></div>
+        <div className="stat-card"><div className="muted">Promedio de goles</div><div className="value">{avgGoals}</div></div>
+      </div>
+
+      <div className="stats-grid">
+        <div className="panel stack-md">
+          <div className="section-head"><h3>Predicciones por grupo</h3><span>Carga acumulada</span></div>
+          <BarChart data={predictionsByGroup} />
+        </div>
+        <div className="panel stack-md">
+          <div className="section-head"><h3>Resultados oficiales</h3><span>Distribución de signos</span></div>
+          <DonutChart
+            centerLabel="partidos"
+            segments={[
+              { label: 'Gana local', value: analytics.officialOutcome.local, color: '#3850dd' },
+              { label: 'Empate', value: analytics.officialOutcome.empate, color: '#f4be1f' },
+              { label: 'Gana visitante', value: analytics.officialOutcome.visitante, color: '#ef3100' },
+            ]}
+          />
+        </div>
+      </div>
+
+      <div className="panel stack-md">
+        <div className="section-head"><h3>Precisión global del PRODE</h3><span>Predicciones evaluadas</span></div>
+        <DonutChart
+          centerLabel="pred."
+          segments={[
+            { label: 'Exactas', value: analytics.exactHits, color: '#59e3d7' },
+            { label: 'Solo signo', value: analytics.outcomeHits, color: '#9bd910' },
+            { label: 'Fallidas', value: analytics.misses, color: '#ff5f78' },
+          ]}
+        />
+        <p className="muted">
+          Total evaluadas: <strong>{analytics.scoredPredictions}</strong>. Puntaje: {state.db.pointsConfig.exactScore} exacto /{' '}
+          {state.db.pointsConfig.correctOutcome} signo.
+        </p>
+      </div>
+
+      <div className="panel stack-md">
+        <div className="section-head"><h3>Total de goles por partido</h3><span>Histograma</span></div>
+        <BarChart
+          data={[
+            { label: '0', value: analytics.goalsHistogram['0'], color: '#3850dd' },
+            { label: '1', value: analytics.goalsHistogram['1'], color: '#4db8e8' },
+            { label: '2', value: analytics.goalsHistogram['2'], color: '#59e3d7' },
+            { label: '3', value: analytics.goalsHistogram['3'], color: '#f4be1f' },
+            { label: '4', value: analytics.goalsHistogram['4'], color: '#f68b1f' },
+            { label: '5', value: analytics.goalsHistogram['5'], color: '#ef6b22' },
+            { label: '6', value: analytics.goalsHistogram['6'], color: '#ef4d22' },
+            { label: '7', value: analytics.goalsHistogram['7'], color: '#ef3100' },
+            { label: '8', value: analytics.goalsHistogram['8'], color: '#b51f08' },
+          ]}
+          height={240}
+        />
+      </div>
 
       <div className="panel stack-md">
         <div className="section-head">
