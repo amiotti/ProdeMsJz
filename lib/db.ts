@@ -1,4 +1,4 @@
-﻿import { randomUUID } from 'node:crypto';
+import { randomUUID } from 'node:crypto';
 
 import { hashPassword, verifyPassword, verifySession } from '@/lib/auth';
 import { getInstantAdminDb, tx } from '@/lib/instant';
@@ -137,6 +137,7 @@ let usersOnlyCache: { expiresAt: number; rows: InstantUserDoc[] } | null = null;
 let configOnlyCache: { expiresAt: number; rows: InstantConfigDoc[] } | null = null;
 let officialResultsOnlyCache: { expiresAt: number; rows: InstantOfficialResultDoc[] } | null = null;
 let officialTriviaResultsOnlyCache: { expiresAt: number; rows: InstantOfficialTriviaResultDoc[] } | null = null;
+const predictionSaveQueues = new Map<string, Promise<void>>();
 let coreStateCache:
   | {
       expiresAt: number;
@@ -946,7 +947,7 @@ export async function updateUserProfile(
   return publicUser({ ...current, ...patch });
 }
 
-export async function savePredictions(
+async function savePredictionsUnlocked(
   userId: string,
   items: Array<{ matchId: string; homeGoals: number; awayGoals: number }>,
 ) {
@@ -964,47 +965,78 @@ export async function savePredictions(
   const seed = getSeedDbTemplate();
   const matchById = new Map(seed.matches.map((m) => [m.id, m] as const));
   const existingUserPredictionsDoc = await queryUserPredictionsDocByUserOnly(userId);
-  const predictionsMap: Record<string, { homeGoals: number; awayGoals: number; updatedAt: string }> = {
-    ...(existingUserPredictionsDoc?.predictions ?? {}),
-  };
+  const predictionPatch: Record<string, { homeGoals: number; awayGoals: number; updatedAt: string }> = {};
 
   const lockedMatches: string[] = [];
+  const invalidMatches: string[] = [];
+  const savedMatchIds: string[] = [];
   const ts = nowIso();
   const nowMs = Date.now();
   let changed = false;
 
   for (const item of items) {
     const match = matchById.get(item.matchId);
-    if (!match) continue;
-    if (!Number.isInteger(item.homeGoals) || item.homeGoals < 0 || item.homeGoals > 30) continue;
-    if (!Number.isInteger(item.awayGoals) || item.awayGoals < 0 || item.awayGoals > 30) continue;
+    if (!match) {
+      invalidMatches.push(item.matchId);
+      continue;
+    }
+    if (!Number.isInteger(item.homeGoals) || item.homeGoals < 0 || item.homeGoals > 30) {
+      invalidMatches.push(item.matchId);
+      continue;
+    }
+    if (!Number.isInteger(item.awayGoals) || item.awayGoals < 0 || item.awayGoals > 30) {
+      invalidMatches.push(item.matchId);
+      continue;
+    }
 
     if (!isPredictionWindowOpen(match.kickoffAt, nowMs)) {
       lockedMatches.push(item.matchId);
       continue;
     }
-    predictionsMap[item.matchId] = {
+    predictionPatch[item.matchId] = {
       homeGoals: item.homeGoals,
       awayGoals: item.awayGoals,
       updatedAt: ts,
     };
+    savedMatchIds.push(item.matchId);
     changed = true;
   }
 
   if (changed) {
-    const id = existingUserPredictionsDoc?.id ?? randomUUID();
+    const id = existingUserPredictionsDoc?.id ?? userId;
     await getInstantAdminDb().transact([
-      tx.prode_user_predictions[id].update({
+      tx.prode_user_predictions[id].merge({
         id,
         userId,
-        predictions: predictionsMap,
+        predictions: predictionPatch,
         updatedAt: ts,
       }),
     ]);
     invalidateCoreStateCache();
   }
 
-  return { lockedMatches };
+  return { savedMatchIds, lockedMatches, invalidMatches };
+}
+
+export async function savePredictions(
+  userId: string,
+  items: Array<{ matchId: string; homeGoals: number; awayGoals: number }>,
+) {
+  const previous = predictionSaveQueues.get(userId) ?? Promise.resolve();
+  const run = previous.catch(() => undefined).then(() => savePredictionsUnlocked(userId, items));
+  const settled = run.then(
+    () => undefined,
+    () => undefined,
+  );
+  predictionSaveQueues.set(userId, settled);
+
+  try {
+    return await run;
+  } finally {
+    if (predictionSaveQueues.get(userId) === settled) {
+      predictionSaveQueues.delete(userId);
+    }
+  }
 }
 
 async function getUserExactMatchIds(userId: string) {
@@ -1066,6 +1098,7 @@ export async function saveTriviaPredictions(
   await ensureBaseData();
   if (!Array.isArray(items)) throw new Error('Formato de trivias inválido');
   if (items.length > TRIVIA_QUESTIONS.length) throw new Error('Demasiadas respuestas de trivia en una sola solicitud');
+  if (items.length === 0) return;
 
   const userDoc = await queryUserByIdOnly(userId);
   const user = userDoc ? publicUser(userDoc) : null;

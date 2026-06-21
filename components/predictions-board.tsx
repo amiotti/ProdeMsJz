@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -15,6 +15,50 @@ type ViewMode = 'group' | 'date';
 type MatchSection = { id: string; title: string; matches: Match[]; saveLabel: string };
 type DateMatch = Match & { _meta: string };
 type DateSection = { label: string; matches: DateMatch[] };
+type SavePredictionsResponse = {
+  ok: boolean;
+  state?: StateResponse;
+  savedMatchIds?: string[];
+  lockedMatches?: string[];
+  invalidMatches?: string[];
+  error?: string;
+};
+
+const DRAFT_STORAGE_PREFIX = 'prode:prediction-drafts:';
+
+function draftStorageKey(userId: string) {
+  return DRAFT_STORAGE_PREFIX + userId;
+}
+
+function readStoredDrafts(userId: string): DraftMap {
+  if (typeof window === 'undefined') return {};
+  try {
+    const raw = window.localStorage.getItem(draftStorageKey(userId));
+    if (!raw) return {};
+    const parsed = JSON.parse(raw) as { drafts?: DraftMap };
+    return parsed.drafts && typeof parsed.drafts === 'object' ? parsed.drafts : {};
+  } catch {
+    return {};
+  }
+}
+
+function persistStoredDrafts(userId: string, drafts: DraftMap, dirtyMatchIds: Set<string>) {
+  if (typeof window === 'undefined') return;
+  const pending = Object.fromEntries(
+    Array.from(dirtyMatchIds)
+      .map((matchId) => [matchId, drafts[matchId]] as const)
+      .filter((entry): entry is [string, { home: string; away: string }] => Boolean(entry[1])),
+  );
+  try {
+    if (Object.keys(pending).length === 0) {
+      window.localStorage.removeItem(draftStorageKey(userId));
+    } else {
+      window.localStorage.setItem(draftStorageKey(userId), JSON.stringify({ drafts: pending, updatedAt: Date.now() }));
+    }
+  } catch {
+    // Storage can be unavailable in private or restricted mobile browser modes.
+  }
+}
 
 function sortMatches(a: Match, b: Match) {
   return new Date(a.kickoffAt).getTime() - new Date(b.kickoffAt).getTime();
@@ -81,6 +125,7 @@ export function PredictionsBoard({
   const awayInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
   const dirtyMatchIdsRef = useRef<Set<string>>(new Set());
   const dirtyTriviaQuestionIdsRef = useRef<Set<string>>(new Set());
+  const savingLockRef = useRef(false);
   const syncedUserIdRef = useRef<string | null>(initialState?.viewer.user?.id ?? null);
   const [optimisticSavedMatchIds, setOptimisticSavedMatchIds] = useState<Set<string>>(new Set());
 
@@ -123,6 +168,21 @@ export function PredictionsBoard({
         away: String(prediction.awayGoals),
       };
     }
+
+    const storedDrafts = readStoredDrafts(userId);
+    let recoveredDrafts = 0;
+    for (const [matchId, storedScore] of Object.entries(storedDrafts)) {
+      const savedScore = nextDrafts[matchId];
+      if (savedScore?.home === storedScore.home && savedScore.away === storedScore.away) continue;
+      nextDrafts[matchId] = storedScore;
+      dirtyMatchIdsRef.current.add(matchId);
+      recoveredDrafts += 1;
+    }
+    if (recoveredDrafts > 0) {
+      setMessage(
+        `Se recuperaron ${recoveredDrafts} borrador(es) sin confirmar de este dispositivo. Presiona Guardar para enviarlos.`,
+      );
+    }
     setDrafts((prev) => {
       if (userChanged) return nextDrafts;
       const merged = { ...nextDrafts };
@@ -147,7 +207,25 @@ export function PredictionsBoard({
   }, [state]);
 
   const currentUser = state?.viewer.user ?? null;
+
+  useEffect(() => {
+    if (!currentUser) return;
+    persistStoredDrafts(currentUser.id, drafts, dirtyMatchIdsRef.current);
+  }, [currentUser, drafts]);
+
+  useEffect(() => {
+    const warnBeforeLeaving = (event: BeforeUnloadEvent) => {
+      if (dirtyMatchIdsRef.current.size === 0) return;
+      event.preventDefault();
+      event.returnValue = '';
+    };
+
+    window.addEventListener('beforeunload', warnBeforeLeaving);
+    return () => window.removeEventListener('beforeunload', warnBeforeLeaving);
+  }, []);
+
   const hasApprovedPayment = currentUser?.registrationPaymentStatus === 'approved';
+  const isAnySaving = saving || savingMatchId !== null || savingSectionId !== null || savingTrivia;
 
   const lockedMatchIds = useMemo(() => {
     const nowMs = Date.now();
@@ -294,6 +372,57 @@ export function PredictionsBoard({
     setTriviaDrafts((prev) => ({ ...prev, [questionId]: value }));
   }
 
+  function applyPredictionSaveResponse(
+    data: SavePredictionsResponse,
+    submitted: Array<{ matchId: string; homeGoals: number; awayGoals: number }>,
+    successMessage: string,
+  ) {
+    const savedIds = new Set(data.savedMatchIds ?? []);
+    const lockedIds = data.lockedMatches ?? [];
+    const invalidIds = data.invalidMatches ?? [];
+
+    if (!data.state) throw new Error('El servidor no devolvió la confirmación de guardado. Tus borradores siguen disponibles.');
+
+    const confirmedById = new Map(
+      data.state.db.predictions
+        .filter((prediction) => prediction.userId === currentUser?.id)
+        .map((prediction) => [prediction.matchId, prediction] as const),
+    );
+    const unverified = submitted.filter((prediction) => {
+      if (!savedIds.has(prediction.matchId)) return false;
+      const confirmed = confirmedById.get(prediction.matchId);
+      return confirmed?.homeGoals !== prediction.homeGoals || confirmed.awayGoals !== prediction.awayGoals;
+    });
+    if (unverified.length > 0) {
+      throw new Error('No se pudo verificar el guardado en la base. Tus borradores siguen disponibles para reintentar.');
+    }
+
+    for (const matchId of savedIds) dirtyMatchIdsRef.current.delete(matchId);
+    if (currentUser) persistStoredDrafts(currentUser.id, drafts, dirtyMatchIdsRef.current);
+
+    setOptimisticSavedMatchIds((prev) => {
+      const next = new Set(prev);
+      for (const matchId of savedIds) next.add(matchId);
+      return next;
+    });
+    setState(data.state);
+
+    if (lockedIds.length > 0 || invalidIds.length > 0) {
+      const rejected = lockedIds.length + invalidIds.length;
+      setMessage(
+        savedIds.size > 0
+          ? `${savedIds.size} predicción(es) guardada(s). ${rejected} no se guardaron porque estaban cerradas o eran inválidas.`
+          : 'No se guardó ninguna predicción: los partidos ya estaban cerrados o los datos eran inválidos.',
+      );
+      return;
+    }
+
+    if (savedIds.size !== submitted.length) {
+      setMessage('El servidor no confirmó todas las predicciones. Los borradores no confirmados siguen disponibles.');
+      return;
+    }
+    setMessage(successMessage);
+  }
   async function savePredictions(targetMatchId?: string) {
     if (!currentUser) {
       setMessage('Debes iniciar sesión para cargar predicciones.');
@@ -303,10 +432,15 @@ export function PredictionsBoard({
       setMessage('Debes tener la inscripción aprobada para guardar predicciones.');
       return;
     }
+    if (savingLockRef.current) {
+      setMessage('Ya hay un guardado en curso. Espera a que termine antes de volver a guardar.');
+      return;
+    }
 
     const predictions = Object.entries(drafts)
       .filter(
         ([matchId, score]) =>
+          dirtyMatchIdsRef.current.has(matchId) &&
           (!targetMatchId || matchId === targetMatchId) &&
           !lockedMatchIds.has(matchId) &&
           score.home !== '' &&
@@ -323,6 +457,7 @@ export function PredictionsBoard({
       return;
     }
 
+    savingLockRef.current = true;
     if (targetMatchId) setSavingMatchId(targetMatchId);
     else setSaving(true);
     setMessage(null);
@@ -333,26 +468,19 @@ export function PredictionsBoard({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ predictions }),
       });
-      const data = await readJsonResponse(response);
+      const data = (await readJsonResponse(response)) as SavePredictionsResponse;
       if (!response.ok || !data.ok) throw new Error(data.error || 'No se pudo guardar');
 
-      for (const prediction of predictions) {
-        dirtyMatchIdsRef.current.delete(prediction.matchId);
-      }
-      setOptimisticSavedMatchIds((prev) => {
-        const next = new Set(prev);
-        for (const prediction of predictions) next.add(prediction.matchId);
-        return next;
-      });
-      setState(data.state as StateResponse);
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new Event('prode-predictions-changed'));
-      }
-
-      setMessage(targetMatchId ? 'Predicción guardada correctamente.' : 'Predicciones guardadas correctamente.');
+      applyPredictionSaveResponse(
+        data,
+        predictions,
+        targetMatchId ? 'Predicción guardada y verificada correctamente.' : 'Predicciones guardadas y verificadas correctamente.',
+      );
+      window.dispatchEvent(new Event('prode-predictions-changed'));
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Error al guardar predicciones');
     } finally {
+      savingLockRef.current = false;
       if (targetMatchId) setSavingMatchId(null);
       else setSaving(false);
     }
@@ -367,11 +495,19 @@ export function PredictionsBoard({
       setMessage('Debes tener la inscripción aprobada para guardar predicciones.');
       return;
     }
+    if (savingLockRef.current) {
+      setMessage('Ya hay un guardado en curso. Espera a que termine antes de volver a guardar.');
+      return;
+    }
 
     const predictions = Object.entries(drafts)
       .filter(
         ([matchId, score]) =>
-          matchIds.includes(matchId) && !lockedMatchIds.has(matchId) && score.home !== '' && score.away !== '',
+          dirtyMatchIdsRef.current.has(matchId) &&
+          matchIds.includes(matchId) &&
+          !lockedMatchIds.has(matchId) &&
+          score.home !== '' &&
+          score.away !== '',
       )
       .map(([matchId, score]) => ({
         matchId,
@@ -384,6 +520,7 @@ export function PredictionsBoard({
       return;
     }
 
+    savingLockRef.current = true;
     setSavingSectionId(sectionId);
     setMessage(null);
     try {
@@ -392,25 +529,15 @@ export function PredictionsBoard({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ predictions }),
       });
-      const data = await readJsonResponse(response);
+      const data = (await readJsonResponse(response)) as SavePredictionsResponse;
       if (!response.ok || !data.ok) throw new Error(data.error || 'No se pudo guardar');
 
-      for (const prediction of predictions) {
-        dirtyMatchIdsRef.current.delete(prediction.matchId);
-      }
-      setOptimisticSavedMatchIds((prev) => {
-        const next = new Set(prev);
-        for (const prediction of predictions) next.add(prediction.matchId);
-        return next;
-      });
-      setState(data.state as StateResponse);
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new Event('prode-predictions-changed'));
-      }
-      setMessage('Predicciones guardadas correctamente.');
+      applyPredictionSaveResponse(data, predictions, 'Predicciones guardadas y verificadas correctamente.');
+      window.dispatchEvent(new Event('prode-predictions-changed'));
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Error al guardar predicciones');
     } finally {
+      savingLockRef.current = false;
       setSavingSectionId(null);
     }
   }
@@ -422,6 +549,10 @@ export function PredictionsBoard({
     }
     if (!hasApprovedPayment) {
       setMessage('Debes tener la inscripción aprobada para guardar trivias.');
+      return;
+    }
+    if (savingLockRef.current) {
+      setMessage('Ya hay un guardado en curso. Espera a que termine antes de volver a guardar.');
       return;
     }
 
@@ -440,6 +571,7 @@ export function PredictionsBoard({
       return;
     }
 
+    savingLockRef.current = true;
     setSavingTrivia(true);
     setMessage(null);
     try {
@@ -448,17 +580,19 @@ export function PredictionsBoard({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ triviaAnswers }),
       });
-      const data = await readJsonResponse(response);
+      const data = (await readJsonResponse(response)) as SavePredictionsResponse;
       if (!response.ok || !data.ok) throw new Error(data.error || 'No se pudo guardar la trivia');
+      if (!data.state) throw new Error('El servidor no devolvió la confirmación de guardado de la trivia.');
 
       for (const answer of triviaAnswers) {
         dirtyTriviaQuestionIdsRef.current.delete(answer.questionId);
       }
-      setState(data.state as StateResponse);
+      setState(data.state);
       setMessage('Trivia guardada correctamente.');
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Error al guardar trivia');
     } finally {
+      savingLockRef.current = false;
       setSavingTrivia(false);
     }
   }
@@ -506,7 +640,7 @@ export function PredictionsBoard({
                   onChange={(event) => setTriviaDraft(question.id, event.target.value)}
                   placeholder={question.answerType === 'number' ? 'Ingresa un número' : 'Escribe tu respuesta'}
                   inputMode={question.answerType === 'number' ? 'numeric' : undefined}
-                  disabled={triviaReadOnly || savingTrivia}
+                  disabled={triviaReadOnly || isAnySaving}
                 />
                 {hasOfficialAnswer ? (
                   <p className="official-result">Resultado oficial: {official?.answer}</p>
@@ -516,7 +650,7 @@ export function PredictionsBoard({
           })}
         </div>
         <div className="fixture-inline" style={{ justifyContent: 'flex-start' }}>
-          <button className="btn btn-primary" type="button" onClick={saveTriviaAnswers} disabled={triviaReadOnly || savingTrivia}>
+          <button className="btn btn-primary" type="button" onClick={saveTriviaAnswers} disabled={triviaReadOnly || isAnySaving}>
             {savingTrivia ? 'Guardando...' : 'Guardar trivia'}
           </button>
         </div>
@@ -526,6 +660,8 @@ export function PredictionsBoard({
 
   function renderMatchCard(match: Match, readOnly = false) {
     const draft = drafts[match.id] ?? { home: '', away: '' };
+    const matchIsDirty = dirtyMatchIdsRef.current.has(match.id);
+    const matchIsSaved = savedPredictedMatchIds.has(match.id) && !matchIsDirty;
     const matchReadOnly = readOnly || lockedMatchIds.has(match.id);
     const kickoff = formatKickoffArgentina(match.kickoffAt);
     const headerMeta = match.groupId === 'KO' ? match.stage ?? 'Fase final' : `Grupo ${match.groupId} - Fecha ${match.matchday}`;
@@ -591,9 +727,9 @@ export function PredictionsBoard({
             className="btn btn-primary btn-small"
             type="button"
             onClick={() => savePredictions(match.id)}
-            disabled={matchReadOnly || saving || savingMatchId === match.id || draft.home === '' || draft.away === ''}
+            disabled={matchReadOnly || isAnySaving || !matchIsDirty || draft.home === '' || draft.away === ''}
           >
-            {savingMatchId === match.id ? 'Guardando...' : 'Guardar'}
+            {savingMatchId === match.id ? 'Guardando...' : matchIsSaved ? 'Guardada' : 'Guardar'}
           </button>
         </div>
       </div>
@@ -682,13 +818,19 @@ export function PredictionsBoard({
           className="btn btn-primary pred-save-all-btn"
           type="button"
           onClick={() => savePredictions()}
-          disabled={!hasApprovedPayment || saving || Boolean(savingMatchId) || Boolean(savingSectionId) || selectedGroupId === 'TRIVIA'}
+          disabled={!hasApprovedPayment || isAnySaving || dirtyMatchIdsRef.current.size === 0 || selectedGroupId === 'TRIVIA'}
         >
           {saving ? 'Guardando...' : 'Guardar Todo'}
         </button>
       </div>
 
       {message ? <p className="status">{message}</p> : null}
+      {dirtyMatchIdsRef.current.size > 0 ? (
+        <p className="status">
+          Borradores sin guardar: <strong>{dirtyMatchIdsRef.current.size}</strong>. Solo se consideran cargados cuando aparece
+          la confirmación de guardado.
+        </p>
+      ) : null}
 
       {showTriviaBeforeMatches
         ? renderTriviaPanel('trivia-first', !hasApprovedPayment)
@@ -707,7 +849,7 @@ export function PredictionsBoard({
                     className="btn btn-primary btn-small"
                     type="button"
                     onClick={() => saveSectionPredictions(section.id, section.matches.map((m) => m.id))}
-                    disabled={!hasApprovedPayment || savingSectionId === section.id || saving}
+                    disabled={!hasApprovedPayment || isAnySaving}
                   >
                     {savingSectionId === section.id ? 'Guardando...' : section.saveLabel}
                   </button>

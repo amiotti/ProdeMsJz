@@ -1,4 +1,4 @@
-﻿import { cookies } from 'next/headers';
+import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 
 import { getSessionCookieName } from '@/lib/auth';
@@ -29,8 +29,14 @@ export async function POST(request: Request) {
     const rate = checkRateLimit(`predictions:save:${user.id}:${ip}`, { limit: 120, windowMs: 10 * 60 * 1000 });
     if (!rate.ok) return noStoreJson({ ok: false, error: 'Demasiadas acciones. Intenta mas tarde.' }, { status: 429 });
 
-    const result = await savePredictions(user.id, body.predictions ?? []);
-    await saveTriviaPredictions(user.id, body.triviaAnswers ?? []);
+    const predictionItems = Array.isArray(body.predictions) ? body.predictions : [];
+    const triviaItems = Array.isArray(body.triviaAnswers) ? body.triviaAnswers : [];
+    const result = predictionItems.length > 0
+      ? await savePredictions(user.id, predictionItems)
+      : { savedMatchIds: [], lockedMatches: [], invalidMatches: [] };
+    if (triviaItems.length > 0) {
+      await saveTriviaPredictions(user.id, triviaItems);
+    }
 
     revalidatePath('/predictions');
     revalidatePath('/profile');
@@ -38,7 +44,13 @@ export async function POST(request: Request) {
     revalidatePath('/');
 
     const state = await getPredictionsScreenState(token);
-    return noStoreJson({ ok: true, state, lockedMatches: result.lockedMatches });
+    return noStoreJson({
+      ok: true,
+      state,
+      savedMatchIds: result.savedMatchIds,
+      lockedMatches: result.lockedMatches,
+      invalidMatches: result.invalidMatches,
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'No se pudieron guardar las predicciones';
     return noStoreJson({ ok: false, error: message }, { status: 400 });
