@@ -132,7 +132,6 @@ export type LeaderboardScope = 'general' | 'groups' | 'knockout';
 
 export type LeaderboardView = {
   rows: LeaderboardRow[];
-  participantDetails: LeaderboardParticipantDetail[];
 };
 
 export type StateResponse = {

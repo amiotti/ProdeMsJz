@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { LeaderboardPlayerDialog } from '@/components/leaderboard-player-dialog';
-import type { LeaderboardRow, LeaderboardScope, LeaderboardView } from '@/lib/types';
+import type { LeaderboardParticipantDetail, LeaderboardRow, LeaderboardScope, LeaderboardView } from '@/lib/types';
 
 type SavedGroup = {
   id: string;
@@ -65,9 +65,11 @@ export function LeaderboardTable({
   const [groupsError, setGroupsError] = useState<string | null>(null);
   const [groupMutationLoading, setGroupMutationLoading] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState<{ row: LeaderboardRow; position: number } | null>(null);
+  const [detailCache, setDetailCache] = useState<Record<string, LeaderboardParticipantDetail>>({});
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [detailError, setDetailError] = useState<string | null>(null);
   const activeView = views[activeScope];
   const rows = activeView.rows;
-  const participantDetails = activeView.participantDetails;
   const activeScopeOption = SCOPE_OPTIONS.find((option) => option.id === activeScope) ?? SCOPE_OPTIONS[0];
 
   useEffect(() => {
@@ -144,10 +146,6 @@ export function LeaderboardTable({
   }, [rows, userQuery]);
 
   const selectedCount = useMemo(() => Object.values(draftSelectedUserIds).filter(Boolean).length, [draftSelectedUserIds]);
-  const participantDetailByUserId = useMemo(
-    () => new Map(participantDetails.map((detail) => [detail.userId, detail] as const)),
-    [participantDetails],
-  );
   const positionByUserId = useMemo(
     () => new Map(rows.map((row, index) => [row.userId, index + 1] as const)),
     [rows],
@@ -171,6 +169,36 @@ export function LeaderboardTable({
 
   function toggleDraftUser(userId: string) {
     setDraftSelectedUserIds((prev) => ({ ...prev, [userId]: !prev[userId] }));
+  }
+
+  async function openPlayerDetail(row: LeaderboardRow, position: number) {
+    setSelectedPlayer({ row, position });
+    setDetailError(null);
+    const cacheKey = `${activeScope}:${row.userId}`;
+    if (detailCache[cacheKey]) return;
+
+    setDetailLoading(true);
+    try {
+      const params = new URLSearchParams({ userId: row.userId, scope: activeScope });
+      const response = await fetch(`/api/leaderboard/player-detail?${params.toString()}`, { cache: 'no-store' });
+      const payload = (await response.json()) as {
+        ok?: boolean;
+        detail?: LeaderboardParticipantDetail;
+        error?: string;
+      };
+      if (response.status === 401) {
+        window.location.assign('/login');
+        return;
+      }
+      if (!response.ok || !payload.ok || !payload.detail) {
+        throw new Error(payload.error || 'No se pudo cargar el detalle');
+      }
+      setDetailCache((prev) => ({ ...prev, [cacheKey]: payload.detail! }));
+    } catch (error) {
+      setDetailError(error instanceof Error ? error.message : 'No se pudo cargar el detalle');
+    } finally {
+      setDetailLoading(false);
+    }
   }
 
   async function createGroup() {
@@ -336,7 +364,7 @@ export function LeaderboardTable({
                         <button
                           className="leader-player-button"
                           type="button"
-                          onClick={() => setSelectedPlayer({ row, position: positionByUserId.get(row.userId) ?? index + 1 })}
+                          onClick={() => void openPlayerDetail(row, positionByUserId.get(row.userId) ?? index + 1)}
                           aria-label={`Ver detalle de ${displayName(row)}`}
                         >
                           <strong>{displayName(row)}</strong>
@@ -519,7 +547,9 @@ export function LeaderboardTable({
         <LeaderboardPlayerDialog
           row={selectedPlayer.row}
           position={selectedPlayer.position}
-          detail={participantDetailByUserId.get(selectedPlayer.row.userId) ?? null}
+          detail={detailCache[`${activeScope}:${selectedPlayer.row.userId}`] ?? null}
+          loading={detailLoading}
+          error={detailError}
           onClose={() => setSelectedPlayer(null)}
         />
       ) : null}

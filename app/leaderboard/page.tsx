@@ -39,9 +39,9 @@ export default async function LeaderboardPage() {
       {canViewLeaderboard ? (
         <LeaderboardTable
           views={state?.views ?? {
-            general: { rows: [], participantDetails: [] },
-            groups: { rows: [], participantDetails: [] },
-            knockout: { rows: [], participantDetails: [] },
+            general: { rows: [] },
+            groups: { rows: [] },
+            knockout: { rows: [] },
           }}
           isLoggedIn
         />

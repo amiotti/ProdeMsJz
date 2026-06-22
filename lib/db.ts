@@ -10,6 +10,7 @@ import type {
   ContactMessageStatus,
   LeaderboardParticipantDetail,
   LeaderboardRow,
+  LeaderboardScope,
   LeaderboardView,
   Match,
   Prediction,
@@ -1544,11 +1545,7 @@ function buildLeaderboardParticipantDetails(db: ProdeDB, leaderboard: Leaderboar
 }
 
 function buildLeaderboardView(db: ProdeDB): LeaderboardView {
-  const rows = computeLeaderboard(db);
-  return {
-    rows,
-    participantDetails: buildLeaderboardParticipantDetails(db, rows),
-  };
+  return { rows: computeLeaderboard(db) };
 }
 
 function buildPhaseLeaderboardDb(db: ProdeDB, phase: 'groups' | 'knockout'): ProdeDB {
@@ -1567,10 +1564,7 @@ function buildPhaseLeaderboardDb(db: ProdeDB, phase: 'groups' | 'knockout'): Pro
 export async function getLeaderboardPageState() {
   await ensureBaseData();
   const core = await getCoreStateSnapshot();
-  const general: LeaderboardView = {
-    rows: core.leaderboard,
-    participantDetails: buildLeaderboardParticipantDetails(core.db, core.leaderboard),
-  };
+  const general: LeaderboardView = { rows: core.leaderboard };
   const groups = buildLeaderboardView(buildPhaseLeaderboardDb(core.db, 'groups'));
   const knockout = buildLeaderboardView(buildPhaseLeaderboardDb(core.db, 'knockout'));
 
@@ -1582,6 +1576,22 @@ export async function getLeaderboardPageState() {
       knockout,
     },
   };
+}
+
+export async function getLeaderboardParticipantDetail(
+  userId: string,
+  scope: LeaderboardScope,
+): Promise<LeaderboardParticipantDetail | null> {
+  await ensureBaseData();
+  const core = await getCoreStateSnapshot();
+  const scopedDb =
+    scope === 'general'
+      ? core.db
+      : buildPhaseLeaderboardDb(core.db, scope === 'groups' ? 'groups' : 'knockout');
+  const leaderboard = scope === 'general' ? core.leaderboard : computeLeaderboard(scopedDb);
+  const row = leaderboard.find((item) => item.userId === userId);
+  if (!row) return null;
+  return buildLeaderboardParticipantDetails(scopedDb, [row])[0] ?? null;
 }
 
 export async function getResultsScreenState(viewerToken?: string | null): Promise<StateResponse> {

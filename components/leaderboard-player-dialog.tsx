@@ -14,11 +14,15 @@ export function LeaderboardPlayerDialog({
   row,
   position,
   detail,
+  loading,
+  error,
   onClose,
 }: {
   row: LeaderboardRow;
   position: number;
   detail: LeaderboardParticipantDetail | null;
+  loading: boolean;
+  error: string | null;
   onClose: () => void;
 }) {
   useEffect(() => {
@@ -80,7 +84,11 @@ export function LeaderboardPlayerDialog({
         </div>
 
         <div className="player-result-sections">
-          {matchSections.length ? (
+          {loading ? (
+            <p className="muted">Cargando detalle del participante...</p>
+          ) : error ? (
+            <p className="status">{error}</p>
+          ) : matchSections.length ? (
             matchSections.map((section) => (
               <section key={section.title} className="player-result-section">
                 <div className="player-result-section-head">
