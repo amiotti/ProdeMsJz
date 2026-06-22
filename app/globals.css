@@ -2500,6 +2500,19 @@ select:focus {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.45rem;
+  flex: 1 1 auto;
+}
+
+.leaderboard-scope-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0.55rem;
+}
+
+.leaderboard-inline-create {
+  flex: 0 0 auto;
+  min-height: 42px;
+  white-space: nowrap;
 }
 
 .leaderboard-scope-button {
@@ -4387,11 +4400,11 @@ html[data-theme='dark'] .trivia-question-card {
   display: grid;
   gap: 0.38rem;
   min-width: 0;
-  justify-items: end;
+  justify-items: center;
 }
 
 .prediction-team-column:last-child {
-  justify-items: start;
+  justify-items: center;
 }
 
 .prediction-fixture-row > .vs {
@@ -4825,6 +4838,15 @@ html[data-theme='dark'] .detail-dialog-close {
 }
 
 @media (max-width: 760px) {
+  .leaderboard-scope-row {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .leaderboard-inline-create {
+    width: 100%;
+  }
+
   .leaderboard-scope-tabs {
     gap: 0.3rem;
   }
@@ -4852,11 +4874,11 @@ html[data-theme='dark'] .detail-dialog-close {
   }
 
   .prediction-team-column {
-    justify-items: end;
+    justify-items: center;
   }
 
   .prediction-team-column:last-child {
-    justify-items: start;
+    justify-items: center;
   }
 
   .team-form-summary {

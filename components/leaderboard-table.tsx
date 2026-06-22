@@ -238,33 +238,38 @@ export function LeaderboardTable({
     <>
       <div className="stack-md">
         <div className="panel leaderboard-scope-panel">
-          <div className="leaderboard-scope-tabs" role="group" aria-label="Fase de la tabla de posiciones">
-            {SCOPE_OPTIONS.map((option) => (
+          <div className="leaderboard-scope-row">
+            <div className="leaderboard-scope-tabs" role="group" aria-label="Fase de la tabla de posiciones">
+              {SCOPE_OPTIONS.map((option) => (
+                <button
+                  key={option.id}
+                  className={`leaderboard-scope-button${activeScope === option.id ? ' is-active' : ''}`}
+                  type="button"
+                  onClick={() => {
+                    setActiveScope(option.id);
+                    setSelectedPlayer(null);
+                  }}
+                  aria-pressed={activeScope === option.id}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+            {isLoggedIn ? (
               <button
-                key={option.id}
-                className={`leaderboard-scope-button${activeScope === option.id ? ' is-active' : ''}`}
                 type="button"
-                onClick={() => {
-                  setActiveScope(option.id);
-                  setSelectedPlayer(null);
-                }}
-                aria-pressed={activeScope === option.id}
+                className="btn btn-primary btn-small leaderboard-inline-create"
+                onClick={openCreateModal}
+                disabled={groupMutationLoading || groupsLoading}
               >
-                {option.label}
+                Crear grupo
               </button>
-            ))}
+            ) : null}
           </div>
           <p className="leaderboard-scope-description">{activeScopeOption.description}</p>
         </div>
 
-        {isLoggedIn && groups.length === 0 ? (
-          <div className="leaderboard-create-group-row">
-            {groupsError ? <p className="field-error">{groupsError}</p> : null}
-            <button type="button" className="btn btn-primary btn-small" onClick={openCreateModal} disabled={groupMutationLoading || groupsLoading}>
-              Crear grupo
-            </button>
-          </div>
-        ) : null}
+        {isLoggedIn && groups.length === 0 && groupsError ? <p className="field-error">{groupsError}</p> : null}
 
         {isLoggedIn && groups.length > 0 ? (
           <div className="panel stack-md">
@@ -292,10 +297,6 @@ export function LeaderboardTable({
                   </option>
                 ))}
               </select>
-
-              <button type="button" className="btn btn-primary btn-small" onClick={openCreateModal} disabled={!isLoggedIn || groupMutationLoading || groupsLoading}>
-                Crear grupo
-              </button>
 
               <button type="button" className="btn btn-small" onClick={deleteActiveGroup} disabled={!isLoggedIn || !activeGroup || groupMutationLoading}>
                 Eliminar grupo activo
