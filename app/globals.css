@@ -4309,10 +4309,11 @@ html[data-theme='dark'] .trivia-question-card {
 /* Recent team form and leaderboard participant details */
 .prediction-fixture-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 34px minmax(0, 1fr);
+  grid-template-columns: minmax(150px, auto) 34px minmax(150px, auto);
   align-items: flex-start;
   gap: 0.6rem;
-  width: 100%;
+  width: fit-content;
+  max-width: 100%;
 }
 
 .prediction-team-column {
@@ -4616,7 +4617,13 @@ html[data-theme='dark'] .trivia-question-card {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  gap: 0.38rem;
+  column-gap: 0.85rem;
+}
+
+.player-result-fixture > strong {
+  min-width: 46px;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .player-result-fixture > :last-child {
@@ -4753,6 +4760,7 @@ html[data-theme='dark'] .detail-dialog-close {
   .prediction-fixture-row {
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     gap: 0.42rem;
+    width: 100%;
   }
 
   .prediction-team-column {
@@ -4794,6 +4802,10 @@ html[data-theme='dark'] .detail-dialog-close {
 
   .player-result-row {
     grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .player-result-fixture {
+    column-gap: 0.55rem;
   }
 
   .player-result-info {
