@@ -112,6 +112,22 @@ export type LeaderboardRow = {
   totalPredictions: number;
 };
 
+export type LeaderboardPredictionDetail = {
+  matchId: string;
+  kickoffAt: string;
+  stageLabel: string;
+  homeTeam: string;
+  awayTeam: string;
+  officialResult: Score;
+  prediction: Score | null;
+  points: number | null;
+};
+
+export type LeaderboardParticipantDetail = {
+  userId: string;
+  matches: LeaderboardPredictionDetail[];
+};
+
 export type StateResponse = {
   db: ProdeDB;
   leaderboard: LeaderboardRow[];

@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
-import type { LeaderboardRow } from '@/lib/types';
+import { LeaderboardPlayerDialog } from '@/components/leaderboard-player-dialog';
+import type { LeaderboardParticipantDetail, LeaderboardRow } from '@/lib/types';
 
 type SavedGroup = {
   id: string;
@@ -26,7 +27,15 @@ function splitName(row: LeaderboardRow) {
   return { firstName, lastName };
 }
 
-export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[]; isLoggedIn: boolean }) {
+export function LeaderboardTable({
+  rows,
+  participantDetails,
+  isLoggedIn,
+}: {
+  rows: LeaderboardRow[];
+  participantDetails: LeaderboardParticipantDetail[];
+  isLoggedIn: boolean;
+}) {
   const [groups, setGroups] = useState<SavedGroup[]>([]);
   const [activeGroupId, setActiveGroupId] = useState<string>('all');
 
@@ -38,6 +47,7 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
   const [groupsLoading, setGroupsLoading] = useState(false);
   const [groupsError, setGroupsError] = useState<string | null>(null);
   const [groupMutationLoading, setGroupMutationLoading] = useState(false);
+  const [selectedPlayer, setSelectedPlayer] = useState<{ row: LeaderboardRow; position: number } | null>(null);
 
   useEffect(() => {
     const syncTheme = () => setIsDarkTheme(document.documentElement.getAttribute('data-theme') === 'dark');
@@ -113,6 +123,14 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
   }, [rows, userQuery]);
 
   const selectedCount = useMemo(() => Object.values(draftSelectedUserIds).filter(Boolean).length, [draftSelectedUserIds]);
+  const participantDetailByUserId = useMemo(
+    () => new Map(participantDetails.map((detail) => [detail.userId, detail] as const)),
+    [participantDetails],
+  );
+  const positionByUserId = useMemo(
+    () => new Map(rows.map((row, index) => [row.userId, index + 1] as const)),
+    [rows],
+  );
 
   function openCreateModal() {
     if (!isLoggedIn || groupMutationLoading) return;
@@ -273,9 +291,15 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
                         <span className="session-avatar session-avatar-fallback avatar-preview-xs" aria-hidden="true">
                           {initials(row)}
                         </span>
-                        <div>
+                        <button
+                          className="leader-player-button"
+                          type="button"
+                          onClick={() => setSelectedPlayer({ row, position: positionByUserId.get(row.userId) ?? index + 1 })}
+                          aria-label={`Ver detalle de ${displayName(row)}`}
+                        >
                           <strong>{displayName(row)}</strong>
-                        </div>
+                          <span>Ver detalle</span>
+                        </button>
                       </div>
                     </td>
                     <td>{row.totalPoints}</td>
@@ -448,6 +472,15 @@ export function LeaderboardTable({ rows, isLoggedIn }: { rows: LeaderboardRow[];
             </div>
           </div>
         </div>
+      ) : null}
+
+      {selectedPlayer ? (
+        <LeaderboardPlayerDialog
+          row={selectedPlayer.row}
+          position={selectedPlayer.position}
+          detail={participantDetailByUserId.get(selectedPlayer.row.userId) ?? null}
+          onClose={() => setSelectedPlayer(null)}
+        />
       ) : null}
     </>
   );

@@ -37,7 +37,11 @@ export default async function LeaderboardPage() {
       </div>
 
       {canViewLeaderboard ? (
-        <LeaderboardTable rows={state?.leaderboard ?? []} isLoggedIn />
+        <LeaderboardTable
+          rows={state?.leaderboard ?? []}
+          participantDetails={state?.participantDetails ?? []}
+          isLoggedIn
+        />
       ) : (
         <div className="panel stack-md blocked-payment-panel">
           <h3>Tabla bloqueada hasta confirmar pago</h3>

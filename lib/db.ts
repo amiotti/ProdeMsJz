@@ -2,12 +2,13 @@ import { randomUUID } from 'node:crypto';
 
 import { hashPassword, verifyPassword, verifySession } from '@/lib/auth';
 import { getInstantAdminDb, tx } from '@/lib/instant';
-import { computeLeaderboard } from '@/lib/prode';
+import { calculatePredictionPoints, computeLeaderboard } from '@/lib/prode';
 import { createSeedDb } from '@/lib/seed';
 import { getTaloPayment, isValidTaloRegistrationPaymentForUser } from '@/lib/talopay';
 import type {
   ContactMessage,
   ContactMessageStatus,
+  LeaderboardParticipantDetail,
   LeaderboardRow,
   Match,
   Prediction,
@@ -1514,9 +1515,37 @@ export async function getHomePageState() {
 export async function getLeaderboardPageState() {
   await ensureBaseData();
   const core = await getCoreStateSnapshot();
+  const predictionsByUserAndMatch = new Map(
+    core.db.predictions.map((prediction) => [`${prediction.userId}:${prediction.matchId}`, prediction] as const),
+  );
+  const completedMatches = core.db.matches
+    .filter((match): match is Match & { officialResult: Score } => Boolean(match.officialResult))
+    .sort((a, b) => new Date(a.kickoffAt).getTime() - new Date(b.kickoffAt).getTime());
+  const participantDetails: LeaderboardParticipantDetail[] = core.leaderboard.map((row) => ({
+    userId: row.userId,
+    matches: completedMatches.map((match) => {
+      const prediction = predictionsByUserAndMatch.get(`${row.userId}:${match.id}`) ?? null;
+      const points = prediction
+        ? calculatePredictionPoints(prediction, match.officialResult, core.db.pointsConfig).points
+        : null;
+
+      return {
+        matchId: match.id,
+        kickoffAt: match.kickoffAt,
+        stageLabel: match.groupId === 'KO' ? match.stage ?? 'Fase final' : `Grupo ${match.groupId}`,
+        homeTeam: match.homeTeam,
+        awayTeam: match.awayTeam,
+        officialResult: match.officialResult,
+        prediction: prediction ? { home: prediction.homeGoals, away: prediction.awayGoals } : null,
+        points,
+      };
+    }),
+  }));
+
   return {
     leaderboard: core.leaderboard,
     pointsConfig: core.db.pointsConfig,
+    participantDetails,
   };
 }
 

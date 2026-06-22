@@ -3,9 +3,12 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { TeamFormDialog } from '@/components/team-form-dialog';
+import { TeamFormSummary } from '@/components/team-form-summary';
 import { TeamName } from '@/components/team-name';
 import { formatDateArgentinaShort, formatKickoffArgentina } from '@/lib/datetime';
 import { calculatePredictionPoints, isTriviaAnswerMatch } from '@/lib/prode';
+import { getRecentTeamResults } from '@/lib/team-form';
 import type { Match, StateResponse, TriviaQuestion } from '@/lib/types';
 import { estimateMatchProbabilities, getTeamDisplayName } from '@/lib/worldcup26';
 
@@ -128,6 +131,7 @@ export function PredictionsBoard({
   const savingLockRef = useRef(false);
   const syncedUserIdRef = useRef<string | null>(initialState?.viewer.user?.id ?? null);
   const [optimisticSavedMatchIds, setOptimisticSavedMatchIds] = useState<Set<string>>(new Set());
+  const [selectedFormTeam, setSelectedFormTeam] = useState<string | null>(null);
 
   async function loadState() {
     setLoading(true);
@@ -248,6 +252,12 @@ export function PredictionsBoard({
   const allMatches = useMemo(() => {
     return [...(state?.db.matches ?? [])].sort(sortMatches);
   }, [state?.db.matches]);
+  const recentResultsByTeam = useMemo(() => {
+    const teams = new Set(allMatches.flatMap((match) => [match.homeTeam, match.awayTeam]));
+    return new Map(
+      Array.from(teams, (teamName) => [teamName, getRecentTeamResults(teamName, allMatches)] as const),
+    );
+  }, [allMatches]);
 
   const groupSections = useMemo(() => {
     if (!state) return [] as MatchSection[];
@@ -286,6 +296,19 @@ export function PredictionsBoard({
     for (const matchId of optimisticSavedMatchIds) saved.add(matchId);
     return saved;
   }, [currentUser?.id, optimisticSavedMatchIds, state?.db.predictions]);
+  const predictionProgress = useMemo(() => {
+    const total = allMatches.length;
+    const saved = allMatches.reduce(
+      (count, match) => count + (savedPredictedMatchIds.has(match.id) ? 1 : 0),
+      0,
+    );
+
+    return {
+      saved,
+      total,
+      percentage: total > 0 ? Math.round((saved / total) * 100) : 0,
+    };
+  }, [allMatches, savedPredictedMatchIds]);
 
   const visibleSections = useMemo(() => {
     const todayKey = formatDateArgentinaShort(new Date().toISOString());
@@ -682,10 +705,24 @@ export function PredictionsBoard({
         {earnedPoints !== null ? <span className="prediction-points-badge">{earnedPoints} pts</span> : null}
         <div className="match-main">
           <p className="match-meta">{headerMeta} - {kickoff}</p>
-          <div className="fixture-row">
-            <TeamName teamName={match.homeTeam} linkToTeam />
+          <div className="fixture-row prediction-fixture-row">
+            <div className="prediction-team-column">
+              <TeamName teamName={match.homeTeam} linkToTeam />
+              <TeamFormSummary
+                teamName={match.homeTeam}
+                results={recentResultsByTeam.get(match.homeTeam) ?? []}
+                onOpen={() => setSelectedFormTeam(match.homeTeam)}
+              />
+            </div>
             <span className="vs">vs</span>
-            <TeamName teamName={match.awayTeam} linkToTeam />
+            <div className="prediction-team-column">
+              <TeamName teamName={match.awayTeam} linkToTeam />
+              <TeamFormSummary
+                teamName={match.awayTeam}
+                results={recentResultsByTeam.get(match.awayTeam) ?? []}
+                onOpen={() => setSelectedFormTeam(match.awayTeam)}
+              />
+            </div>
           </div>
           {probabilities ? (
             <p className="prob-row">
@@ -824,6 +861,36 @@ export function PredictionsBoard({
         </button>
       </div>
 
+      <div className="prediction-progress panel" aria-label="Progreso de predicciones guardadas">
+        <div className="prediction-progress-head">
+          <div>
+            <span className="eyebrow">Avance del PRODE</span>
+            <strong>{predictionProgress.percentage}% completado</strong>
+          </div>
+          <span className="prediction-progress-count">
+            {predictionProgress.saved} de {predictionProgress.total} partidos
+          </span>
+        </div>
+        <div
+          className="prediction-progress-track"
+          role="progressbar"
+          aria-valuemin={0}
+          aria-valuemax={predictionProgress.total}
+          aria-valuenow={predictionProgress.saved}
+          aria-valuetext={`${predictionProgress.percentage}% de predicciones guardadas`}
+        >
+          <span
+            className="prediction-progress-fill"
+            style={{ width: `${predictionProgress.percentage}%` }}
+          />
+        </div>
+        {dirtyMatchIdsRef.current.size > 0 ? (
+          <span className="prediction-progress-pending">
+            {dirtyMatchIdsRef.current.size} borrador(es) todavía sin guardar
+          </span>
+        ) : null}
+      </div>
+
       {message ? <p className="status">{message}</p> : null}
       {dirtyMatchIdsRef.current.size > 0 ? (
         <p className="status">
@@ -909,6 +976,14 @@ export function PredictionsBoard({
       {showTriviaAfterMatches
         ? renderTriviaPanel('trivia-readonly-last', !hasApprovedPayment)
         : null}
+
+      {selectedFormTeam ? (
+        <TeamFormDialog
+          teamName={selectedFormTeam}
+          results={recentResultsByTeam.get(selectedFormTeam) ?? []}
+          onClose={() => setSelectedFormTeam(null)}
+        />
+      ) : null}
     </section>
   );
 }
