@@ -16,7 +16,7 @@ export function TeamFormSummary({
   results: TeamFormResult[];
   onOpen: () => void;
 }) {
-  const slots = Array.from({ length: 5 }, (_, index) => results[index] ?? null);
+  const slots = Array.from({ length: 3 }, (_, index) => results[index] ?? null);
   const displayName = getTeamDisplayName(teamName);
 
   return (
@@ -26,7 +26,7 @@ export function TeamFormSummary({
       onClick={onOpen}
       aria-label={`Ver los últimos partidos de ${displayName}`}
     >
-      <span className="team-form-title">Últimos 5</span>
+      <span className="team-form-title">Últimos 3</span>
       <span className="team-form-dots" aria-hidden="true">
         {slots.map((result, index) => (
           <span

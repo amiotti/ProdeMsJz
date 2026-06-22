@@ -298,7 +298,6 @@ export function LeaderboardTable({
                           aria-label={`Ver detalle de ${displayName(row)}`}
                         >
                           <strong>{displayName(row)}</strong>
-                          <span>Ver detalle</span>
                         </button>
                       </div>
                     </td>

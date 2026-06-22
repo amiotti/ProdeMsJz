@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 
 import { TeamName } from '@/components/team-name';
-import { formatDateArgentinaShort } from '@/lib/datetime';
 import type { LeaderboardParticipantDetail, LeaderboardRow } from '@/lib/types';
 
 function playerName(row: LeaderboardRow) {
@@ -22,14 +22,36 @@ export function LeaderboardPlayerDialog({
   onClose: () => void;
 }) {
   useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose();
     };
     window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+    };
   }, [onClose]);
 
-  return (
+  const matchSections = useMemo(() => {
+    const matches = detail?.matches ?? [];
+    const groupMatches = matches.filter((match) => match.stageLabel.startsWith('Grupo '));
+    const knockoutByStage = new Map<string, typeof matches>();
+
+    for (const match of matches.filter((item) => !item.stageLabel.startsWith('Grupo '))) {
+      const section = knockoutByStage.get(match.stageLabel) ?? [];
+      section.push(match);
+      knockoutByStage.set(match.stageLabel, section);
+    }
+
+    return [
+      ...(groupMatches.length ? [{ title: 'Fase de grupos', matches: groupMatches }] : []),
+      ...Array.from(knockoutByStage, ([title, sectionMatches]) => ({ title, matches: sectionMatches })),
+    ];
+  }, [detail]);
+
+  return createPortal(
     <div className="detail-dialog-backdrop" role="presentation" onMouseDown={onClose}>
       <section
         className="detail-dialog leaderboard-player-dialog panel stack-md"
@@ -52,37 +74,49 @@ export function LeaderboardPlayerDialog({
           <span><strong>#{position}</strong> Posición</span>
           <span><strong>{row.totalPoints}</strong> Puntos</span>
           <span><strong>{row.exactHits}</strong> Exactos</span>
+          <span><strong>{row.outcomeHits}</strong> Signos</span>
+          <span><strong>{row.sideGoalsHits}</strong> Goles</span>
           <span><strong>{row.accuracyRate}%</strong> Efectividad</span>
         </div>
 
-        <div className="player-result-list">
-          {detail?.matches.length ? (
-            detail.matches.map((match) => (
-              <article key={match.matchId} className="player-result-row">
-                <div className="player-result-info">
-                  <span className="muted">{formatDateArgentinaShort(match.kickoffAt)} · {match.stageLabel}</span>
-                  <div className="player-result-fixture">
-                    <TeamName teamName={match.homeTeam} linkToTeam />
-                    <strong>{match.officialResult.home} - {match.officialResult.away}</strong>
-                    <TeamName teamName={match.awayTeam} linkToTeam />
-                  </div>
+        <div className="player-result-sections">
+          {matchSections.length ? (
+            matchSections.map((section) => (
+              <section key={section.title} className="player-result-section">
+                <div className="player-result-section-head">
+                  <h4>{section.title}</h4>
+                  <span>{section.matches.length} partido(s)</span>
                 </div>
-                <div className="player-result-prediction">
-                  <span>Predicción</span>
-                  <strong>
-                    {match.prediction ? `${match.prediction.home} - ${match.prediction.away}` : 'Sin predicción'}
-                  </strong>
+                <div className="player-result-list">
+                  {section.matches.map((match) => (
+                    <article key={match.matchId} className="player-result-row">
+                      <div className="player-result-info">
+                        <div className="player-result-fixture">
+                          <TeamName teamName={match.homeTeam} linkToTeam />
+                          <strong>{match.officialResult.home} - {match.officialResult.away}</strong>
+                          <TeamName teamName={match.awayTeam} linkToTeam />
+                        </div>
+                      </div>
+                      <div className="player-result-prediction">
+                        <span>Predicción</span>
+                        <strong>
+                          {match.prediction ? `${match.prediction.home} - ${match.prediction.away}` : 'Sin predicción'}
+                        </strong>
+                      </div>
+                      <span className={`player-result-points${match.points === null ? ' is-empty' : ''}`}>
+                        {match.points === null ? '—' : `+${match.points} pts`}
+                      </span>
+                    </article>
+                  ))}
                 </div>
-                <span className={`player-result-points${match.points === null ? ' is-empty' : ''}`}>
-                  {match.points === null ? '—' : `+${match.points} pts`}
-                </span>
-              </article>
+              </section>
             ))
           ) : (
             <p className="muted">Todavía no hay partidos con resultados oficiales cargados.</p>
           )}
         </div>
       </section>
-    </div>
+    </div>,
+    document.body,
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 import { TeamName } from '@/components/team-name';
 import { formatDateArgentinaShort } from '@/lib/datetime';
@@ -23,16 +24,21 @@ export function TeamFormDialog({
   onClose: () => void;
 }) {
   useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose();
     };
     window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+    };
   }, [onClose]);
 
   const displayName = getTeamDisplayName(teamName);
 
-  return (
+  return createPortal(
     <div className="detail-dialog-backdrop" role="presentation" onMouseDown={onClose}>
       <section
         className="detail-dialog panel stack-md"
@@ -44,7 +50,7 @@ export function TeamFormDialog({
         <div className="detail-dialog-head">
           <div>
             <p className="eyebrow">Forma reciente</p>
-            <h3 id="team-form-dialog-title">Últimos partidos de {displayName}</h3>
+            <h3 id="team-form-dialog-title">Últimos 3 partidos de {displayName}</h3>
           </div>
           <button className="detail-dialog-close" type="button" onClick={onClose} aria-label="Cerrar detalle">
             ×
@@ -56,12 +62,9 @@ export function TeamFormDialog({
             {results.map((result) => (
               <article key={result.matchId} className="team-form-result-row">
                 <span className={`team-form-result-badge is-${result.result}`}>{RESULT_TEXT[result.result]}</span>
-                <div className="team-form-result-main">
-                  <span className="muted">{formatDateArgentinaShort(result.kickoffAt)}</span>
-                  <div className="team-form-opponent">
-                    <span>vs</span>
-                    <TeamName teamName={result.opponent} linkToTeam />
-                  </div>
+                <span className="team-form-result-date">{formatDateArgentinaShort(result.kickoffAt)}</span>
+                <div className="team-form-opponent">
+                  <TeamName teamName={result.opponent} linkToTeam />
                 </div>
                 <strong className="team-form-score">{result.teamScore} - {result.opponentScore}</strong>
               </article>
@@ -71,6 +74,7 @@ export function TeamFormDialog({
           <p className="muted">Todavía no hay resultados oficiales cargados para esta selección.</p>
         )}
       </section>
-    </div>
+    </div>,
+    document.body,
   );
 }

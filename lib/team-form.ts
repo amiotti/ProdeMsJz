@@ -12,7 +12,7 @@ export type TeamFormResult = {
   awayTeam: string;
 };
 
-export function getRecentTeamResults(teamName: string, matches: Match[], limit = 5): TeamFormResult[] {
+export function getRecentTeamResults(teamName: string, matches: Match[], limit = 3): TeamFormResult[] {
   return matches
     .filter(
       (match): match is Match & { officialResult: Score } =>
