@@ -4912,12 +4912,15 @@ html[data-theme='dark'] .detail-dialog-close {
 
   .player-result-row {
     grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.58rem 0.72rem;
+    padding: 0.72rem;
   }
 
   .player-result-fixture {
     grid-template-columns: minmax(0, 1fr) 46px minmax(0, 1fr);
-    column-gap: 0.55rem;
+    column-gap: 0.42rem;
     justify-content: stretch;
+    width: 100%;
   }
 
   .player-result-fixture > :first-child,
@@ -4927,12 +4930,48 @@ html[data-theme='dark'] .detail-dialog-close {
     max-width: none;
   }
 
+  .player-result-fixture > :first-child {
+    justify-self: end;
+  }
+
+  .player-result-fixture > :last-child {
+    justify-self: start;
+  }
+
+  .player-result-fixture .team-inline {
+    width: fit-content;
+    max-width: 100%;
+    padding: 0.3rem 0.42rem;
+    font-size: 0.82rem;
+    line-height: 1.15;
+  }
+
+  .player-result-fixture .team-inline > span:last-child {
+    overflow-wrap: anywhere;
+  }
+
   .player-result-info {
     grid-column: 1 / -1;
   }
 
   .player-result-prediction {
+    display: flex;
+    align-items: baseline;
+    gap: 0.42rem;
     text-align: left;
+  }
+
+  .player-result-prediction span {
+    font-size: 0.7rem;
+  }
+
+  .player-result-prediction strong {
+    font-size: 0.92rem;
+  }
+
+  .player-result-points {
+    align-self: center;
+    min-width: 58px;
   }
 
   .team-form-result-row {
@@ -4974,6 +5013,18 @@ html[data-theme='dark'] .table tbody tr:hover {
 html[data-theme='dark'] .team-inline {
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(14, 13, 22, 0.52);
+}
+
+@media (max-width: 760px) {
+  html[data-theme='dark'] .leaderboard-player-dialog .player-result-row {
+    background: rgba(255, 255, 255, 0.065);
+  }
+
+  html[data-theme='dark'] .leaderboard-player-dialog .team-inline {
+    border-color: rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: none;
+  }
 }
 
 html[data-theme='dark'] .flag-pill {
