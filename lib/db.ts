@@ -10,6 +10,7 @@ import type {
   ContactMessageStatus,
   LeaderboardParticipantDetail,
   LeaderboardRow,
+  LeaderboardView,
   Match,
   Prediction,
   ProdeDB,
@@ -1512,21 +1513,20 @@ export async function getHomePageState() {
   };
 }
 
-export async function getLeaderboardPageState() {
-  await ensureBaseData();
-  const core = await getCoreStateSnapshot();
+function buildLeaderboardParticipantDetails(db: ProdeDB, leaderboard: LeaderboardRow[]): LeaderboardParticipantDetail[] {
   const predictionsByUserAndMatch = new Map(
-    core.db.predictions.map((prediction) => [`${prediction.userId}:${prediction.matchId}`, prediction] as const),
+    db.predictions.map((prediction) => [`${prediction.userId}:${prediction.matchId}`, prediction] as const),
   );
-  const completedMatches = core.db.matches
+  const completedMatches = db.matches
     .filter((match): match is Match & { officialResult: Score } => Boolean(match.officialResult))
     .sort((a, b) => new Date(a.kickoffAt).getTime() - new Date(b.kickoffAt).getTime());
-  const participantDetails: LeaderboardParticipantDetail[] = core.leaderboard.map((row) => ({
+
+  return leaderboard.map((row) => ({
     userId: row.userId,
     matches: completedMatches.map((match) => {
       const prediction = predictionsByUserAndMatch.get(`${row.userId}:${match.id}`) ?? null;
       const points = prediction
-        ? calculatePredictionPoints(prediction, match.officialResult, core.db.pointsConfig).points
+        ? calculatePredictionPoints(prediction, match.officialResult, db.pointsConfig).points
         : null;
 
       return {
@@ -1541,11 +1541,46 @@ export async function getLeaderboardPageState() {
       };
     }),
   }));
+}
+
+function buildLeaderboardView(db: ProdeDB): LeaderboardView {
+  const rows = computeLeaderboard(db);
+  return {
+    rows,
+    participantDetails: buildLeaderboardParticipantDetails(db, rows),
+  };
+}
+
+function buildPhaseLeaderboardDb(db: ProdeDB, phase: 'groups' | 'knockout'): ProdeDB {
+  const matches = db.matches.filter((match) => (phase === 'groups' ? match.groupId !== 'KO' : match.groupId === 'KO'));
+  const matchIds = new Set(matches.map((match) => match.id));
 
   return {
-    leaderboard: core.leaderboard,
+    ...db,
+    matches,
+    predictions: db.predictions.filter((prediction) => matchIds.has(prediction.matchId)),
+    triviaPredictions: [],
+    triviaResults: [],
+  };
+}
+
+export async function getLeaderboardPageState() {
+  await ensureBaseData();
+  const core = await getCoreStateSnapshot();
+  const general: LeaderboardView = {
+    rows: core.leaderboard,
+    participantDetails: buildLeaderboardParticipantDetails(core.db, core.leaderboard),
+  };
+  const groups = buildLeaderboardView(buildPhaseLeaderboardDb(core.db, 'groups'));
+  const knockout = buildLeaderboardView(buildPhaseLeaderboardDb(core.db, 'knockout'));
+
+  return {
     pointsConfig: core.db.pointsConfig,
-    participantDetails,
+    views: {
+      general,
+      groups,
+      knockout,
+    },
   };
 }
 

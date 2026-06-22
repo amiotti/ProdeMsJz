@@ -2490,6 +2490,73 @@ select:focus {
   flex-wrap: wrap;
 }
 
+.leaderboard-scope-panel {
+  display: grid;
+  gap: 0.58rem;
+  padding: 0.7rem;
+}
+
+.leaderboard-scope-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.leaderboard-scope-button {
+  min-height: 42px;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.44);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    background 160ms ease;
+}
+
+.leaderboard-scope-button:hover,
+.leaderboard-scope-button:focus-visible {
+  border-color: rgba(0, 211, 183, 0.5);
+  color: var(--text);
+  transform: translateY(-1px);
+}
+
+.leaderboard-scope-button.is-active {
+  border-color: rgba(0, 211, 183, 0.58);
+  color: #101c22;
+  background:
+    linear-gradient(135deg, rgba(244, 190, 31, 0.94), rgba(89, 227, 215, 0.94)),
+    #f4be1f;
+  box-shadow:
+    0 8px 20px rgba(0, 211, 183, 0.16),
+    0 0 0 1px rgba(255, 255, 255, 0.34) inset;
+}
+
+.leaderboard-scope-description {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.76rem;
+  text-align: center;
+}
+
+html[data-theme='dark'] .leaderboard-scope-button {
+  color: #d8e0ed;
+  background: rgba(255, 255, 255, 0.055);
+}
+
+html[data-theme='dark'] .leaderboard-scope-button.is-active {
+  color: #101c22;
+  background:
+    linear-gradient(135deg, rgba(244, 190, 31, 0.96), rgba(89, 227, 215, 0.92)),
+    #f4be1f;
+}
+
 .historical-prode-table {
   min-width: 1120px;
   font-size: 0.82rem;
@@ -4320,7 +4387,7 @@ html[data-theme='dark'] .trivia-question-card {
   display: grid;
   gap: 0.38rem;
   min-width: 0;
-  justify-items: start;
+  justify-items: end;
 }
 
 .prediction-team-column:last-child {
@@ -4330,7 +4397,7 @@ html[data-theme='dark'] .trivia-question-card {
 .prediction-fixture-row > .vs {
   align-self: start;
   justify-self: center;
-  margin-top: 0.18rem;
+  margin-top: 0.22rem;
   text-align: center;
 }
 
@@ -4615,9 +4682,17 @@ html[data-theme='dark'] .trivia-question-card {
 
 .player-result-fixture {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-columns: minmax(108px, 108px) 46px minmax(108px, 108px);
   align-items: center;
   column-gap: 0.85rem;
+  justify-content: start;
+}
+
+.player-result-fixture > :first-child {
+  width: 108px;
+  min-width: 108px;
+  max-width: 108px;
+  justify-self: end;
 }
 
 .player-result-fixture > strong {
@@ -4627,6 +4702,9 @@ html[data-theme='dark'] .trivia-question-card {
 }
 
 .player-result-fixture > :last-child {
+  width: 108px;
+  min-width: 108px;
+  max-width: 108px;
   justify-self: start;
 }
 
@@ -4747,6 +4825,16 @@ html[data-theme='dark'] .detail-dialog-close {
 }
 
 @media (max-width: 760px) {
+  .leaderboard-scope-tabs {
+    gap: 0.3rem;
+  }
+
+  .leaderboard-scope-button {
+    min-height: 40px;
+    padding: 0.45rem 0.3rem;
+    font-size: 0.72rem;
+  }
+
   .prediction-progress-head {
     align-items: start;
   }
@@ -4764,7 +4852,7 @@ html[data-theme='dark'] .detail-dialog-close {
   }
 
   .prediction-team-column {
-    justify-items: start;
+    justify-items: end;
   }
 
   .prediction-team-column:last-child {
@@ -4805,7 +4893,16 @@ html[data-theme='dark'] .detail-dialog-close {
   }
 
   .player-result-fixture {
+    grid-template-columns: minmax(0, 1fr) 46px minmax(0, 1fr);
     column-gap: 0.55rem;
+    justify-content: stretch;
+  }
+
+  .player-result-fixture > :first-child,
+  .player-result-fixture > :last-child {
+    width: auto;
+    min-width: 0;
+    max-width: none;
   }
 
   .player-result-info {

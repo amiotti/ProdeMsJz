@@ -3,13 +3,31 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { LeaderboardPlayerDialog } from '@/components/leaderboard-player-dialog';
-import type { LeaderboardParticipantDetail, LeaderboardRow } from '@/lib/types';
+import type { LeaderboardRow, LeaderboardScope, LeaderboardView } from '@/lib/types';
 
 type SavedGroup = {
   id: string;
   name: string;
   userIds: string[];
 };
+
+const SCOPE_OPTIONS: Array<{ id: LeaderboardScope; label: string; description: string }> = [
+  {
+    id: 'general',
+    label: 'Tabla General',
+    description: 'Todos los partidos y puntos obtenidos en la trivia.',
+  },
+  {
+    id: 'groups',
+    label: 'Grupos',
+    description: 'Solo la fase de grupos. La trivia no suma en esta tabla.',
+  },
+  {
+    id: 'knockout',
+    label: 'Eliminatoria',
+    description: 'Desde 16avos hasta la final. La trivia no suma en esta tabla.',
+  },
+];
 
 function initials(row: LeaderboardRow) {
   const a = row.firstName?.trim()?.[0] ?? '';
@@ -28,14 +46,13 @@ function splitName(row: LeaderboardRow) {
 }
 
 export function LeaderboardTable({
-  rows,
-  participantDetails,
+  views,
   isLoggedIn,
 }: {
-  rows: LeaderboardRow[];
-  participantDetails: LeaderboardParticipantDetail[];
+  views: Record<LeaderboardScope, LeaderboardView>;
   isLoggedIn: boolean;
 }) {
+  const [activeScope, setActiveScope] = useState<LeaderboardScope>('general');
   const [groups, setGroups] = useState<SavedGroup[]>([]);
   const [activeGroupId, setActiveGroupId] = useState<string>('all');
 
@@ -48,6 +65,10 @@ export function LeaderboardTable({
   const [groupsError, setGroupsError] = useState<string | null>(null);
   const [groupMutationLoading, setGroupMutationLoading] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState<{ row: LeaderboardRow; position: number } | null>(null);
+  const activeView = views[activeScope];
+  const rows = activeView.rows;
+  const participantDetails = activeView.participantDetails;
+  const activeScopeOption = SCOPE_OPTIONS.find((option) => option.id === activeScope) ?? SCOPE_OPTIONS[0];
 
   useEffect(() => {
     const syncTheme = () => setIsDarkTheme(document.documentElement.getAttribute('data-theme') === 'dark');
@@ -216,6 +237,26 @@ export function LeaderboardTable({
   return (
     <>
       <div className="stack-md">
+        <div className="panel leaderboard-scope-panel">
+          <div className="leaderboard-scope-tabs" role="group" aria-label="Fase de la tabla de posiciones">
+            {SCOPE_OPTIONS.map((option) => (
+              <button
+                key={option.id}
+                className={`leaderboard-scope-button${activeScope === option.id ? ' is-active' : ''}`}
+                type="button"
+                onClick={() => {
+                  setActiveScope(option.id);
+                  setSelectedPlayer(null);
+                }}
+                aria-pressed={activeScope === option.id}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+          <p className="leaderboard-scope-description">{activeScopeOption.description}</p>
+        </div>
+
         {isLoggedIn && groups.length === 0 ? (
           <div className="leaderboard-create-group-row">
             {groupsError ? <p className="field-error">{groupsError}</p> : null}
