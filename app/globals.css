@@ -4837,6 +4837,17 @@ html[data-theme='dark'] .detail-dialog-close {
   background: rgba(255, 255, 255, 0.07);
 }
 
+html[data-theme='dark'] .leaderboard-player-dialog .player-result-row {
+  border-color: rgba(255, 255, 255, 0.13);
+  background: rgba(255, 255, 255, 0.065);
+}
+
+html[data-theme='dark'] .leaderboard-player-dialog .team-inline {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: none;
+}
+
 @media (max-width: 760px) {
   .leaderboard-scope-row {
     display: grid;
@@ -5013,18 +5024,6 @@ html[data-theme='dark'] .table tbody tr:hover {
 html[data-theme='dark'] .team-inline {
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(14, 13, 22, 0.52);
-}
-
-@media (max-width: 760px) {
-  html[data-theme='dark'] .leaderboard-player-dialog .player-result-row {
-    background: rgba(255, 255, 255, 0.065);
-  }
-
-  html[data-theme='dark'] .leaderboard-player-dialog .team-inline {
-    border-color: rgba(255, 255, 255, 0.14);
-    background: rgba(255, 255, 255, 0.1);
-    box-shadow: none;
-  }
 }
 
 html[data-theme='dark'] .flag-pill {
