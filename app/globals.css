@@ -2482,6 +2482,37 @@ select:focus {
   vertical-align: middle;
 }
 
+.position-change {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  min-width: 42px;
+  font-size: 0.76rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.position-change > span {
+  font-size: 0.7rem;
+}
+
+.position-change.is-up {
+  color: #1ba94c;
+}
+
+.position-change.is-down {
+  color: #e34b50;
+}
+
+.position-change.is-flat {
+  color: #8992a6;
+}
+
+.position-change strong {
+  font-size: 0.78rem;
+}
+
 .leaderboard-create-group-row {
   display: flex;
   justify-content: flex-end;

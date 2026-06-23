@@ -1548,6 +1548,62 @@ function buildLeaderboardView(db: ProdeDB): LeaderboardView {
   return { rows: computeLeaderboard(db) };
 }
 
+function getArgentinaDayStartMs(now = new Date()) {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Argentina/Buenos_Aires',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(now);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return Date.UTC(Number(values.year), Number(values.month) - 1, Number(values.day), 3, 0, 0, 0);
+}
+
+function addDailyPositionChanges(currentRows: LeaderboardRow[], previousRows: LeaderboardRow[]): LeaderboardRow[] {
+  const previousPositionByUser = new Map(
+    previousRows.map((row, index) => [row.userId, index + 1] as const),
+  );
+
+  return currentRows.map((row, index) => {
+    const previousPosition = previousPositionByUser.get(row.userId);
+    return {
+      ...row,
+      positionChange: previousPosition ? previousPosition - (index + 1) : 0,
+    };
+  });
+}
+
+function buildLeaderboardDbBefore(
+  db: ProdeDB,
+  officialResults: InstantOfficialResultDoc[],
+  officialTriviaResults: InstantOfficialTriviaResultDoc[],
+  cutoffMs: number,
+): ProdeDB {
+  const officialUpdatedAtByMatch = new Map(
+    officialResults.map((result) => [result.matchId, new Date(result.updatedAt).getTime()] as const),
+  );
+  const previousTriviaQuestionIds = new Set(
+    officialTriviaResults
+      .filter((result) => new Date(result.updatedAt).getTime() < cutoffMs)
+      .map((result) => result.questionId),
+  );
+
+  return {
+    ...db,
+    matches: db.matches.map((match) => {
+      const updatedAt = officialUpdatedAtByMatch.get(match.id);
+      return {
+        ...match,
+        officialResult:
+          match.officialResult && Number.isFinite(updatedAt) && updatedAt! < cutoffMs
+            ? { ...match.officialResult }
+            : null,
+      };
+    }),
+    triviaResults: db.triviaResults.filter((result) => previousTriviaQuestionIds.has(result.questionId)),
+  };
+}
+
 function buildPhaseLeaderboardDb(db: ProdeDB, phase: 'groups' | 'knockout'): ProdeDB {
   const matches = db.matches.filter((match) => (phase === 'groups' ? match.groupId !== 'KO' : match.groupId === 'KO'));
   const matchIds = new Set(matches.map((match) => match.id));
@@ -1563,10 +1619,40 @@ function buildPhaseLeaderboardDb(db: ProdeDB, phase: 'groups' | 'knockout'): Pro
 
 export async function getLeaderboardPageState() {
   await ensureBaseData();
-  const core = await getCoreStateSnapshot();
-  const general: LeaderboardView = { rows: core.leaderboard };
-  const groups = buildLeaderboardView(buildPhaseLeaderboardDb(core.db, 'groups'));
-  const knockout = buildLeaderboardView(buildPhaseLeaderboardDb(core.db, 'knockout'));
+  const [core, officialResults, officialTriviaResults] = await Promise.all([
+    getCoreStateSnapshot(),
+    queryOfficialResultsOnly(),
+    queryOfficialTriviaResultsOnly(),
+  ]);
+  const dayStartMs = getArgentinaDayStartMs();
+  const previousDb = buildLeaderboardDbBefore(
+    core.db,
+    officialResults,
+    officialTriviaResults,
+    dayStartMs,
+  );
+
+  const previousGeneralRows = computeLeaderboard(previousDb);
+  const currentGroupsDb = buildPhaseLeaderboardDb(core.db, 'groups');
+  const previousGroupsDb = buildPhaseLeaderboardDb(previousDb, 'groups');
+  const currentKnockoutDb = buildPhaseLeaderboardDb(core.db, 'knockout');
+  const previousKnockoutDb = buildPhaseLeaderboardDb(previousDb, 'knockout');
+
+  const general: LeaderboardView = {
+    rows: addDailyPositionChanges(core.leaderboard, previousGeneralRows),
+  };
+  const groups: LeaderboardView = {
+    rows: addDailyPositionChanges(
+      computeLeaderboard(currentGroupsDb),
+      computeLeaderboard(previousGroupsDb),
+    ),
+  };
+  const knockout: LeaderboardView = {
+    rows: addDailyPositionChanges(
+      computeLeaderboard(currentKnockoutDb),
+      computeLeaderboard(previousKnockoutDb),
+    ),
+  };
 
   return {
     pointsConfig: core.db.pointsConfig,

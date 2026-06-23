@@ -103,6 +103,7 @@ export type LeaderboardRow = {
   lastName: string;
   userName: string;
   totalPoints: number;
+  positionChange?: number;
   exactHits: number;
   outcomeHits: number;
   sideGoalsHits: number;

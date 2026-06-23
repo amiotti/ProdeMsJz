@@ -45,6 +45,31 @@ function splitName(row: LeaderboardRow) {
   return { firstName, lastName };
 }
 
+function PositionChange({ value = 0 }: { value?: number }) {
+  if (value > 0) {
+    return (
+      <span className="position-change is-up" title={`Subió ${value} posiciones`} aria-label={`Subió ${value} posiciones`}>
+        <span aria-hidden="true">▲</span>
+        <strong>{value}</strong>
+      </span>
+    );
+  }
+  if (value < 0) {
+    return (
+      <span className="position-change is-down" title={`Bajó ${Math.abs(value)} posiciones`} aria-label={`Bajó ${Math.abs(value)} posiciones`}>
+        <span aria-hidden="true">▼</span>
+        <strong>{Math.abs(value)}</strong>
+      </span>
+    );
+  }
+  return (
+    <span className="position-change is-flat" title="Sin cambios de posición" aria-label="Sin cambios de posición">
+      <span aria-hidden="true">—</span>
+      <strong>0</strong>
+    </span>
+  );
+}
+
 export function LeaderboardTable({
   views,
   isLoggedIn,
@@ -344,6 +369,7 @@ export function LeaderboardTable({
                 <th>#</th>
                 <th>Participante</th>
                 <th>Puntos</th>
+                <th>G/P</th>
                 <th>Exactos</th>
                 <th>Ganador/Empate</th>
                 <th>Goles</th>
@@ -372,6 +398,7 @@ export function LeaderboardTable({
                       </div>
                     </td>
                     <td>{row.totalPoints}</td>
+                    <td><PositionChange value={row.positionChange} /></td>
                     <td>{row.exactHits}</td>
                     <td>{row.outcomeHits}</td>
                     <td>{row.sideGoalsHits}</td>
@@ -381,7 +408,7 @@ export function LeaderboardTable({
                 ))
               ) : (
                 <tr>
-                  <td colSpan={8} className="muted" style={{ textAlign: 'center' }}>
+                  <td colSpan={9} className="muted" style={{ textAlign: 'center' }}>
                     El grupo seleccionado no tiene integrantes.
                   </td>
                 </tr>
