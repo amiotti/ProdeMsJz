@@ -4436,11 +4436,11 @@ html[data-theme='dark'] .trivia-question-card {
   display: grid;
   gap: 0.38rem;
   min-width: 0;
-  justify-items: end;
+  justify-items: start;
 }
 
 .prediction-team-column:last-child {
-  justify-items: start;
+  justify-items: end;
 }
 
 .prediction-fixture-row > .vs {
@@ -4476,6 +4476,7 @@ html[data-theme='dark'] .trivia-question-card {
 }
 
 .team-form-title {
+  display: none;
   font-size: 0.66rem;
   font-weight: 800;
   white-space: nowrap;
