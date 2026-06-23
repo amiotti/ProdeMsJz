@@ -5,6 +5,7 @@ import { getInstantAdminDb, tx } from '@/lib/instant';
 import { calculatePredictionPoints, computeLeaderboard } from '@/lib/prode';
 import { createSeedDb } from '@/lib/seed';
 import { getTaloPayment, isValidTaloRegistrationPaymentForUser } from '@/lib/talopay';
+import { resolveDynamicKnockoutParticipants } from '@/lib/worldcup26';
 import type {
   ContactMessage,
   ContactMessageStatus,
@@ -676,13 +677,7 @@ function buildStateFromInstantData(data: Awaited<ReturnType<typeof queryAllInsta
     pointsConfig: pointsDoc
       ? { exactScore: pointsDoc.exactScore, correctOutcome: pointsDoc.correctOutcome }
       : seed.pointsConfig,
-    matches: seed.matches.map((m) => {
-      const r = officialByMatchId.get(m.id);
-      return {
-        ...m,
-        officialResult: r ? ({ home: r.home, away: r.away } satisfies Score) : null,
-      };
-    }),
+    matches: applyOfficialMatchResults(seed, officialByMatchId),
     updatedAt: nowIso(),
   };
 }
@@ -711,13 +706,7 @@ function applyOfficialResultsToSeed(
         updatedAt: official?.updatedAt ?? '',
       };
     }).filter((item) => item.answer),
-    matches: seed.matches.map((m) => {
-      const r = officialByMatchId.get(m.id);
-      return {
-        ...m,
-        officialResult: r ? ({ home: r.home, away: r.away } satisfies Score) : null,
-      };
-    }),
+    matches: applyOfficialMatchResults(seed, officialByMatchId),
     updatedAt: nowIso(),
   };
 }
@@ -1602,6 +1591,20 @@ function buildLeaderboardDbBefore(
     }),
     triviaResults: db.triviaResults.filter((result) => previousTriviaQuestionIds.has(result.questionId)),
   };
+}
+
+function applyOfficialMatchResults(
+  seed: ProdeDB,
+  officialByMatchId: Map<string, InstantOfficialResultDoc>,
+) {
+  const matches = seed.matches.map((match) => {
+    const result = officialByMatchId.get(match.id);
+    return {
+      ...match,
+      officialResult: result ? ({ home: result.home, away: result.away } satisfies Score) : null,
+    };
+  });
+  return resolveDynamicKnockoutParticipants(matches, seed.groups);
 }
 
 function buildPhaseLeaderboardDb(db: ProdeDB, phase: 'groups' | 'knockout'): ProdeDB {

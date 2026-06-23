@@ -1305,6 +1305,29 @@ export function estimateMatchProbabilities(homeTeam: string, awayTeam: string) {
   };
 }
 
+type KnockoutSlot =
+  | { kind: 'group'; position: 1 | 2; groupId: string; label: string }
+  | { kind: 'third'; candidateGroupIds: string[]; label: string };
+
+const ROUND_OF_32_SLOTS: Array<{ id: string; home: KnockoutSlot; away: KnockoutSlot }> = [
+  { id: 'KO-73', home: { kind: 'group', position: 2, groupId: 'A', label: '2do Grupo A' }, away: { kind: 'group', position: 2, groupId: 'B', label: '2do Grupo B' } },
+  { id: 'KO-74', home: { kind: 'group', position: 1, groupId: 'E', label: '1ro Grupo E' }, away: { kind: 'third', candidateGroupIds: ['A', 'B', 'C', 'D', 'F'], label: '3ro Grupos A/B/C/D/F' } },
+  { id: 'KO-75', home: { kind: 'group', position: 1, groupId: 'F', label: '1ro Grupo F' }, away: { kind: 'group', position: 2, groupId: 'C', label: '2do Grupo C' } },
+  { id: 'KO-76', home: { kind: 'group', position: 1, groupId: 'C', label: '1ro Grupo C' }, away: { kind: 'group', position: 2, groupId: 'F', label: '2do Grupo F' } },
+  { id: 'KO-77', home: { kind: 'group', position: 1, groupId: 'I', label: '1ro Grupo I' }, away: { kind: 'third', candidateGroupIds: ['C', 'D', 'F', 'G', 'H'], label: '3ro Grupos C/D/F/G/H' } },
+  { id: 'KO-78', home: { kind: 'group', position: 2, groupId: 'E', label: '2do Grupo E' }, away: { kind: 'group', position: 2, groupId: 'I', label: '2do Grupo I' } },
+  { id: 'KO-79', home: { kind: 'group', position: 1, groupId: 'A', label: '1ro Grupo A' }, away: { kind: 'third', candidateGroupIds: ['C', 'E', 'F', 'H', 'I'], label: '3ro Grupos C/E/F/H/I' } },
+  { id: 'KO-80', home: { kind: 'group', position: 1, groupId: 'L', label: '1ro Grupo L' }, away: { kind: 'third', candidateGroupIds: ['E', 'H', 'I', 'J', 'K'], label: '3ro Grupos E/H/I/J/K' } },
+  { id: 'KO-81', home: { kind: 'group', position: 1, groupId: 'D', label: '1ro Grupo D' }, away: { kind: 'third', candidateGroupIds: ['B', 'E', 'F', 'I', 'J'], label: '3ro Grupos B/E/F/I/J' } },
+  { id: 'KO-82', home: { kind: 'group', position: 1, groupId: 'G', label: '1ro Grupo G' }, away: { kind: 'third', candidateGroupIds: ['A', 'E', 'H', 'I', 'J'], label: '3ro Grupos A/E/H/I/J' } },
+  { id: 'KO-83', home: { kind: 'group', position: 2, groupId: 'K', label: '2do Grupo K' }, away: { kind: 'group', position: 2, groupId: 'L', label: '2do Grupo L' } },
+  { id: 'KO-84', home: { kind: 'group', position: 1, groupId: 'H', label: '1ro Grupo H' }, away: { kind: 'group', position: 2, groupId: 'J', label: '2do Grupo J' } },
+  { id: 'KO-85', home: { kind: 'group', position: 1, groupId: 'B', label: '1ro Grupo B' }, away: { kind: 'third', candidateGroupIds: ['E', 'F', 'G', 'I', 'J'], label: '3ro Grupos E/F/G/I/J' } },
+  { id: 'KO-86', home: { kind: 'group', position: 1, groupId: 'J', label: '1ro Grupo J' }, away: { kind: 'group', position: 2, groupId: 'H', label: '2do Grupo H' } },
+  { id: 'KO-87', home: { kind: 'group', position: 1, groupId: 'K', label: '1ro Grupo K' }, away: { kind: 'third', candidateGroupIds: ['D', 'E', 'I', 'J', 'L'], label: '3ro Grupos D/E/I/J/L' } },
+  { id: 'KO-88', home: { kind: 'group', position: 2, groupId: 'D', label: '2do Grupo D' }, away: { kind: 'group', position: 2, groupId: 'G', label: '2do Grupo G' } },
+];
+
 export function buildKnockoutCalendar(): CalendarEvent[] {
   const events: CalendarEvent[] = [];
   const addStage = (
@@ -1330,10 +1353,10 @@ export function buildKnockoutCalendar(): CalendarEvent[] {
     });
   };
 
-  const r32Labels = Array.from({ length: 16 }, (_, i) => ({
-    id: `KO-${73 + i}`,
-    homeTeam: `1ro/2do de grupo (${73 + i})`,
-    awayTeam: `Cruce pendiente (${73 + i})`,
+  const r32Labels = ROUND_OF_32_SLOTS.map(({ id, home, away }) => ({
+    id,
+    homeTeam: home.label,
+    awayTeam: away.label,
   }));
   addStage(
     '16avos',
@@ -1400,6 +1423,193 @@ export function buildKnockoutMatches(): Match[] {
     } satisfies Match;
   });
 }
+
+type GroupTableRow = {
+  team: string;
+  groupId: string;
+  pts: number;
+  gf: number;
+  gc: number;
+  dg: number;
+};
+
+function getCompletedGroupPositions(matches: Match[], groups: Group[]) {
+  const positions = new Map<string, string>();
+  const thirdRows: GroupTableRow[] = [];
+
+  for (const group of groups) {
+    const groupMatches = matches.filter((match) => match.groupId === group.id);
+    if (groupMatches.length !== 6 || groupMatches.some((match) => !match.officialResult)) continue;
+
+    const rows = new Map(
+      group.teams.map((team) => [
+        team,
+        { team, groupId: group.id, pts: 0, gf: 0, gc: 0, dg: 0 } satisfies GroupTableRow,
+      ]),
+    );
+
+    for (const match of groupMatches) {
+      const result = match.officialResult!;
+      const home = rows.get(match.homeTeam);
+      const away = rows.get(match.awayTeam);
+      if (!home || !away) continue;
+      home.gf += result.home;
+      home.gc += result.away;
+      away.gf += result.away;
+      away.gc += result.home;
+      if (result.home > result.away) home.pts += 3;
+      else if (result.home < result.away) away.pts += 3;
+      else {
+        home.pts += 1;
+        away.pts += 1;
+      }
+    }
+
+    const ordered = [...rows.values()]
+      .map((row) => ({ ...row, dg: row.gf - row.gc }))
+      .sort((a, b) => b.pts - a.pts || b.dg - a.dg || b.gf - a.gf || a.team.localeCompare(b.team, 'es'));
+
+    ordered.forEach((row, index) => {
+      const previous = ordered[index - 1];
+      const next = ordered[index + 1];
+      const tiedWithPrevious = previous && previous.pts === row.pts && previous.dg === row.dg && previous.gf === row.gf;
+      const tiedWithNext = next && next.pts === row.pts && next.dg === row.dg && next.gf === row.gf;
+      if (!tiedWithPrevious && !tiedWithNext) positions.set(`${index + 1}${group.id}`, row.team);
+    });
+
+    if (positions.has(`3${group.id}`)) thirdRows.push(ordered[2]);
+  }
+
+  return { positions, thirdRows };
+}
+
+function resolveThirdPlaceSlots(thirdRows: GroupTableRow[]) {
+  const resolved = new Map<string, string>();
+  if (thirdRows.length !== 12) return resolved;
+
+  const ordered = [...thirdRows].sort(
+    (a, b) => b.pts - a.pts || b.dg - a.dg || b.gf - a.gf || a.groupId.localeCompare(b.groupId),
+  );
+  const eighth = ordered[7];
+  const ninth = ordered[8];
+  if (eighth.pts === ninth.pts && eighth.dg === ninth.dg && eighth.gf === ninth.gf) return resolved;
+
+  const qualified = ordered.slice(0, 8);
+  const teamByGroup = new Map(qualified.map((row) => [row.groupId, row.team] as const));
+  const thirdSlots = ROUND_OF_32_SLOTS
+    .flatMap(({ id, home, away }) => [
+      ...(home.kind === 'third' ? [{ key: `${id}:home`, slot: home }] : []),
+      ...(away.kind === 'third' ? [{ key: `${id}:away`, slot: away }] : []),
+    ])
+    .sort(
+      (a, b) =>
+        a.slot.candidateGroupIds.filter((groupId) => teamByGroup.has(groupId)).length -
+        b.slot.candidateGroupIds.filter((groupId) => teamByGroup.has(groupId)).length,
+    );
+
+  const solutions: Array<Map<string, string>> = [];
+  let overflow = false;
+  const visit = (index: number, usedGroups: Set<string>, assignment: Map<string, string>) => {
+    if (solutions.length > 4096) {
+      overflow = true;
+      return;
+    }
+    if (index === thirdSlots.length) {
+      solutions.push(new Map(assignment));
+      return;
+    }
+
+    const { key, slot } = thirdSlots[index];
+    for (const groupId of slot.candidateGroupIds) {
+      if (!teamByGroup.has(groupId) || usedGroups.has(groupId)) continue;
+      usedGroups.add(groupId);
+      assignment.set(key, groupId);
+      visit(index + 1, usedGroups, assignment);
+      assignment.delete(key);
+      usedGroups.delete(groupId);
+    }
+  };
+  visit(0, new Set(), new Map());
+  if (overflow || solutions.length === 0) return resolved;
+
+  for (const { key } of thirdSlots) {
+    const possibleGroups = new Set(solutions.map((solution) => solution.get(key)).filter(Boolean));
+    if (possibleGroups.size !== 1) continue;
+    const groupId = [...possibleGroups][0]!;
+    const team = teamByGroup.get(groupId);
+    if (team) resolved.set(key, team);
+  }
+  return resolved;
+}
+
+function getDecidedKnockoutTeam(match: Match | undefined, outcome: 'winner' | 'loser', knownTeams: Set<string>) {
+  if (!match?.officialResult || match.officialResult.home === match.officialResult.away) return null;
+  const homeWon = match.officialResult.home > match.officialResult.away;
+  const team = outcome === 'winner'
+    ? (homeWon ? match.homeTeam : match.awayTeam)
+    : (homeWon ? match.awayTeam : match.homeTeam);
+  return knownTeams.has(team) ? team : null;
+}
+
+export function resolveDynamicKnockoutParticipants(matches: Match[], groups: Group[]): Match[] {
+  const resolvedMatches = matches.map((match) => ({ ...match }));
+  const byId = new Map(resolvedMatches.map((match) => [match.id, match] as const));
+  const knownTeams = new Set(groups.flatMap((group) => group.teams));
+  const { positions, thirdRows } = getCompletedGroupPositions(resolvedMatches, groups);
+  const thirdSlots = resolveThirdPlaceSlots(thirdRows);
+
+  const resolveSlot = (matchId: string, side: 'home' | 'away', slot: KnockoutSlot) => {
+    if (slot.kind === 'group') return positions.get(`${slot.position}${slot.groupId}`) ?? slot.label;
+    return thirdSlots.get(`${matchId}:${side}`) ?? slot.label;
+  };
+
+  for (const { id, home, away } of ROUND_OF_32_SLOTS) {
+    const match = byId.get(id);
+    if (!match) continue;
+    match.homeTeam = resolveSlot(id, 'home', home);
+    match.awayTeam = resolveSlot(id, 'away', away);
+  }
+
+  const links: Array<{
+    targetId: string;
+    homeSourceId: string;
+    awaySourceId: string;
+    outcome: 'winner' | 'loser';
+  }> = [
+    ...Array.from({ length: 8 }, (_, index) => ({
+      targetId: `KO-${89 + index}`,
+      homeSourceId: `KO-${73 + index * 2}`,
+      awaySourceId: `KO-${74 + index * 2}`,
+      outcome: 'winner' as const,
+    })),
+    ...Array.from({ length: 4 }, (_, index) => ({
+      targetId: `KO-${97 + index}`,
+      homeSourceId: `KO-${89 + index * 2}`,
+      awaySourceId: `KO-${90 + index * 2}`,
+      outcome: 'winner' as const,
+    })),
+    ...Array.from({ length: 2 }, (_, index) => ({
+      targetId: `KO-${101 + index}`,
+      homeSourceId: `KO-${97 + index * 2}`,
+      awaySourceId: `KO-${98 + index * 2}`,
+      outcome: 'winner' as const,
+    })),
+    { targetId: 'KO-103', homeSourceId: 'KO-101', awaySourceId: 'KO-102', outcome: 'loser' as const },
+    { targetId: 'KO-104', homeSourceId: 'KO-101', awaySourceId: 'KO-102', outcome: 'winner' as const },
+  ];
+
+  for (const link of links) {
+    const target = byId.get(link.targetId);
+    if (!target) continue;
+    target.homeTeam =
+      getDecidedKnockoutTeam(byId.get(link.homeSourceId), link.outcome, knownTeams) ?? target.homeTeam;
+    target.awayTeam =
+      getDecidedKnockoutTeam(byId.get(link.awaySourceId), link.outcome, knownTeams) ?? target.awayTeam;
+  }
+
+  return resolvedMatches;
+}
+
 export type CalendarFixture = CalendarEvent;
 
 export function getOfficialGroupStageFixtures() {
