@@ -69,6 +69,7 @@ type InstantOfficialResultDoc = {
   matchId: string;
   home: number;
   away: number;
+  winnerSide?: 'home' | 'away';
   updatedAt: string;
 };
 
@@ -1140,7 +1141,7 @@ export async function saveTriviaPredictions(
   }
 }
 export async function saveOfficialResults(
-  items: Array<{ matchId: string; home: number; away: number }>,
+  items: Array<{ matchId: string; home: number; away: number; winnerSide?: 'home' | 'away' }>,
   clearMatchIds: string[] = [],
 ) {
   await ensureBaseData();
@@ -1150,7 +1151,8 @@ export async function saveOfficialResults(
   if (clearMatchIds.length > 120) throw new Error('Demasiadas limpiezas en una sola solicitud');
 
   const base = getSeedDbTemplate();
-  const validMatchIds = new Set(base.matches.map((m) => m.id));
+  const matchById = new Map(base.matches.map((m) => [m.id, m] as const));
+  const validMatchIds = new Set(matchById.keys());
   const current = await queryAllInstant();
   const byMatchId = new Map(current.officialResults.map((r) => [r.matchId, r] as const));
   const updateIds = new Set(items.map((item) => item.matchId));
@@ -1169,6 +1171,12 @@ export async function saveOfficialResults(
     if (!validMatchIds.has(item.matchId)) continue;
     if (!Number.isInteger(item.home) || item.home < 0 || item.home > 30) continue;
     if (!Number.isInteger(item.away) || item.away < 0 || item.away > 30) continue;
+    const match = matchById.get(item.matchId);
+    const isKnockoutTie = match?.groupId === 'KO' && item.home === item.away;
+    const winnerSide = item.winnerSide === 'home' || item.winnerSide === 'away' ? item.winnerSide : undefined;
+    if (isKnockoutTie && !winnerSide) {
+      throw new Error('En empates de fase final debes indicar quien avanza de ronda.');
+    }
 
     const existing = byMatchId.get(item.matchId);
     const id = existing?.id ?? randomUUID();
@@ -1178,6 +1186,7 @@ export async function saveOfficialResults(
         matchId: item.matchId,
         home: item.home,
         away: item.away,
+        winnerSide: isKnockoutTie ? winnerSide : undefined,
         updatedAt: ts,
       }),
     );
@@ -1600,7 +1609,9 @@ function applyOfficialMatchResults(
     const result = officialByMatchId.get(match.id);
     return {
       ...match,
-      officialResult: result ? ({ home: result.home, away: result.away } satisfies Score) : null,
+      officialResult: result
+        ? ({ home: result.home, away: result.away, winnerSide: result.winnerSide } satisfies Score)
+        : null,
     };
   });
   return resolveDynamicKnockoutParticipants(matches, seed.groups);

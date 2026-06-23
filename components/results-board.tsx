@@ -6,7 +6,7 @@ import { formatKickoffArgentina } from '@/lib/datetime';
 import { TeamName } from '@/components/team-name';
 import type { Match, StateResponse } from '@/lib/types';
 
-type DraftMap = Record<string, { home: string; away: string }>;
+type DraftMap = Record<string, { home: string; away: string; winnerSide?: 'home' | 'away' | '' }>;
 type TriviaDraftMap = Record<string, string>;
 type ResultsViewMode = 'results' | 'standings';
 type ResultsSortMode = 'date' | 'group';
@@ -138,6 +138,7 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
           nextDrafts[match.id] = {
             home: String(match.officialResult.home),
             away: String(match.officialResult.away),
+            winnerSide: match.officialResult.winnerSide ?? '',
           };
         }
         setDrafts(nextDrafts);
@@ -160,6 +161,7 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
       nextDrafts[match.id] = {
         home: String(match.officialResult.home),
         away: String(match.officialResult.away),
+        winnerSide: match.officialResult.winnerSide ?? '',
       };
     }
     setDrafts(nextDrafts);
@@ -230,7 +232,20 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
       [matchId]: {
         home: prev[matchId]?.home ?? '',
         away: prev[matchId]?.away ?? '',
+        winnerSide: prev[matchId]?.winnerSide ?? '',
         [side]: value,
+      },
+    }));
+  }
+
+  function setWinnerDraft(matchId: string, winnerSide: 'home' | 'away' | '') {
+    if (!state?.viewer.isAdmin) return;
+    setDrafts((prev) => ({
+      ...prev,
+      [matchId]: {
+        home: prev[matchId]?.home ?? '',
+        away: prev[matchId]?.away ?? '',
+        winnerSide,
       },
     }));
   }
@@ -245,7 +260,12 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
 
     const results = Object.entries(drafts)
       .filter(([, score]) => score.home !== '' && score.away !== '')
-      .map(([matchId, score]) => ({ matchId, home: Number(score.home), away: Number(score.away) }));
+      .map(([matchId, score]) => ({
+        matchId,
+        home: Number(score.home),
+        away: Number(score.away),
+        winnerSide: score.winnerSide === 'home' || score.winnerSide === 'away' ? score.winnerSide : undefined,
+      }));
 
     const clearMatchIds = Object.entries(drafts)
       .filter(([, score]) => score.home === '' && score.away === '')
@@ -300,6 +320,18 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
       return;
     }
 
+    if (
+      match?.groupId === 'KO' &&
+      draft.home !== '' &&
+      draft.away !== '' &&
+      Number(draft.home) === Number(draft.away) &&
+      draft.winnerSide !== 'home' &&
+      draft.winnerSide !== 'away'
+    ) {
+      setMessage('En empates de fase final debes indicar quien avanza de ronda.');
+      return;
+    }
+
     if (shouldClear && !match?.officialResult) {
       setMessage('Ese partido no tiene resultado oficial cargado para borrar.');
       return;
@@ -312,7 +344,14 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          results: shouldClear ? [] : [{ matchId, home: Number(draft.home), away: Number(draft.away) }],
+          results: shouldClear
+            ? []
+            : [{
+                matchId,
+                home: Number(draft.home),
+                away: Number(draft.away),
+                winnerSide: draft.winnerSide === 'home' || draft.winnerSide === 'away' ? draft.winnerSide : undefined,
+              }],
           triviaResults: [],
           clearMatchIds: shouldClear ? [matchId] : [],
           clearTriviaQuestionIds: [],
@@ -329,10 +368,42 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
     }
   }
 
-  function canSaveSingleMatch(match: Match, draft: { home: string; away: string }) {
+  function canSaveSingleMatch(match: Match, draft: DraftMap[string]) {
     const hasFullResult = draft.home !== '' && draft.away !== '';
     const clearsExistingResult = draft.home === '' && draft.away === '' && Boolean(match.officialResult);
-    return hasFullResult || clearsExistingResult;
+    const missingKnockoutWinner =
+      match.groupId === 'KO' &&
+      hasFullResult &&
+      Number(draft.home) === Number(draft.away) &&
+      draft.winnerSide !== 'home' &&
+      draft.winnerSide !== 'away';
+    return (hasFullResult && !missingKnockoutWinner) || clearsExistingResult;
+  }
+
+  function renderKnockoutWinnerSelector(match: Match, draft: DraftMap[string], readOnly: boolean) {
+    const shouldShow =
+      match.groupId === 'KO' &&
+      draft.home !== '' &&
+      draft.away !== '' &&
+      Number(draft.home) === Number(draft.away);
+    if (!shouldShow) return null;
+
+    return (
+      <label className="knockout-winner-select">
+        Clasifica
+        <select
+          id={`results-winner-${match.id}`}
+          name={`results-winner-${match.id}`}
+          value={draft.winnerSide ?? ''}
+          onChange={(event) => setWinnerDraft(match.id, event.target.value as 'home' | 'away' | '')}
+          disabled={readOnly || savingMatchId === match.id}
+        >
+          <option value="">Elegir equipo</option>
+          <option value="home">{match.homeTeam}</option>
+          <option value="away">{match.awayTeam}</option>
+        </select>
+      </label>
+    );
   }
 
   if (loading || !state) {
@@ -447,6 +518,7 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
                         <span className="score-divider">-</span>
                         <input id={`results-away-${match.id}`} name={`results-away-${match.id}`} value={draft.away} onChange={(e) => setDraft(match.id, 'away', e.target.value)} disabled={readOnly || savingMatchId === match.id} />
                       </div>
+                      {renderKnockoutWinnerSelector(match, draft, readOnly)}
                       {state.viewer.isAdmin ? (
                         <div className="cta-row match-actions">
                           <button
@@ -519,6 +591,7 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
                         <span className="score-divider">-</span>
                         <input id={`results-away-all-${match.id}`} name={`results-away-all-${match.id}`} value={draft.away} onChange={(e) => setDraft(match.id, 'away', e.target.value)} disabled={readOnly || savingMatchId === match.id} />
                       </div>
+                      {renderKnockoutWinnerSelector(match, draft, readOnly)}
                       {state.viewer.isAdmin ? (
                         <div className="cta-row match-actions">
                           <button
@@ -562,6 +635,7 @@ export function ResultsBoard({ initialState = null }: { initialState?: StateResp
                       <span className="score-divider">-</span>
                       <input id={`results-away-filter-${match.id}`} name={`results-away-filter-${match.id}`} value={draft.away} onChange={(e) => setDraft(match.id, 'away', e.target.value)} disabled={readOnly || savingMatchId === match.id} />
                     </div>
+                    {renderKnockoutWinnerSelector(match, draft, readOnly)}
                     {state.viewer.isAdmin ? (
                       <div className="cta-row match-actions">
                         <button

@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     }
 
     const parsed = await parseJsonBody<{
-      results?: Array<{ matchId: string; home: number; away: number }>;
+      results?: Array<{ matchId: string; home: number; away: number; winnerSide?: 'home' | 'away' }>;
       triviaResults?: Array<{ questionId: string; answer: string }>;
       clearMatchIds?: string[];
       clearTriviaQuestionIds?: string[];

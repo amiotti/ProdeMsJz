@@ -2469,6 +2469,38 @@ select:focus {
   align-self: center;
 }
 
+.knockout-winner-select {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 150px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.knockout-winner-select select {
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.42rem 2rem 0.42rem 0.65rem;
+  color: var(--text);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.38)),
+    rgba(255, 255, 255, 0.48);
+  font-family: var(--font-body), 'Noto Sans', 'Segoe UI', Roboto, Arial, sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+html[data-theme='dark'] .knockout-winner-select select {
+  color: #f6f3ea;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04)),
+    rgba(14, 13, 22, 0.66);
+}
+
 
 
 .score-inputs .chip {

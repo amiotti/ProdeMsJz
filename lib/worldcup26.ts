@@ -1552,8 +1552,14 @@ function resolveThirdPlaceSlots(thirdRows: GroupTableRow[]) {
 }
 
 function getDecidedKnockoutTeam(match: Match | undefined, outcome: 'winner' | 'loser', knownTeams: Set<string>) {
-  if (!match?.officialResult || match.officialResult.home === match.officialResult.away) return null;
-  const homeWon = match.officialResult.home > match.officialResult.away;
+  if (!match?.officialResult) return null;
+  const winnerSide = match.officialResult.home === match.officialResult.away
+    ? match.officialResult.winnerSide
+    : match.officialResult.home > match.officialResult.away
+      ? 'home'
+      : 'away';
+  if (!winnerSide) return null;
+  const homeWon = winnerSide === 'home';
   const team = outcome === 'winner'
     ? (homeWon ? match.homeTeam : match.awayTeam)
     : (homeWon ? match.awayTeam : match.homeTeam);

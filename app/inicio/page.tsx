@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 
 const PRIZE_BASE_AMOUNT_ARS = 25000;
 
-const KNOCKOUT_STAGE_ORDER = ['16avos', '8vos', 'Cuartos', 'Semifinal', 'Tercer puesto', 'Final'] as const;
+const KNOCKOUT_STAGE_ORDER = ['16avos', '8vos', 'Cuartos', 'Semifinal', 'Final', 'Tercer puesto'] as const;
 const KNOCKOUT_STAGE_LABELS: Record<string, string> = {
   '16avos': 'Eliminatoria de 32',
   '8vos': 'Octavos de final',
@@ -64,8 +64,8 @@ function getKnockoutSlot(stage: string, index: number) {
   if (stage === '8vos') return index * 2 + 0.5;
   if (stage === 'Cuartos') return index * 4 + 1.5;
   if (stage === 'Semifinal') return index * 8 + 3.5;
-  if (stage === 'Tercer puesto') return 5.5;
-  if (stage === 'Final') return 9.5;
+  if (stage === 'Final') return 7.5;
+  if (stage === 'Tercer puesto') return 7.5;
   return index;
 }
 

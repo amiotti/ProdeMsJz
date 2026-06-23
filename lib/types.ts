@@ -1,6 +1,7 @@
-﻿export type Score = {
+export type Score = {
   home: number;
   away: number;
+  winnerSide?: 'home' | 'away';
 };
 
 export type Group = {
