@@ -2287,6 +2287,11 @@ select:focus {
   padding: 0.36rem 0.7rem;
 }
 
+.score-inputs.is-locked .chip {
+  grid-column: 1 / -1;
+  justify-self: center;
+}
+
 .predictions-board .score-inputs.score-inputs-with-action {
   grid-template-columns: 52px 14px 52px auto;
   width: auto;
@@ -4916,11 +4921,11 @@ html[data-theme='dark'] .leaderboard-player-dialog .team-inline {
   }
 
   .prediction-team-column {
-    justify-items: center;
+    justify-items: start;
   }
 
   .prediction-team-column:last-child {
-    justify-items: center;
+    justify-items: end;
   }
 
   .team-form-summary {
@@ -4973,11 +4978,15 @@ html[data-theme='dark'] .leaderboard-player-dialog .team-inline {
   }
 
   .player-result-fixture > :first-child {
-    justify-self: end;
+    justify-self: start;
   }
 
   .player-result-fixture > :last-child {
-    justify-self: start;
+    justify-self: end;
+  }
+
+  .player-result-fixture > strong {
+    justify-self: center;
   }
 
   .player-result-fixture .team-inline {
