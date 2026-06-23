@@ -4436,11 +4436,11 @@ html[data-theme='dark'] .trivia-question-card {
   display: grid;
   gap: 0.38rem;
   min-width: 0;
-  justify-items: center;
+  justify-items: end;
 }
 
 .prediction-team-column:last-child {
-  justify-items: center;
+  justify-items: start;
 }
 
 .prediction-fixture-row > .vs {
