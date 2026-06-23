@@ -4,6 +4,7 @@ import { NextMatchCountdown } from '@/components/next-match-countdown';
 import { TeamName } from '@/components/team-name';
 import { getHomePageState, getPendingExactCelebrations } from '@/lib/db';
 import { requireAuthenticatedUser } from '@/lib/route-guard';
+import type { CSSProperties } from 'react';
 import type { Match } from '@/lib/types';
 import { getTeamDisplayName } from '@/lib/worldcup26';
 
@@ -32,14 +33,18 @@ function getRegistrationAmountArs() {
 }
 
 function formatKnockoutDate(kickoffAt: string) {
-  return new Intl.DateTimeFormat('es-AR', {
+  const parts = new Intl.DateTimeFormat('es-AR', {
     weekday: 'short',
     day: 'numeric',
     month: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    hour12: false,
     timeZone: 'America/Argentina/Buenos_Aires',
-  }).format(new Date(kickoffAt));
+  }).formatToParts(new Date(kickoffAt));
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  const weekday = `${values.weekday?.charAt(0).toUpperCase()}${values.weekday?.slice(1).replace('.', '')}`;
+  return `${weekday} ${values.day}/${values.month} - ${values.hour}:${values.minute} hs`;
 }
 
 function getKnockoutRounds(matches: Match[]) {
@@ -52,6 +57,16 @@ function getKnockoutRounds(matches: Match[]) {
     label: KNOCKOUT_STAGE_LABELS[stage],
     matches: knockoutMatches.filter((match) => match.stage === stage),
   })).filter((round) => round.matches.length > 0);
+}
+
+function getKnockoutSlot(stage: string, index: number) {
+  if (stage === '16avos') return index;
+  if (stage === '8vos') return index * 2 + 0.5;
+  if (stage === 'Cuartos') return index * 4 + 1.5;
+  if (stage === 'Semifinal') return index * 8 + 3.5;
+  if (stage === 'Tercer puesto') return 5.5;
+  if (stage === 'Final') return 9.5;
+  return index;
 }
 
 export default async function InicioPage() {
@@ -199,8 +214,12 @@ export default async function InicioPage() {
               <div key={round.stage} className="knockout-round">
                 <h4>{round.label}</h4>
                 <div className="knockout-match-list">
-                  {round.matches.map((match) => (
-                    <article key={match.id} className="knockout-match-card">
+                  {round.matches.map((match, matchIndex) => (
+                    <article
+                      key={match.id}
+                      className="knockout-match-card"
+                      style={{ '--knockout-slot': getKnockoutSlot(round.stage, matchIndex) } as CSSProperties}
+                    >
                       <span className="knockout-date">{formatKnockoutDate(match.kickoffAt)}</span>
                       <div className="knockout-team-row">
                         <TeamName teamName={match.homeTeam} linkToTeam />
