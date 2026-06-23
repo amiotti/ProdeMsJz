@@ -1433,13 +1433,13 @@ type GroupTableRow = {
   dg: number;
 };
 
-function getCompletedGroupPositions(matches: Match[], groups: Group[]) {
+function getCurrentGroupPositions(matches: Match[], groups: Group[]) {
   const positions = new Map<string, string>();
   const thirdRows: GroupTableRow[] = [];
 
   for (const group of groups) {
     const groupMatches = matches.filter((match) => match.groupId === group.id);
-    if (groupMatches.length !== 6 || groupMatches.some((match) => !match.officialResult)) continue;
+    if (groupMatches.every((match) => !match.officialResult)) continue;
 
     const rows = new Map(
       group.teams.map((team) => [
@@ -1449,6 +1449,7 @@ function getCompletedGroupPositions(matches: Match[], groups: Group[]) {
     );
 
     for (const match of groupMatches) {
+      if (!match.officialResult) continue;
       const result = match.officialResult!;
       const home = rows.get(match.homeTeam);
       const away = rows.get(match.awayTeam);
@@ -1555,7 +1556,7 @@ export function resolveDynamicKnockoutParticipants(matches: Match[], groups: Gro
   const resolvedMatches = matches.map((match) => ({ ...match }));
   const byId = new Map(resolvedMatches.map((match) => [match.id, match] as const));
   const knownTeams = new Set(groups.flatMap((group) => group.teams));
-  const { positions, thirdRows } = getCompletedGroupPositions(resolvedMatches, groups);
+  const { positions, thirdRows } = getCurrentGroupPositions(resolvedMatches, groups);
   const thirdSlots = resolveThirdPlaceSlots(thirdRows);
 
   const resolveSlot = (matchId: string, side: 'home' | 'away', slot: KnockoutSlot) => {
