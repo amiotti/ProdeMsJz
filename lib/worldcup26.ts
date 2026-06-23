@@ -1436,9 +1436,17 @@ type GroupTableRow = {
 function getCurrentGroupPositions(matches: Match[], groups: Group[]) {
   const positions = new Map<string, string>();
   const thirdRows: GroupTableRow[] = [];
+  const matchesByGroup = new Map<string, Match[]>();
+
+  for (const match of matches) {
+    if (match.groupId === 'KO') continue;
+    const list = matchesByGroup.get(match.groupId) ?? [];
+    list.push(match);
+    matchesByGroup.set(match.groupId, list);
+  }
 
   for (const group of groups) {
-    const groupMatches = matches.filter((match) => match.groupId === group.id);
+    const groupMatches = matchesByGroup.get(group.id) ?? [];
     if (groupMatches.every((match) => !match.officialResult)) continue;
 
     const rows = new Map(
@@ -1486,14 +1494,14 @@ function getCurrentGroupPositions(matches: Match[], groups: Group[]) {
 
 function resolveThirdPlaceSlots(thirdRows: GroupTableRow[]) {
   const resolved = new Map<string, string>();
-  if (thirdRows.length !== 12) return resolved;
+  if (thirdRows.length < 8) return resolved;
 
   const ordered = [...thirdRows].sort(
     (a, b) => b.pts - a.pts || b.dg - a.dg || b.gf - a.gf || a.groupId.localeCompare(b.groupId),
   );
   const eighth = ordered[7];
   const ninth = ordered[8];
-  if (eighth.pts === ninth.pts && eighth.dg === ninth.dg && eighth.gf === ninth.gf) return resolved;
+  if (ninth && eighth.pts === ninth.pts && eighth.dg === ninth.dg && eighth.gf === ninth.gf) return resolved;
 
   const qualified = ordered.slice(0, 8);
   const teamByGroup = new Map(qualified.map((row) => [row.groupId, row.team] as const));

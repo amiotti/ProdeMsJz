@@ -1537,18 +1537,17 @@ function buildLeaderboardView(db: ProdeDB): LeaderboardView {
   return { rows: computeLeaderboard(db) };
 }
 
-function getArgentinaDayStartMs(now = new Date()) {
-  const parts = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'America/Argentina/Buenos_Aires',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).formatToParts(now);
-  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
-  return Date.UTC(Number(values.year), Number(values.month) - 1, Number(values.day), 3, 0, 0, 0);
+function getLastOfficialResultUpdateMs(
+  officialResults: InstantOfficialResultDoc[],
+  officialTriviaResults: InstantOfficialTriviaResultDoc[],
+) {
+  const timestamps = [...officialResults, ...officialTriviaResults]
+    .map((result) => new Date(result.updatedAt).getTime())
+    .filter(Number.isFinite);
+  return timestamps.length ? Math.max(...timestamps) : null;
 }
 
-function addDailyPositionChanges(currentRows: LeaderboardRow[], previousRows: LeaderboardRow[]): LeaderboardRow[] {
+function addPositionChanges(currentRows: LeaderboardRow[], previousRows: LeaderboardRow[]): LeaderboardRow[] {
   const previousPositionByUser = new Map(
     previousRows.map((row, index) => [row.userId, index + 1] as const),
   );
@@ -1627,12 +1626,12 @@ export async function getLeaderboardPageState() {
     queryOfficialResultsOnly(),
     queryOfficialTriviaResultsOnly(),
   ]);
-  const dayStartMs = getArgentinaDayStartMs();
+  const lastOfficialUpdateMs = getLastOfficialResultUpdateMs(officialResults, officialTriviaResults);
   const previousDb = buildLeaderboardDbBefore(
     core.db,
     officialResults,
     officialTriviaResults,
-    dayStartMs,
+    lastOfficialUpdateMs ?? Number.POSITIVE_INFINITY,
   );
 
   const previousGeneralRows = computeLeaderboard(previousDb);
@@ -1642,16 +1641,16 @@ export async function getLeaderboardPageState() {
   const previousKnockoutDb = buildPhaseLeaderboardDb(previousDb, 'knockout');
 
   const general: LeaderboardView = {
-    rows: addDailyPositionChanges(core.leaderboard, previousGeneralRows),
+    rows: addPositionChanges(core.leaderboard, previousGeneralRows),
   };
   const groups: LeaderboardView = {
-    rows: addDailyPositionChanges(
+    rows: addPositionChanges(
       computeLeaderboard(currentGroupsDb),
       computeLeaderboard(previousGroupsDb),
     ),
   };
   const knockout: LeaderboardView = {
-    rows: addDailyPositionChanges(
+    rows: addPositionChanges(
       computeLeaderboard(currentKnockoutDb),
       computeLeaderboard(previousKnockoutDb),
     ),

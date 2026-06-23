@@ -4,11 +4,22 @@ import { NextMatchCountdown } from '@/components/next-match-countdown';
 import { TeamName } from '@/components/team-name';
 import { getHomePageState, getPendingExactCelebrations } from '@/lib/db';
 import { requireAuthenticatedUser } from '@/lib/route-guard';
+import type { Match } from '@/lib/types';
 import { getTeamDisplayName } from '@/lib/worldcup26';
 
 export const dynamic = 'force-dynamic';
 
 const PRIZE_BASE_AMOUNT_ARS = 25000;
+
+const KNOCKOUT_STAGE_ORDER = ['16avos', '8vos', 'Cuartos', 'Semifinal', 'Tercer puesto', 'Final'] as const;
+const KNOCKOUT_STAGE_LABELS: Record<string, string> = {
+  '16avos': 'Eliminatoria de 32',
+  '8vos': 'Octavos de final',
+  Cuartos: 'Cuartos de final',
+  Semifinal: 'Semifinales',
+  'Tercer puesto': 'Tercer puesto',
+  Final: 'Final',
+};
 
 function getRegistrationAmountArs() {
   const isProd = process.env.VERCEL_ENV === 'production' || process.env.NODE_ENV === 'production';
@@ -18,6 +29,29 @@ function getRegistrationAmountArs() {
   const fallback = process.env.TALOPAY_REGISTRATION_AMOUNT_ARS;
   const parsed = Number(scoped ?? fallback ?? 0);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+}
+
+function formatKnockoutDate(kickoffAt: string) {
+  return new Intl.DateTimeFormat('es-AR', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'America/Argentina/Buenos_Aires',
+  }).format(new Date(kickoffAt));
+}
+
+function getKnockoutRounds(matches: Match[]) {
+  const knockoutMatches = matches
+    .filter((match) => match.groupId === 'KO')
+    .sort((a, b) => new Date(a.kickoffAt).getTime() - new Date(b.kickoffAt).getTime());
+
+  return KNOCKOUT_STAGE_ORDER.map((stage) => ({
+    stage,
+    label: KNOCKOUT_STAGE_LABELS[stage],
+    matches: knockoutMatches.filter((match) => match.stage === stage),
+  })).filter((round) => round.matches.length > 0);
 }
 
 export default async function InicioPage() {
@@ -41,6 +75,7 @@ export default async function InicioPage() {
   const thirdPrize = prizePool - firstPrize - secondPrize;
   const formatPrize = (value: number) => `$${value.toLocaleString('es-AR')}`;
   const topThreeLeaderboard = resultsLoaded > 0 ? state.leaderboard.filter((row) => row.totalPoints > 0).slice(0, 3) : [];
+  const knockoutRounds = getKnockoutRounds(state.matches);
 
   return (
     <section className="stack-lg">
@@ -147,6 +182,40 @@ export default async function InicioPage() {
               </ul>
             </div>
           ))}
+        </div>
+      </div>
+
+      <div className="panel stack-md knockout-panel">
+        <div>
+          <p className="eyebrow">Llaves actualizadas</p>
+          <h3>Fase Eliminatoria</h3>
+          <p className="muted compact-text">
+            Los cruces se recalculan automáticamente con las posiciones actuales de los grupos y los resultados oficiales cargados.
+          </p>
+        </div>
+        <div className="knockout-scroll" role="region" aria-label="Cuadro de fase eliminatoria" tabIndex={0}>
+          <div className="knockout-bracket">
+            {knockoutRounds.map((round) => (
+              <div key={round.stage} className="knockout-round">
+                <h4>{round.label}</h4>
+                <div className="knockout-match-list">
+                  {round.matches.map((match) => (
+                    <article key={match.id} className="knockout-match-card">
+                      <span className="knockout-date">{formatKnockoutDate(match.kickoffAt)}</span>
+                      <div className="knockout-team-row">
+                        <TeamName teamName={match.homeTeam} linkToTeam />
+                        {match.officialResult ? <strong>{match.officialResult.home}</strong> : null}
+                      </div>
+                      <div className="knockout-team-row">
+                        <TeamName teamName={match.awayTeam} linkToTeam />
+                        {match.officialResult ? <strong>{match.officialResult.away}</strong> : null}
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
