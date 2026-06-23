@@ -28,6 +28,14 @@ type SavePredictionsResponse = {
 };
 
 const DRAFT_STORAGE_PREFIX = 'prode:prediction-drafts:';
+const KNOCKOUT_STAGE_LABELS: Record<string, string> = {
+  '16avos': 'Eliminatoria 32',
+  '8vos': 'Octavos de Final',
+  Cuartos: 'Cuartos de Final',
+  Semifinal: 'Semifinales',
+  'Tercer puesto': 'Tercer Puesto',
+  Final: 'Final',
+};
 
 function draftStorageKey(userId: string) {
   return DRAFT_STORAGE_PREFIX + userId;
@@ -105,6 +113,11 @@ function normalizeTriviaInput(value: string, question: TriviaQuestion) {
     return String(Number(trimmed));
   }
   return trimmed;
+}
+
+function getPredictionStageTitle(match: Match) {
+  if (match.groupId !== 'KO') return 'Fase de Grupos';
+  return KNOCKOUT_STAGE_LABELS[match.stage ?? ''] ?? match.stage ?? 'Fase Final';
 }
 
 export function PredictionsBoard({
@@ -773,6 +786,21 @@ export function PredictionsBoard({
     );
   }
 
+  function renderMatchList(matches: Match[], readOnly = false) {
+    let previousTitle: string | null = null;
+    return matches.map((match) => {
+      const stageTitle = getPredictionStageTitle(match);
+      const shouldShowTitle = stageTitle !== previousTitle;
+      previousTitle = stageTitle;
+      return (
+        <div key={`stage-wrap-${match.id}`} className="prediction-stage-block">
+          {shouldShowTitle ? <h4 className="prediction-stage-title">{stageTitle}</h4> : null}
+          {renderMatchCard(match, readOnly)}
+        </div>
+      );
+    });
+  }
+
   if (loading || !state) {
     return <div className="panel">Cargando predicciones...</div>;
   }
@@ -923,7 +951,7 @@ export function PredictionsBoard({
                 </div>
               </div>
 
-              <div className="match-list">{section.matches.map((match) => renderMatchCard(match, !hasApprovedPayment))}</div>
+              <div className="match-list">{renderMatchList(section.matches, !hasApprovedPayment)}</div>
             </div>
         ))
       ) : (
@@ -936,7 +964,7 @@ export function PredictionsBoard({
                   <span>{section.matches.length} partidos</span>
                 </div>
                 <div className="match-list">
-                  {section.matches.map((match) => renderMatchCard(match, !hasApprovedPayment))}
+                  {renderMatchList(section.matches, !hasApprovedPayment)}
                 </div>
               </div>
             ))}
@@ -947,7 +975,7 @@ export function PredictionsBoard({
                   <span>{section.matches.length} partidos</span>
                 </div>
                 <div className="match-list">
-                  {section.matches.map((match) => renderMatchCard(match, !hasApprovedPayment))}
+                  {renderMatchList(section.matches, !hasApprovedPayment)}
                 </div>
               </div>
             ))}
@@ -960,7 +988,7 @@ export function PredictionsBoard({
                 <span>{section.matches.length} partidos</span>
               </div>
               <div className="match-list">
-                {section.matches.map((match) => renderMatchCard(match, !hasApprovedPayment))}
+                {renderMatchList(section.matches, !hasApprovedPayment)}
               </div>
             </div>
           ))

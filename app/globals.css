@@ -2204,6 +2204,28 @@ select:focus {
   gap: 0.6rem;
 }
 
+.prediction-stage-block {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.prediction-stage-title {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  margin: 0.35rem 0 0.05rem;
+  padding: 0.18rem 0.65rem;
+  border: 1px solid rgba(0, 211, 183, 0.22);
+  border-radius: 999px;
+  color: var(--gold);
+  background: rgba(0, 211, 183, 0.08);
+  font-family: var(--font-title), sans-serif;
+  font-size: 0.86rem;
+  font-weight: 500;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+}
+
 .match-card {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto;
