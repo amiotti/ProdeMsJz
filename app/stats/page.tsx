@@ -572,7 +572,7 @@ function NextMatchPredictionsPanel({
   };
 
   return (
-    <>
+    <div className="next-match-predictions-grid">
       {nextMatches.map((match) => {
         const homeName = getTeamDisplayName(match.homeTeam);
         const awayName = getTeamDisplayName(match.awayTeam);
@@ -603,7 +603,7 @@ function NextMatchPredictionsPanel({
           </div>
         );
       })}
-    </>
+    </div>
   );
 }
 function AdminStatsDashboard({ state }: { state: StateResponse }) {
@@ -631,11 +631,15 @@ function AdminStatsDashboard({ state }: { state: StateResponse }) {
       </div>
 
       <div className="stats-grid">
-        <div className="panel stack-md">
+        <div className="panel stack-md stats-grid-wide">
           <div className="section-head"><h3>Predicciones por grupo</h3><span>Carga acumulada</span></div>
           <BarChart data={predictionsByGroup} />
         </div>
-        <NextMatchPredictionsPanel state={state} analytics={analytics} />
+      </div>
+
+      <NextMatchPredictionsPanel state={state} analytics={analytics} />
+
+      <div className="stats-grid">
         <div className="panel stack-md">
           <div className="section-head"><h3>Resultados oficiales</h3><span>Distribución de signos</span></div>
           <DonutChart
@@ -646,13 +650,6 @@ function AdminStatsDashboard({ state }: { state: StateResponse }) {
               { label: 'Gana visitante', value: analytics.officialOutcome.visitante, color: '#ef3100' },
             ]}
           />
-        </div>
-      </div>
-
-      <div className="stats-grid">
-        <div className="panel stack-md">
-          <div className="section-head"><h3>Participación por usuario</h3><span>Top por cantidad de predicciones</span></div>
-          {participationBars.length > 0 ? <HorizontalBars data={participationBars} /> : <p className="muted">Aún no hay predicciones.</p>}
         </div>
         <div className="panel stack-md">
           <div className="section-head"><h3>Precisión global del PRODE</h3><span>Predicciones evaluadas</span></div>
@@ -671,6 +668,10 @@ function AdminStatsDashboard({ state }: { state: StateResponse }) {
         </div>
       </div>
 
+      <div className="panel stack-md">
+        <div className="section-head"><h3>Participación por usuario</h3><span>Top por cantidad de predicciones</span></div>
+        {participationBars.length > 0 ? <HorizontalBars data={participationBars} /> : <p className="muted">Aún no hay predicciones.</p>}
+      </div>
       <div className="panel stack-md">
         <div className="section-head"><h3>Total de goles por partido</h3><span>Histograma</span></div>
         <BarChart
@@ -810,10 +811,13 @@ function UserStatsDashboard({ state, user }: { state: StateResponse; user: User 
       </div>
 
       <div className="stats-grid">
-        <div className="panel stack-md">
+        <div className="panel stack-md stats-grid-wide">
           <div className="section-head"><h3>Predicciones por grupo</h3><span>Carga acumulada</span></div>
           <BarChart data={predictionsByGroup} />
         </div>
+      </div>
+
+      <div className="stats-grid">
         <div className="panel stack-md">
           <div className="section-head"><h3>Resultados oficiales</h3><span>Distribución de signos</span></div>
           <DonutChart
@@ -825,24 +829,22 @@ function UserStatsDashboard({ state, user }: { state: StateResponse; user: User 
             ]}
           />
         </div>
+        <div className="panel stack-md">
+          <div className="section-head"><h3>Precisión global del PRODE</h3><span>Predicciones evaluadas</span></div>
+          <DonutChart
+            centerLabel="pred."
+            segments={[
+              { label: 'Exactas', value: analytics.exactHits, color: '#59e3d7' },
+              { label: 'Solo signo', value: analytics.outcomeHits, color: '#9bd910' },
+              { label: 'Fallidas', value: analytics.misses, color: '#ff5f78' },
+            ]}
+          />
+          <p className="muted">
+            Total evaluadas: <strong>{analytics.scoredPredictions}</strong>. Puntaje: {state.db.pointsConfig.exactScore} exacto /{' '}
+            {state.db.pointsConfig.correctOutcome} signo.
+          </p>
+        </div>
       </div>
-
-      <div className="panel stack-md">
-        <div className="section-head"><h3>Precisión global del PRODE</h3><span>Predicciones evaluadas</span></div>
-        <DonutChart
-          centerLabel="pred."
-          segments={[
-            { label: 'Exactas', value: analytics.exactHits, color: '#59e3d7' },
-            { label: 'Solo signo', value: analytics.outcomeHits, color: '#9bd910' },
-            { label: 'Fallidas', value: analytics.misses, color: '#ff5f78' },
-          ]}
-        />
-        <p className="muted">
-          Total evaluadas: <strong>{analytics.scoredPredictions}</strong>. Puntaje: {state.db.pointsConfig.exactScore} exacto /{' '}
-          {state.db.pointsConfig.correctOutcome} signo.
-        </p>
-      </div>
-
       <div className="panel stack-md">
         <div className="section-head"><h3>Total de goles por partido</h3><span>Histograma</span></div>
         <BarChart

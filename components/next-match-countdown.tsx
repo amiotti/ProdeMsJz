@@ -48,13 +48,13 @@ export function NextMatchCountdown({
     return () => window.clearInterval(id);
   }, [kickoffAt]);
 
-  const matchLabel = useMemo(() => {
+  const matchLabels = useMemo(() => {
     if (matches?.length) {
-      return matches.map((match) => `${match.homeTeam} vs ${match.awayTeam}`).join(' / ');
+      return matches.map((match) => `${match.homeTeam} vs ${match.awayTeam}`);
     }
-    if (!homeTeam || !awayTeam) return 'Sin próximo partido';
-    return `${homeTeam} vs ${awayTeam}`;
+    return [homeTeam && awayTeam ? `${homeTeam} vs ${awayTeam}` : 'Sin próximo partido'];
   }, [awayTeam, homeTeam, matches]);
+  const matchLabel = matchLabels[0] ?? 'Sin próximo partido';
 
   if (!kickoffAt || !remaining) {
     return (
@@ -68,15 +68,15 @@ export function NextMatchCountdown({
     );
   }
 
-  const hasMultipleMatches = Boolean(matches && matches.length > 1);
-
   return (
     <div className="next-match-countdown">
       <div className="countdown-copy">
         <p className="countdown-label">Próximo partido</p>
-        <strong>{hasMultipleMatches ? `${matches?.length} partidos al mismo horario` : matchLabel}</strong>
-        {hasMultipleMatches ? <span className="countdown-matches">{matchLabel}</span> : null}
-        <span>Faltan</span>
+        <div className="countdown-match-list">
+          {matchLabels.map((label) => (
+            <strong key={label}>{label}</strong>
+          ))}
+        </div>
       </div>
       <div className="countdown-clock" aria-label={`Faltan ${remaining.hours} horas, ${remaining.minutes} minutos y ${remaining.seconds} segundos`}>
         <span>
