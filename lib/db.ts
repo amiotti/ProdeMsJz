@@ -1156,7 +1156,7 @@ export async function saveOfficialResults(
   const current = await queryAllInstant();
   const byMatchId = new Map(current.officialResults.map((r) => [r.matchId, r] as const));
   const updateIds = new Set(items.map((item) => item.matchId));
-  const ts = nowIso();
+  const baseTs = Date.now();
   const operations: any[] = [];
 
   for (const matchId of clearMatchIds) {
@@ -1167,7 +1167,7 @@ export async function saveOfficialResults(
     operations.push(tx.prode_official_results[existing.id].delete());
   }
 
-  for (const item of items) {
+  for (const [index, item] of items.entries()) {
     if (!validMatchIds.has(item.matchId)) continue;
     if (!Number.isInteger(item.home) || item.home < 0 || item.home > 30) continue;
     if (!Number.isInteger(item.away) || item.away < 0 || item.away > 30) continue;
@@ -1187,7 +1187,7 @@ export async function saveOfficialResults(
         home: item.home,
         away: item.away,
         winnerSide: isKnockoutTie ? winnerSide : undefined,
-        updatedAt: ts,
+        updatedAt: new Date(baseTs + index).toISOString(),
       }),
     );
   }
@@ -1214,7 +1214,7 @@ export async function saveOfficialTriviaResults(
   const current = await queryAllInstant();
   const byQuestionId = new Map(current.officialTriviaResults.map((result) => [result.questionId, result] as const));
   const updateIds = new Set(items.map((item) => item.questionId));
-  const ts = nowIso();
+  const baseTs = Date.now();
   const operations: any[] = [];
 
   for (const questionId of clearQuestionIds) {
@@ -1225,7 +1225,7 @@ export async function saveOfficialTriviaResults(
     operations.push(tx.prode_official_trivia_results[existing.id].delete());
   }
 
-  for (const item of items) {
+  for (const [index, item] of items.entries()) {
     const question = validQuestions.get(item.questionId);
     if (!question) continue;
     const normalized = normalizeTriviaAnswer(item.answer, question.answerType);
@@ -1238,7 +1238,7 @@ export async function saveOfficialTriviaResults(
         id,
         questionId: item.questionId,
         answer: normalized,
-        updatedAt: ts,
+        updatedAt: new Date(baseTs + index).toISOString(),
       }),
     );
   }
@@ -1546,14 +1546,44 @@ function buildLeaderboardView(db: ProdeDB): LeaderboardView {
   return { rows: computeLeaderboard(db) };
 }
 
-function getLastOfficialResultUpdateMs(
+type LatestOfficialChange =
+  | { kind: 'match'; id: string; updatedAtMs: number; orderMs: number }
+  | { kind: 'trivia'; id: string; updatedAtMs: number; orderMs: number };
+
+function getLatestOfficialChange(
+  db: ProdeDB,
   officialResults: InstantOfficialResultDoc[],
   officialTriviaResults: InstantOfficialTriviaResultDoc[],
-) {
-  const timestamps = [...officialResults, ...officialTriviaResults]
-    .map((result) => new Date(result.updatedAt).getTime())
-    .filter(Number.isFinite);
-  return timestamps.length ? Math.max(...timestamps) : null;
+): LatestOfficialChange | null {
+  const matchKickoffById = new Map(db.matches.map((match) => [match.id, new Date(match.kickoffAt).getTime()] as const));
+  const changes: LatestOfficialChange[] = [
+    ...officialResults
+      .map((result) => ({
+        kind: 'match' as const,
+        id: result.matchId,
+        updatedAtMs: new Date(result.updatedAt).getTime(),
+        orderMs: matchKickoffById.get(result.matchId) ?? 0,
+      }))
+      .filter((change) => Number.isFinite(change.updatedAtMs)),
+    ...officialTriviaResults
+      .map((result) => ({
+        kind: 'trivia' as const,
+        id: result.questionId,
+        updatedAtMs: new Date(result.updatedAt).getTime(),
+        orderMs: Number.MAX_SAFE_INTEGER,
+      }))
+      .filter((change) => Number.isFinite(change.updatedAtMs)),
+  ];
+
+  if (changes.length === 0) return null;
+  changes.sort(
+    (a, b) =>
+      a.updatedAtMs - b.updatedAtMs ||
+      a.orderMs - b.orderMs ||
+      a.kind.localeCompare(b.kind) ||
+      a.id.localeCompare(b.id),
+  );
+  return changes[changes.length - 1] ?? null;
 }
 
 function addPositionChanges(currentRows: LeaderboardRow[], previousRows: LeaderboardRow[]): LeaderboardRow[] {
@@ -1574,14 +1604,21 @@ function buildLeaderboardDbBefore(
   db: ProdeDB,
   officialResults: InstantOfficialResultDoc[],
   officialTriviaResults: InstantOfficialTriviaResultDoc[],
-  cutoffMs: number,
+  latestChange: LatestOfficialChange | null,
 ): ProdeDB {
+  const cutoffMs = latestChange?.updatedAtMs ?? Number.POSITIVE_INFINITY;
   const officialUpdatedAtByMatch = new Map(
     officialResults.map((result) => [result.matchId, new Date(result.updatedAt).getTime()] as const),
   );
   const previousTriviaQuestionIds = new Set(
     officialTriviaResults
-      .filter((result) => new Date(result.updatedAt).getTime() < cutoffMs)
+      .filter((result) => {
+        const updatedAt = new Date(result.updatedAt).getTime();
+        return (
+          updatedAt < cutoffMs ||
+          (updatedAt === cutoffMs && !(latestChange?.kind === 'trivia' && latestChange.id === result.questionId))
+        );
+      })
       .map((result) => result.questionId),
   );
 
@@ -1592,7 +1629,10 @@ function buildLeaderboardDbBefore(
       return {
         ...match,
         officialResult:
-          match.officialResult && Number.isFinite(updatedAt) && updatedAt! < cutoffMs
+          match.officialResult &&
+          Number.isFinite(updatedAt) &&
+          (updatedAt! < cutoffMs ||
+            (updatedAt === cutoffMs && !(latestChange?.kind === 'match' && latestChange.id === match.id)))
             ? { ...match.officialResult }
             : null,
       };
@@ -1637,12 +1677,12 @@ export async function getLeaderboardPageState() {
     queryOfficialResultsOnly(),
     queryOfficialTriviaResultsOnly(),
   ]);
-  const lastOfficialUpdateMs = getLastOfficialResultUpdateMs(officialResults, officialTriviaResults);
+  const latestChange = getLatestOfficialChange(core.db, officialResults, officialTriviaResults);
   const previousDb = buildLeaderboardDbBefore(
     core.db,
     officialResults,
     officialTriviaResults,
-    lastOfficialUpdateMs ?? Number.POSITIVE_INFINITY,
+    latestChange,
   );
 
   const previousGeneralRows = computeLeaderboard(previousDb);

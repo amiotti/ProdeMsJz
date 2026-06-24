@@ -1328,63 +1328,111 @@ const ROUND_OF_32_SLOTS: Array<{ id: string; home: KnockoutSlot; away: KnockoutS
   { id: 'KO-88', home: { kind: 'group', position: 2, groupId: 'D', label: '2do Grupo D' }, away: { kind: 'group', position: 2, groupId: 'G', label: '2do Grupo G' } },
 ];
 
+const ROUND_OF_32_SLOT_BY_ID = new Map(ROUND_OF_32_SLOTS.map((slot) => [slot.id, slot] as const));
+
+// FIFA publishes knockout fixtures by chronological slot, not by match number.
+// Keep this order aligned with the official schedule rows so each KO id receives the right venue/kickoff.
+const ROUND_OF_32_FIXTURE_ORDER = [
+  'KO-73',
+  'KO-76',
+  'KO-74',
+  'KO-75',
+  'KO-78',
+  'KO-77',
+  'KO-79',
+  'KO-80',
+  'KO-82',
+  'KO-81',
+  'KO-84',
+  'KO-83',
+  'KO-85',
+  'KO-88',
+  'KO-86',
+  'KO-87',
+] as const;
+
+const ROUND_OF_16_SLOTS = [
+  { id: 'KO-89', homeTeam: 'Ganador M73', awayTeam: 'Ganador M75' },
+  { id: 'KO-90', homeTeam: 'Ganador M74', awayTeam: 'Ganador M77' },
+  { id: 'KO-91', homeTeam: 'Ganador M76', awayTeam: 'Ganador M78' },
+  { id: 'KO-92', homeTeam: 'Ganador M79', awayTeam: 'Ganador M80' },
+  { id: 'KO-93', homeTeam: 'Ganador M83', awayTeam: 'Ganador M84' },
+  { id: 'KO-94', homeTeam: 'Ganador M81', awayTeam: 'Ganador M82' },
+  { id: 'KO-95', homeTeam: 'Ganador M86', awayTeam: 'Ganador M88' },
+  { id: 'KO-96', homeTeam: 'Ganador M85', awayTeam: 'Ganador M87' },
+] as const;
+
+const ROUND_OF_16_FIXTURE_ORDER = [
+  'KO-90',
+  'KO-89',
+  'KO-91',
+  'KO-92',
+  'KO-93',
+  'KO-94',
+  'KO-95',
+  'KO-96',
+] as const;
+
+const ROUND_OF_16_SLOT_BY_ID = new Map(ROUND_OF_16_SLOTS.map((slot) => [slot.id, slot] as const));
+
+const QUARTERFINAL_SLOTS = [
+  { id: 'KO-97', homeTeam: 'Ganador M89', awayTeam: 'Ganador M90' },
+  { id: 'KO-98', homeTeam: 'Ganador M93', awayTeam: 'Ganador M94' },
+  { id: 'KO-99', homeTeam: 'Ganador M91', awayTeam: 'Ganador M92' },
+  { id: 'KO-100', homeTeam: 'Ganador M95', awayTeam: 'Ganador M96' },
+] as const;
+
+const SEMIFINAL_SLOTS = [
+  { id: 'KO-101', homeTeam: 'Ganador M97', awayTeam: 'Ganador M98' },
+  { id: 'KO-102', homeTeam: 'Ganador M99', awayTeam: 'Ganador M100' },
+] as const;
+
 export function buildKnockoutCalendar(): CalendarEvent[] {
   const events: CalendarEvent[] = [];
-  const addStage = (
-    stage: string,
-    dates: string[],
-    matchesPerDate: number[],
-    labels: Array<{ id: string; homeTeam: string; awayTeam: string }>,
-  ) => {
-    let idx = 0;
-    dates.forEach((date, dateIndex) => {
-      for (let i = 0; i < matchesPerDate[dateIndex]; i += 1) {
-        const label = labels[idx];
-        if (!label) return;
-        events.push({
-          id: label.id,
-          stage,
-          date: `${date}T20:00:00.000Z`,
-          homeTeam: label.homeTeam,
-          awayTeam: label.awayTeam,
-        });
-        idx += 1;
-      }
+
+  for (const id of ROUND_OF_32_FIXTURE_ORDER) {
+    const slot = ROUND_OF_32_SLOT_BY_ID.get(id);
+    if (!slot) continue;
+    events.push({
+      id,
+      stage: '16avos',
+      date: '2026-06-28T19:00:00.000Z',
+      homeTeam: slot.home.label,
+      awayTeam: slot.away.label,
     });
-  };
+  }
 
-  const r32Labels = ROUND_OF_32_SLOTS.map(({ id, home, away }) => ({
-    id,
-    homeTeam: home.label,
-    awayTeam: away.label,
-  }));
-  addStage(
-    '16avos',
-    ['2026-06-28', '2026-06-29', '2026-06-30', '2026-07-01', '2026-07-02', '2026-07-03'],
-    [3, 3, 3, 3, 2, 2],
-    r32Labels,
-  );
+  for (const id of ROUND_OF_16_FIXTURE_ORDER) {
+    const slot = ROUND_OF_16_SLOT_BY_ID.get(id);
+    if (!slot) continue;
+    events.push({
+      id,
+      stage: '8vos',
+      date: '2026-07-04T17:00:00.000Z',
+      homeTeam: slot.homeTeam,
+      awayTeam: slot.awayTeam,
+    });
+  }
 
-  const r16Labels = Array.from({ length: 8 }, (_, i) => ({
-    id: `KO-${89 + i}`,
-    homeTeam: `Ganador M${73 + i * 2}`,
-    awayTeam: `Ganador M${74 + i * 2}`,
-  }));
-  addStage('8vos', ['2026-07-04', '2026-07-05', '2026-07-06', '2026-07-07'], [2, 2, 2, 2], r16Labels);
+  for (const slot of QUARTERFINAL_SLOTS) {
+    events.push({
+      id: slot.id,
+      stage: 'Cuartos',
+      date: '2026-07-09T20:00:00.000Z',
+      homeTeam: slot.homeTeam,
+      awayTeam: slot.awayTeam,
+    });
+  }
 
-  const qfLabels = Array.from({ length: 4 }, (_, i) => ({
-    id: `KO-${97 + i}`,
-    homeTeam: `Ganador M${89 + i * 2}`,
-    awayTeam: `Ganador M${90 + i * 2}`,
-  }));
-  addStage('Cuartos', ['2026-07-09', '2026-07-10', '2026-07-11'], [1, 2, 1], qfLabels);
-
-  const sfLabels = Array.from({ length: 2 }, (_, i) => ({
-    id: `KO-${101 + i}`,
-    homeTeam: `Ganador M${97 + i * 2}`,
-    awayTeam: `Ganador M${98 + i * 2}`,
-  }));
-  addStage('Semifinal', ['2026-07-14', '2026-07-15'], [1, 1], sfLabels);
+  for (const slot of SEMIFINAL_SLOTS) {
+    events.push({
+      id: slot.id,
+      stage: 'Semifinal',
+      date: '2026-07-14T19:00:00.000Z',
+      homeTeam: slot.homeTeam,
+      awayTeam: slot.awayTeam,
+    });
+  }
 
   events.push({
     id: 'KO-103',
@@ -1591,24 +1639,20 @@ export function resolveDynamicKnockoutParticipants(matches: Match[], groups: Gro
     awaySourceId: string;
     outcome: 'winner' | 'loser';
   }> = [
-    ...Array.from({ length: 8 }, (_, index) => ({
-      targetId: `KO-${89 + index}`,
-      homeSourceId: `KO-${73 + index * 2}`,
-      awaySourceId: `KO-${74 + index * 2}`,
-      outcome: 'winner' as const,
-    })),
-    ...Array.from({ length: 4 }, (_, index) => ({
-      targetId: `KO-${97 + index}`,
-      homeSourceId: `KO-${89 + index * 2}`,
-      awaySourceId: `KO-${90 + index * 2}`,
-      outcome: 'winner' as const,
-    })),
-    ...Array.from({ length: 2 }, (_, index) => ({
-      targetId: `KO-${101 + index}`,
-      homeSourceId: `KO-${97 + index * 2}`,
-      awaySourceId: `KO-${98 + index * 2}`,
-      outcome: 'winner' as const,
-    })),
+    { targetId: 'KO-89', homeSourceId: 'KO-73', awaySourceId: 'KO-75', outcome: 'winner' as const },
+    { targetId: 'KO-90', homeSourceId: 'KO-74', awaySourceId: 'KO-77', outcome: 'winner' as const },
+    { targetId: 'KO-91', homeSourceId: 'KO-76', awaySourceId: 'KO-78', outcome: 'winner' as const },
+    { targetId: 'KO-92', homeSourceId: 'KO-79', awaySourceId: 'KO-80', outcome: 'winner' as const },
+    { targetId: 'KO-93', homeSourceId: 'KO-83', awaySourceId: 'KO-84', outcome: 'winner' as const },
+    { targetId: 'KO-94', homeSourceId: 'KO-81', awaySourceId: 'KO-82', outcome: 'winner' as const },
+    { targetId: 'KO-95', homeSourceId: 'KO-86', awaySourceId: 'KO-88', outcome: 'winner' as const },
+    { targetId: 'KO-96', homeSourceId: 'KO-85', awaySourceId: 'KO-87', outcome: 'winner' as const },
+    { targetId: 'KO-97', homeSourceId: 'KO-89', awaySourceId: 'KO-90', outcome: 'winner' as const },
+    { targetId: 'KO-98', homeSourceId: 'KO-93', awaySourceId: 'KO-94', outcome: 'winner' as const },
+    { targetId: 'KO-99', homeSourceId: 'KO-91', awaySourceId: 'KO-92', outcome: 'winner' as const },
+    { targetId: 'KO-100', homeSourceId: 'KO-95', awaySourceId: 'KO-96', outcome: 'winner' as const },
+    { targetId: 'KO-101', homeSourceId: 'KO-97', awaySourceId: 'KO-98', outcome: 'winner' as const },
+    { targetId: 'KO-102', homeSourceId: 'KO-99', awaySourceId: 'KO-100', outcome: 'winner' as const },
     { targetId: 'KO-103', homeSourceId: 'KO-101', awaySourceId: 'KO-102', outcome: 'loser' as const },
     { targetId: 'KO-104', homeSourceId: 'KO-101', awaySourceId: 'KO-102', outcome: 'winner' as const },
   ];
@@ -1701,6 +1745,8 @@ export function buildCalendarFixtures(
 
   const rows = ensureCompleteOfficialFixtureRows(OFFICIAL_FIXTURE_ROWS);
   const counters = { group: 1, knockout: 73 };
+  const knockoutEvents = buildKnockoutCalendar();
+  let knockoutIndex = 0;
 
   const fixtures: CalendarFixture[] = rows.map((row) => {
     if (row.stage === 'group' && row.homeTeam && row.awayTeam) {
@@ -1721,13 +1767,14 @@ export function buildCalendarFixtures(
     }
 
     const date = getOfficialRowKickoffIso(row);
-    const knockoutId = `KO-${counters.knockout++}`;
+    const knockoutEvent = knockoutEvents[knockoutIndex++];
+    const knockoutId = knockoutEvent?.id ?? `KO-${counters.knockout++}`;
     return {
       id: knockoutId,
-      stage: 'Fase final',
+      stage: knockoutEvent?.stage ?? 'Fase final',
       date,
-      homeTeam: row.matchLabel,
-      awayTeam: '',
+      homeTeam: knockoutEvent?.homeTeam ?? row.matchLabel,
+      awayTeam: knockoutEvent?.awayTeam ?? '',
       venue: row.venue,
     };
   });
