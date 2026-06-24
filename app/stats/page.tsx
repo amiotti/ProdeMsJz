@@ -61,12 +61,6 @@ const HISTORICAL_PRODE_ROWS: HistoricalProdeRow[] = [
 
 const HISTORICAL_MATCH_COUNTS = [48, 48, 56, 16, 48, 60, 23] as const;
 
-function isPredictionEditable(kickoffAt: string, nowMs = Date.now()) {
-  const kickoffMs = new Date(kickoffAt).getTime();
-  if (!Number.isFinite(kickoffMs)) return false;
-  return nowMs < kickoffMs - 60 * 60 * 1000;
-}
-
 function normalizeHistoricalName(value: string) {
   return value
     .normalize('NFD')
@@ -547,43 +541,71 @@ function OfficialMatchStatsPanel({ state }: { state: StateResponse }) {
 
 function NextMatchPredictionsPanel({
   state,
-  analytics,
 }: {
   state: StateResponse;
   analytics: StatsAnalyticsSnapshot;
 }) {
-  const nextMatch = analytics.nextMatchId ? state.db.matches.find((match) => match.id === analytics.nextMatchId) : null;
-  if (!nextMatch || isPredictionEditable(nextMatch.kickoffAt)) return null;
+  const futureMatches = [...state.db.matches]
+    .filter((match) => new Date(match.kickoffAt).getTime() > Date.now())
+    .sort((a, b) => new Date(a.kickoffAt).getTime() - new Date(b.kickoffAt).getTime());
+  const nextMatch = futureMatches[0] ?? null;
+  if (!nextMatch) return null;
 
-  const total = analytics.nextMatchDist.home + analytics.nextMatchDist.draw + analytics.nextMatchDist.away;
-  const homeName = getTeamDisplayName(nextMatch.homeTeam);
-  const awayName = getTeamDisplayName(nextMatch.awayTeam);
+  const nextKickoffMs = new Date(nextMatch.kickoffAt).getTime();
+  const nextMatches = futureMatches.filter((match) => new Date(match.kickoffAt).getTime() === nextKickoffMs);
+  const predictionsByMatchId = new Map<string, Prediction[]>();
+
+  for (const prediction of state.db.predictions) {
+    const list = predictionsByMatchId.get(prediction.matchId) ?? [];
+    list.push(prediction);
+    predictionsByMatchId.set(prediction.matchId, list);
+  }
+
+  const getDist = (matchId: string) => {
+    const dist = { home: 0, draw: 0, away: 0 };
+    for (const prediction of predictionsByMatchId.get(matchId) ?? []) {
+      if (prediction.homeGoals > prediction.awayGoals) dist.home += 1;
+      else if (prediction.homeGoals < prediction.awayGoals) dist.away += 1;
+      else dist.draw += 1;
+    }
+    return dist;
+  };
 
   return (
-    <div className="panel stack-md">
-      <div className="section-head">
-        <h3>Predicciones del próximo partido</h3>
-        <span>{formatKickoffArgentina(nextMatch.kickoffAt)}</span>
-      </div>
-      <p className="muted compact-text">
-        {homeName} vs {awayName}. Se muestra porque la edición ya está cerrada para este partido.
-      </p>
-      {total > 0 ? (
-        <DonutChart
-          centerLabel="pred."
-          segments={[
-            { label: homeName, value: analytics.nextMatchDist.home, color: '#3850dd' },
-            { label: 'Empate', value: analytics.nextMatchDist.draw, color: '#f4be1f' },
-            { label: awayName, value: analytics.nextMatchDist.away, color: '#ef3100' },
-          ]}
-        />
-      ) : (
-        <p className="muted">Todavía no hay predicciones cargadas para este partido.</p>
-      )}
-    </div>
+    <>
+      {nextMatches.map((match) => {
+        const homeName = getTeamDisplayName(match.homeTeam);
+        const awayName = getTeamDisplayName(match.awayTeam);
+        const dist = getDist(match.id);
+        const total = dist.home + dist.draw + dist.away;
+
+        return (
+          <div key={match.id} className="panel stack-md">
+            <div className="section-head">
+              <h3>Predicciones del próximo partido</h3>
+              <span>{formatKickoffArgentina(match.kickoffAt)}</span>
+            </div>
+            <p className="muted compact-text">
+              {homeName} vs {awayName}
+            </p>
+            {total > 0 ? (
+              <DonutChart
+                centerLabel="pred."
+                segments={[
+                  { label: homeName, value: dist.home, color: '#3850dd' },
+                  { label: 'Empate', value: dist.draw, color: '#f4be1f' },
+                  { label: awayName, value: dist.away, color: '#ef3100' },
+                ]}
+              />
+            ) : (
+              <p className="muted">Todavía no hay predicciones cargadas para este partido.</p>
+            )}
+          </div>
+        );
+      })}
+    </>
   );
 }
-
 function AdminStatsDashboard({ state }: { state: StateResponse }) {
   const analytics = getStatsAnalytics(state);
   const predictionsByGroup = analytics.predictionsByGroup.map((g) => ({ label: g.groupId, value: g.count, note: g.groupName }));

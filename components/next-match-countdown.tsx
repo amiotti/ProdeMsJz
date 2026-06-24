@@ -2,6 +2,11 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
+type CountdownMatch = {
+  homeTeam: string;
+  awayTeam: string;
+};
+
 function getRemaining(kickoffAt: string) {
   const target = new Date(kickoffAt).getTime();
   const diff = Math.max(0, target - Date.now());
@@ -20,10 +25,12 @@ export function NextMatchCountdown({
   kickoffAt,
   homeTeam,
   awayTeam,
+  matches,
 }: {
   kickoffAt?: string | null;
   homeTeam?: string | null;
   awayTeam?: string | null;
+  matches?: CountdownMatch[];
 }) {
   const [remaining, setRemaining] = useState(() => (kickoffAt ? getRemaining(kickoffAt) : null));
 
@@ -42,9 +49,12 @@ export function NextMatchCountdown({
   }, [kickoffAt]);
 
   const matchLabel = useMemo(() => {
+    if (matches?.length) {
+      return matches.map((match) => `${match.homeTeam} vs ${match.awayTeam}`).join(' / ');
+    }
     if (!homeTeam || !awayTeam) return 'Sin próximo partido';
     return `${homeTeam} vs ${awayTeam}`;
-  }, [awayTeam, homeTeam]);
+  }, [awayTeam, homeTeam, matches]);
 
   if (!kickoffAt || !remaining) {
     return (
@@ -58,11 +68,14 @@ export function NextMatchCountdown({
     );
   }
 
+  const hasMultipleMatches = Boolean(matches && matches.length > 1);
+
   return (
     <div className="next-match-countdown">
       <div className="countdown-copy">
         <p className="countdown-label">Próximo partido</p>
-        <strong>{matchLabel}</strong>
+        <strong>{hasMultipleMatches ? `${matches?.length} partidos al mismo horario` : matchLabel}</strong>
+        {hasMultipleMatches ? <span className="countdown-matches">{matchLabel}</span> : null}
         <span>Faltan</span>
       </div>
       <div className="countdown-clock" aria-label={`Faltan ${remaining.hours} horas, ${remaining.minutes} minutos y ${remaining.seconds} segundos`}>

@@ -81,9 +81,14 @@ export default async function InicioPage() {
   const totalMatches = state.summary.matches;
   const resultsLoaded = state.summary.matchesWithOfficialResult;
   const loadProgressPct = totalMatches > 0 ? Math.round((resultsLoaded / totalMatches) * 100) : 0;
-  const nextMatch = [...state.matches]
+  const futureMatches = [...state.matches]
     .filter((m) => new Date(m.kickoffAt).getTime() > Date.now())
-    .sort((a, b) => new Date(a.kickoffAt).getTime() - new Date(b.kickoffAt).getTime())[0];
+    .sort((a, b) => new Date(a.kickoffAt).getTime() - new Date(b.kickoffAt).getTime());
+  const nextMatch = futureMatches[0];
+  const nextKickoffMs = nextMatch ? new Date(nextMatch.kickoffAt).getTime() : null;
+  const nextMatches = nextKickoffMs === null
+    ? []
+    : futureMatches.filter((match) => new Date(match.kickoffAt).getTime() === nextKickoffMs);
   const prizePool = PRIZE_BASE_AMOUNT_ARS * state.paidParticipants;
   const firstPrize = Math.round(prizePool * 0.7);
   const secondPrize = Math.round(prizePool * 0.25);
@@ -127,6 +132,10 @@ export default async function InicioPage() {
             kickoffAt={nextMatch?.kickoffAt ?? null}
             homeTeam={nextMatch ? getTeamDisplayName(nextMatch.homeTeam) : null}
             awayTeam={nextMatch ? getTeamDisplayName(nextMatch.awayTeam) : null}
+            matches={nextMatches.map((match) => ({
+              homeTeam: getTeamDisplayName(match.homeTeam),
+              awayTeam: getTeamDisplayName(match.awayTeam),
+            }))}
           />
           <div className="panel prizes-panel">
             <h3>Premios</h3>

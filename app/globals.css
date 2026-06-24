@@ -1609,6 +1609,15 @@ select {
   text-transform: uppercase;
 }
 
+.countdown-copy .countdown-matches {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1.35;
+  text-transform: none;
+}
+
 .countdown-copy span,
 .countdown-label {
   margin: 0;
