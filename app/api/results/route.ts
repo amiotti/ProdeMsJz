@@ -1,4 +1,6 @@
-﻿import { cookies } from 'next/headers';
+import { randomUUID } from 'node:crypto';
+
+import { cookies } from 'next/headers';
 
 import { getSessionCookieName } from '@/lib/auth';
 import { getResultsScreenState, getUserFromSessionToken, saveOfficialResults, saveOfficialTriviaResults } from '@/lib/db';
@@ -34,8 +36,9 @@ export async function POST(request: Request) {
     const rate = checkRateLimit(`results:admin:${user.id}:${ip}`, { limit: 120, windowMs: 10 * 60 * 1000 });
     if (!rate.ok) return noStoreJson({ ok: false, error: 'Demasiadas acciones. Intenta mas tarde.' }, { status: 429 });
 
-    await saveOfficialResults(body.results ?? [], body.clearMatchIds ?? []);
-    await saveOfficialTriviaResults(body.triviaResults ?? [], body.clearTriviaQuestionIds ?? []);
+    const batchId = randomUUID();
+    await saveOfficialResults(body.results ?? [], body.clearMatchIds ?? [], batchId);
+    await saveOfficialTriviaResults(body.triviaResults ?? [], body.clearTriviaQuestionIds ?? [], batchId);
 
     const state = await getResultsScreenState(token);
     return noStoreJson({ ok: true, state });

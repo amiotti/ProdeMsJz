@@ -70,6 +70,7 @@ type InstantOfficialResultDoc = {
   home: number;
   away: number;
   winnerSide?: 'home' | 'away';
+  batchId?: string;
   updatedAt: string;
 };
 
@@ -77,6 +78,7 @@ type InstantOfficialTriviaResultDoc = {
   id: string;
   questionId: string;
   answer: string;
+  batchId?: string;
   updatedAt: string;
 };
 
@@ -1143,6 +1145,7 @@ export async function saveTriviaPredictions(
 export async function saveOfficialResults(
   items: Array<{ matchId: string; home: number; away: number; winnerSide?: 'home' | 'away' }>,
   clearMatchIds: string[] = [],
+  batchId = randomUUID(),
 ) {
   await ensureBaseData();
   if (!Array.isArray(items)) throw new Error('Formato de resultados inv?lido');
@@ -1156,7 +1159,7 @@ export async function saveOfficialResults(
   const current = await queryAllInstant();
   const byMatchId = new Map(current.officialResults.map((r) => [r.matchId, r] as const));
   const updateIds = new Set(items.map((item) => item.matchId));
-  const baseTs = Date.now();
+  const updatedAt = nowIso();
   const operations: any[] = [];
 
   for (const matchId of clearMatchIds) {
@@ -1167,7 +1170,7 @@ export async function saveOfficialResults(
     operations.push(tx.prode_official_results[existing.id].delete());
   }
 
-  for (const [index, item] of items.entries()) {
+  for (const item of items) {
     if (!validMatchIds.has(item.matchId)) continue;
     if (!Number.isInteger(item.home) || item.home < 0 || item.home > 30) continue;
     if (!Number.isInteger(item.away) || item.away < 0 || item.away > 30) continue;
@@ -1187,7 +1190,8 @@ export async function saveOfficialResults(
         home: item.home,
         away: item.away,
         winnerSide: isKnockoutTie ? winnerSide : undefined,
-        updatedAt: new Date(baseTs + index).toISOString(),
+        batchId,
+        updatedAt,
       }),
     );
   }
@@ -1203,6 +1207,7 @@ export async function saveOfficialResults(
 export async function saveOfficialTriviaResults(
   items: Array<{ questionId: string; answer: string }>,
   clearQuestionIds: string[] = [],
+  batchId = randomUUID(),
 ) {
   await ensureBaseData();
   if (!Array.isArray(items)) throw new Error('Formato de resultados de trivia inv?lido');
@@ -1214,7 +1219,7 @@ export async function saveOfficialTriviaResults(
   const current = await queryAllInstant();
   const byQuestionId = new Map(current.officialTriviaResults.map((result) => [result.questionId, result] as const));
   const updateIds = new Set(items.map((item) => item.questionId));
-  const baseTs = Date.now();
+  const updatedAt = nowIso();
   const operations: any[] = [];
 
   for (const questionId of clearQuestionIds) {
@@ -1225,7 +1230,7 @@ export async function saveOfficialTriviaResults(
     operations.push(tx.prode_official_trivia_results[existing.id].delete());
   }
 
-  for (const [index, item] of items.entries()) {
+  for (const item of items) {
     const question = validQuestions.get(item.questionId);
     if (!question) continue;
     const normalized = normalizeTriviaAnswer(item.answer, question.answerType);
@@ -1238,7 +1243,8 @@ export async function saveOfficialTriviaResults(
         id,
         questionId: item.questionId,
         answer: normalized,
-        updatedAt: new Date(baseTs + index).toISOString(),
+        batchId,
+        updatedAt,
       }),
     );
   }
@@ -1547,8 +1553,8 @@ function buildLeaderboardView(db: ProdeDB): LeaderboardView {
 }
 
 type LatestOfficialChange =
-  | { kind: 'match'; id: string; updatedAtMs: number; orderMs: number }
-  | { kind: 'trivia'; id: string; updatedAtMs: number; orderMs: number };
+  | { kind: 'match'; id: string; updatedAtMs: number; orderMs: number; batchId?: string }
+  | { kind: 'trivia'; id: string; updatedAtMs: number; orderMs: number; batchId?: string };
 
 function getLatestOfficialChange(
   db: ProdeDB,
@@ -1563,6 +1569,7 @@ function getLatestOfficialChange(
         id: result.matchId,
         updatedAtMs: new Date(result.updatedAt).getTime(),
         orderMs: matchKickoffById.get(result.matchId) ?? 0,
+        batchId: result.batchId,
       }))
       .filter((change) => Number.isFinite(change.updatedAtMs)),
     ...officialTriviaResults
@@ -1571,6 +1578,7 @@ function getLatestOfficialChange(
         id: result.questionId,
         updatedAtMs: new Date(result.updatedAt).getTime(),
         orderMs: Number.MAX_SAFE_INTEGER,
+        batchId: result.batchId,
       }))
       .filter((change) => Number.isFinite(change.updatedAtMs)),
   ];
@@ -1607,13 +1615,23 @@ function buildLeaderboardDbBefore(
   latestChange: LatestOfficialChange | null,
 ): ProdeDB {
   const cutoffMs = latestChange?.updatedAtMs ?? Number.POSITIVE_INFINITY;
-  const officialUpdatedAtByMatch = new Map(
-    officialResults.map((result) => [result.matchId, new Date(result.updatedAt).getTime()] as const),
+  const latestBatchId = latestChange?.batchId;
+  const officialMetaByMatch = new Map(
+    officialResults.map((result) => [
+      result.matchId,
+      { updatedAtMs: new Date(result.updatedAt).getTime(), batchId: result.batchId },
+    ] as const),
   );
+
+  function belongsToLatestBatch(batchId?: string) {
+    return Boolean(latestBatchId && batchId === latestBatchId);
+  }
+
   const previousTriviaQuestionIds = new Set(
     officialTriviaResults
       .filter((result) => {
         const updatedAt = new Date(result.updatedAt).getTime();
+        if (belongsToLatestBatch(result.batchId)) return false;
         return (
           updatedAt < cutoffMs ||
           (updatedAt === cutoffMs && !(latestChange?.kind === 'trivia' && latestChange.id === result.questionId))
@@ -1625,14 +1643,18 @@ function buildLeaderboardDbBefore(
   return {
     ...db,
     matches: db.matches.map((match) => {
-      const updatedAt = officialUpdatedAtByMatch.get(match.id);
+      const meta = officialMetaByMatch.get(match.id);
+      if (meta && belongsToLatestBatch(meta.batchId)) {
+        return { ...match, officialResult: null };
+      }
       return {
         ...match,
         officialResult:
           match.officialResult &&
-          Number.isFinite(updatedAt) &&
-          (updatedAt! < cutoffMs ||
-            (updatedAt === cutoffMs && !(latestChange?.kind === 'match' && latestChange.id === match.id)))
+          meta &&
+          Number.isFinite(meta.updatedAtMs) &&
+          (meta.updatedAtMs < cutoffMs ||
+            (meta.updatedAtMs === cutoffMs && !(latestChange?.kind === 'match' && latestChange.id === match.id)))
             ? { ...match.officialResult }
             : null,
       };
