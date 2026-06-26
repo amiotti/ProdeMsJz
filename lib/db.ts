@@ -1182,6 +1182,18 @@ export async function saveOfficialResults(
     }
 
     const existing = byMatchId.get(item.matchId);
+    const existingWinnerSide =
+      existing?.winnerSide === 'home' || existing?.winnerSide === 'away' ? existing.winnerSide : undefined;
+    const nextWinnerSide = isKnockoutTie ? winnerSide : undefined;
+    if (
+      existing &&
+      existing.home === item.home &&
+      existing.away === item.away &&
+      existingWinnerSide === nextWinnerSide
+    ) {
+      continue;
+    }
+
     const id = existing?.id ?? randomUUID();
     operations.push(
       tx.prode_official_results[id].update({
@@ -1189,7 +1201,7 @@ export async function saveOfficialResults(
         matchId: item.matchId,
         home: item.home,
         away: item.away,
-        winnerSide: isKnockoutTie ? winnerSide : undefined,
+        winnerSide: nextWinnerSide,
         batchId,
         updatedAt,
       }),
@@ -1237,6 +1249,10 @@ export async function saveOfficialTriviaResults(
     if (!normalized) continue;
 
     const existing = byQuestionId.get(item.questionId);
+    if (existing && normalizeTriviaAnswer(existing.answer, question.answerType) === normalized) {
+      continue;
+    }
+
     const id = existing?.id ?? randomUUID();
     operations.push(
       tx.prode_official_trivia_results[id].update({
@@ -1594,6 +1610,18 @@ function getLatestOfficialChange(
   return changes[changes.length - 1] ?? null;
 }
 
+function getOfficialBatchSize(
+  batchId: string | undefined,
+  officialResults: InstantOfficialResultDoc[],
+  officialTriviaResults: InstantOfficialTriviaResultDoc[],
+) {
+  if (!batchId) return 0;
+  return (
+    officialResults.filter((result) => result.batchId === batchId).length +
+    officialTriviaResults.filter((result) => result.batchId === batchId).length
+  );
+}
+
 function addPositionChanges(currentRows: LeaderboardRow[], previousRows: LeaderboardRow[]): LeaderboardRow[] {
   const previousPositionByUser = new Map(
     previousRows.map((row, index) => [row.userId, index + 1] as const),
@@ -1700,11 +1728,13 @@ export async function getLeaderboardPageState() {
     queryOfficialTriviaResultsOnly(),
   ]);
   const latestChange = getLatestOfficialChange(core.db, officialResults, officialTriviaResults);
+  const latestBatchSize = getOfficialBatchSize(latestChange?.batchId, officialResults, officialTriviaResults);
+  const effectiveLatestChange = latestBatchSize > 16 ? null : latestChange;
   const previousDb = buildLeaderboardDbBefore(
     core.db,
     officialResults,
     officialTriviaResults,
-    latestChange,
+    effectiveLatestChange,
   );
 
   const previousGeneralRows = computeLeaderboard(previousDb);
