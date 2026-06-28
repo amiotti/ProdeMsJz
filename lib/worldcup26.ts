@@ -1341,6 +1341,25 @@ const ROUND_OF_32_RESOLVED_THIRD_PLACE_TEAMS = new Map<string, string>([
   ['KO-87:away', 'Cabo Verde'],
 ]);
 
+const ROUND_OF_32_FINAL_MATCHUPS = new Map<string, { homeTeam: string; awayTeam: string }>([
+  ['KO-73', { homeTeam: 'Sudafrica', awayTeam: 'Canada' }],
+  ['KO-76', { homeTeam: 'Paises Bajos', awayTeam: 'Marruecos' }],
+  ['KO-74', { homeTeam: 'Alemania', awayTeam: 'Paraguay' }],
+  ['KO-75', { homeTeam: 'Francia', awayTeam: 'Suecia' }],
+  ['KO-78', { homeTeam: 'Belgica', awayTeam: 'Senegal' }],
+  ['KO-77', { homeTeam: 'Estados Unidos', awayTeam: 'Bosnia y Herzegovina' }],
+  ['KO-79', { homeTeam: 'Espana', awayTeam: 'Austria' }],
+  ['KO-80', { homeTeam: 'Portugal', awayTeam: 'Croacia' }],
+  ['KO-82', { homeTeam: 'Brasil', awayTeam: 'Japon' }],
+  ['KO-81', { homeTeam: 'Costa de Marfil', awayTeam: 'Noruega' }],
+  ['KO-84', { homeTeam: 'Mexico', awayTeam: 'Ecuador' }],
+  ['KO-83', { homeTeam: 'Inglaterra', awayTeam: 'RD Congo' }],
+  ['KO-85', { homeTeam: 'Suiza', awayTeam: 'Argelia' }],
+  ['KO-88', { homeTeam: 'Colombia', awayTeam: 'Ghana' }],
+  ['KO-86', { homeTeam: 'Australia', awayTeam: 'Egipto' }],
+  ['KO-87', { homeTeam: 'Argentina', awayTeam: 'Cabo Verde' }],
+]);
+
 // FIFA publishes knockout fixtures by chronological slot, not by match number.
 // Keep this order aligned with the official schedule rows so each KO id receives the right venue/kickoff.
 const ROUND_OF_32_FIXTURE_ORDER = [
@@ -1404,12 +1423,13 @@ export function buildKnockoutCalendar(): CalendarEvent[] {
   for (const id of ROUND_OF_32_FIXTURE_ORDER) {
     const slot = ROUND_OF_32_SLOT_BY_ID.get(id);
     if (!slot) continue;
+    const matchup = ROUND_OF_32_FINAL_MATCHUPS.get(id);
     events.push({
       id,
       stage: '16avos',
       date: '2026-06-28T19:00:00.000Z',
-      homeTeam: slot.home.label,
-      awayTeam: slot.away.label,
+      homeTeam: matchup?.homeTeam ?? slot.home.label,
+      awayTeam: matchup?.awayTeam ?? slot.away.label,
     });
   }
 
@@ -1640,8 +1660,9 @@ export function resolveDynamicKnockoutParticipants(matches: Match[], groups: Gro
   for (const { id, home, away } of ROUND_OF_32_SLOTS) {
     const match = byId.get(id);
     if (!match) continue;
-    match.homeTeam = resolveSlot(id, 'home', home);
-    match.awayTeam = resolveSlot(id, 'away', away);
+    const finalMatchup = ROUND_OF_32_FINAL_MATCHUPS.get(id);
+    match.homeTeam = finalMatchup?.homeTeam ?? resolveSlot(id, 'home', home);
+    match.awayTeam = finalMatchup?.awayTeam ?? resolveSlot(id, 'away', away);
   }
 
   const links: Array<{
