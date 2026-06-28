@@ -1,3 +1,4 @@
+import { KnockoutBracket } from '@/components/knockout-bracket';
 import { TeamName } from '@/components/team-name';
 import { getState } from '@/lib/db';
 import { requireAuthenticatedUser } from '@/lib/route-guard';
@@ -108,6 +109,8 @@ export default async function CalendarPage() {
         <h2>Fixture</h2>
         <p className="muted">Tabla de posiciones por grupo y partidos programados en formato simplificado.</p>
       </div>
+
+      <KnockoutBracket matches={state.db.matches} />
 
       {state.db.groups.map((group) => {
         const rows = standingsByGroup.get(group.id) ?? [];

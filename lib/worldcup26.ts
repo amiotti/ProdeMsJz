@@ -1352,8 +1352,8 @@ const ROUND_OF_32_FIXTURE_ORDER = [
 ] as const;
 
 const ROUND_OF_16_SLOTS = [
-  { id: 'KO-89', homeTeam: 'Ganador M73', awayTeam: 'Ganador M75' },
-  { id: 'KO-90', homeTeam: 'Ganador M74', awayTeam: 'Ganador M77' },
+  { id: 'KO-89', homeTeam: 'Ganador M74', awayTeam: 'Ganador M77' },
+  { id: 'KO-90', homeTeam: 'Ganador M73', awayTeam: 'Ganador M75' },
   { id: 'KO-91', homeTeam: 'Ganador M76', awayTeam: 'Ganador M78' },
   { id: 'KO-92', homeTeam: 'Ganador M79', awayTeam: 'Ganador M80' },
   { id: 'KO-93', homeTeam: 'Ganador M83', awayTeam: 'Ganador M84' },
@@ -1639,8 +1639,8 @@ export function resolveDynamicKnockoutParticipants(matches: Match[], groups: Gro
     awaySourceId: string;
     outcome: 'winner' | 'loser';
   }> = [
-    { targetId: 'KO-89', homeSourceId: 'KO-73', awaySourceId: 'KO-75', outcome: 'winner' as const },
-    { targetId: 'KO-90', homeSourceId: 'KO-74', awaySourceId: 'KO-77', outcome: 'winner' as const },
+    { targetId: 'KO-89', homeSourceId: 'KO-74', awaySourceId: 'KO-77', outcome: 'winner' as const },
+    { targetId: 'KO-90', homeSourceId: 'KO-73', awaySourceId: 'KO-75', outcome: 'winner' as const },
     { targetId: 'KO-91', homeSourceId: 'KO-76', awaySourceId: 'KO-78', outcome: 'winner' as const },
     { targetId: 'KO-92', homeSourceId: 'KO-79', awaySourceId: 'KO-80', outcome: 'winner' as const },
     { targetId: 'KO-93', homeSourceId: 'KO-83', awaySourceId: 'KO-84', outcome: 'winner' as const },
