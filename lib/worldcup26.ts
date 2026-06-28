@@ -1330,6 +1330,17 @@ const ROUND_OF_32_SLOTS: Array<{ id: string; home: KnockoutSlot; away: KnockoutS
 
 const ROUND_OF_32_SLOT_BY_ID = new Map(ROUND_OF_32_SLOTS.map((slot) => [slot.id, slot] as const));
 
+const ROUND_OF_32_RESOLVED_THIRD_PLACE_TEAMS = new Map<string, string>([
+  ['KO-74:away', 'Paraguay'],
+  ['KO-77:away', 'Bosnia y Herzegovina'],
+  ['KO-79:away', 'Austria'],
+  ['KO-80:away', 'Croacia'],
+  ['KO-81:away', 'Noruega'],
+  ['KO-82:away', 'Japon'],
+  ['KO-85:away', 'Argelia'],
+  ['KO-87:away', 'Cabo Verde'],
+]);
+
 // FIFA publishes knockout fixtures by chronological slot, not by match number.
 // Keep this order aligned with the official schedule rows so each KO id receives the right venue/kickoff.
 const ROUND_OF_32_FIXTURE_ORDER = [
@@ -1352,14 +1363,14 @@ const ROUND_OF_32_FIXTURE_ORDER = [
 ] as const;
 
 const ROUND_OF_16_SLOTS = [
-  { id: 'KO-89', homeTeam: 'Ganador M74', awayTeam: 'Ganador M77' },
-  { id: 'KO-90', homeTeam: 'Ganador M73', awayTeam: 'Ganador M75' },
-  { id: 'KO-91', homeTeam: 'Ganador M76', awayTeam: 'Ganador M78' },
+  { id: 'KO-89', homeTeam: 'Ganador M73', awayTeam: 'Ganador M76' },
+  { id: 'KO-90', homeTeam: 'Ganador M74', awayTeam: 'Ganador M75' },
+  { id: 'KO-91', homeTeam: 'Ganador M78', awayTeam: 'Ganador M77' },
   { id: 'KO-92', homeTeam: 'Ganador M79', awayTeam: 'Ganador M80' },
-  { id: 'KO-93', homeTeam: 'Ganador M83', awayTeam: 'Ganador M84' },
-  { id: 'KO-94', homeTeam: 'Ganador M81', awayTeam: 'Ganador M82' },
-  { id: 'KO-95', homeTeam: 'Ganador M86', awayTeam: 'Ganador M88' },
-  { id: 'KO-96', homeTeam: 'Ganador M85', awayTeam: 'Ganador M87' },
+  { id: 'KO-93', homeTeam: 'Ganador M82', awayTeam: 'Ganador M81' },
+  { id: 'KO-94', homeTeam: 'Ganador M84', awayTeam: 'Ganador M83' },
+  { id: 'KO-95', homeTeam: 'Ganador M85', awayTeam: 'Ganador M88' },
+  { id: 'KO-96', homeTeam: 'Ganador M86', awayTeam: 'Ganador M87' },
 ] as const;
 
 const ROUND_OF_16_FIXTURE_ORDER = [
@@ -1623,7 +1634,7 @@ export function resolveDynamicKnockoutParticipants(matches: Match[], groups: Gro
 
   const resolveSlot = (matchId: string, side: 'home' | 'away', slot: KnockoutSlot) => {
     if (slot.kind === 'group') return positions.get(`${slot.position}${slot.groupId}`) ?? slot.label;
-    return thirdSlots.get(`${matchId}:${side}`) ?? slot.label;
+    return ROUND_OF_32_RESOLVED_THIRD_PLACE_TEAMS.get(`${matchId}:${side}`) ?? thirdSlots.get(`${matchId}:${side}`) ?? slot.label;
   };
 
   for (const { id, home, away } of ROUND_OF_32_SLOTS) {
@@ -1639,14 +1650,14 @@ export function resolveDynamicKnockoutParticipants(matches: Match[], groups: Gro
     awaySourceId: string;
     outcome: 'winner' | 'loser';
   }> = [
-    { targetId: 'KO-89', homeSourceId: 'KO-74', awaySourceId: 'KO-77', outcome: 'winner' as const },
-    { targetId: 'KO-90', homeSourceId: 'KO-73', awaySourceId: 'KO-75', outcome: 'winner' as const },
-    { targetId: 'KO-91', homeSourceId: 'KO-76', awaySourceId: 'KO-78', outcome: 'winner' as const },
+    { targetId: 'KO-89', homeSourceId: 'KO-73', awaySourceId: 'KO-76', outcome: 'winner' as const },
+    { targetId: 'KO-90', homeSourceId: 'KO-74', awaySourceId: 'KO-75', outcome: 'winner' as const },
+    { targetId: 'KO-91', homeSourceId: 'KO-78', awaySourceId: 'KO-77', outcome: 'winner' as const },
     { targetId: 'KO-92', homeSourceId: 'KO-79', awaySourceId: 'KO-80', outcome: 'winner' as const },
-    { targetId: 'KO-93', homeSourceId: 'KO-83', awaySourceId: 'KO-84', outcome: 'winner' as const },
-    { targetId: 'KO-94', homeSourceId: 'KO-81', awaySourceId: 'KO-82', outcome: 'winner' as const },
-    { targetId: 'KO-95', homeSourceId: 'KO-86', awaySourceId: 'KO-88', outcome: 'winner' as const },
-    { targetId: 'KO-96', homeSourceId: 'KO-85', awaySourceId: 'KO-87', outcome: 'winner' as const },
+    { targetId: 'KO-93', homeSourceId: 'KO-82', awaySourceId: 'KO-81', outcome: 'winner' as const },
+    { targetId: 'KO-94', homeSourceId: 'KO-84', awaySourceId: 'KO-83', outcome: 'winner' as const },
+    { targetId: 'KO-95', homeSourceId: 'KO-85', awaySourceId: 'KO-88', outcome: 'winner' as const },
+    { targetId: 'KO-96', homeSourceId: 'KO-86', awaySourceId: 'KO-87', outcome: 'winner' as const },
     { targetId: 'KO-97', homeSourceId: 'KO-89', awaySourceId: 'KO-90', outcome: 'winner' as const },
     { targetId: 'KO-98', homeSourceId: 'KO-93', awaySourceId: 'KO-94', outcome: 'winner' as const },
     { targetId: 'KO-99', homeSourceId: 'KO-91', awaySourceId: 'KO-92', outcome: 'winner' as const },

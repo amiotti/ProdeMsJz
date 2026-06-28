@@ -14,6 +14,46 @@ const KNOCKOUT_STAGE_LABELS: Record<string, string> = {
   Final: 'Final',
 };
 
+const KNOCKOUT_STAGE_MATCH_ORDER: Record<string, string[]> = {
+  '16avos': [
+    'KO-73',
+    'KO-76',
+    'KO-74',
+    'KO-75',
+    'KO-78',
+    'KO-77',
+    'KO-79',
+    'KO-80',
+    'KO-82',
+    'KO-81',
+    'KO-84',
+    'KO-83',
+    'KO-85',
+    'KO-88',
+    'KO-86',
+    'KO-87',
+  ],
+  '8vos': ['KO-89', 'KO-90', 'KO-91', 'KO-92', 'KO-93', 'KO-94', 'KO-95', 'KO-96'],
+  Cuartos: ['KO-97', 'KO-99', 'KO-98', 'KO-100'],
+  Semifinal: ['KO-101', 'KO-102'],
+  Final: ['KO-104'],
+  'Tercer puesto': ['KO-103'],
+};
+
+function sortKnockoutMatches(stage: string, matches: Match[]) {
+  const order = KNOCKOUT_STAGE_MATCH_ORDER[stage] ?? [];
+  const positionById = new Map(order.map((id, index) => [id, index] as const));
+
+  return [...matches].sort((a, b) => {
+    const aPosition = positionById.get(a.id);
+    const bPosition = positionById.get(b.id);
+    if (aPosition !== undefined || bPosition !== undefined) {
+      return (aPosition ?? Number.MAX_SAFE_INTEGER) - (bPosition ?? Number.MAX_SAFE_INTEGER);
+    }
+    return new Date(a.kickoffAt).getTime() - new Date(b.kickoffAt).getTime();
+  });
+}
+
 function formatKnockoutDate(kickoffAt: string) {
   const parts = new Intl.DateTimeFormat('es-AR', {
     weekday: 'short',
@@ -37,7 +77,7 @@ function getKnockoutRounds(matches: Match[]) {
   return KNOCKOUT_STAGE_ORDER.map((stage) => ({
     stage,
     label: KNOCKOUT_STAGE_LABELS[stage],
-    matches: knockoutMatches.filter((match) => match.stage === stage),
+    matches: sortKnockoutMatches(stage, knockoutMatches.filter((match) => match.stage === stage)),
   })).filter((round) => round.matches.length > 0);
 }
 
