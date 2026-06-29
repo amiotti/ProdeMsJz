@@ -1417,6 +1417,45 @@ const SEMIFINAL_SLOTS = [
   { id: 'KO-102', homeTeam: 'Ganador M99', awayTeam: 'Ganador M100' },
 ] as const;
 
+const KNOCKOUT_KICKOFF_BY_ID: Record<string, string> = {
+  'KO-73': '2026-06-28T19:00:00.000Z',
+  'KO-76': '2026-06-29T14:00:00.000Z',
+  'KO-74': '2026-06-29T17:30:00.000Z',
+  'KO-75': '2026-06-29T22:00:00.000Z',
+  'KO-78': '2026-06-30T19:00:00.000Z',
+  'KO-77': '2026-06-30T22:00:00.000Z',
+  'KO-79': '2026-07-01T19:00:00.000Z',
+  'KO-80': '2026-07-01T22:00:00.000Z',
+  'KO-82': '2026-07-02T19:00:00.000Z',
+  'KO-81': '2026-07-02T22:00:00.000Z',
+  'KO-84': '2026-07-03T19:00:00.000Z',
+  'KO-83': '2026-07-03T22:00:00.000Z',
+  'KO-85': '2026-07-04T16:00:00.000Z',
+  'KO-88': '2026-07-04T20:00:00.000Z',
+  'KO-86': '2026-07-05T19:00:00.000Z',
+  'KO-87': '2026-07-05T22:00:00.000Z',
+  'KO-89': '2026-07-06T19:00:00.000Z',
+  'KO-90': '2026-07-06T22:00:00.000Z',
+  'KO-91': '2026-07-07T19:00:00.000Z',
+  'KO-92': '2026-07-07T22:00:00.000Z',
+  'KO-93': '2026-07-08T19:00:00.000Z',
+  'KO-94': '2026-07-08T22:00:00.000Z',
+  'KO-95': '2026-07-09T19:00:00.000Z',
+  'KO-96': '2026-07-09T22:00:00.000Z',
+  'KO-97': '2026-07-11T19:00:00.000Z',
+  'KO-98': '2026-07-11T22:00:00.000Z',
+  'KO-99': '2026-07-12T19:00:00.000Z',
+  'KO-100': '2026-07-12T22:00:00.000Z',
+  'KO-101': '2026-07-15T22:00:00.000Z',
+  'KO-102': '2026-07-16T22:00:00.000Z',
+  'KO-103': '2026-07-18T22:00:00.000Z',
+  'KO-104': '2026-07-19T22:00:00.000Z',
+};
+
+function getKnockoutKickoffIso(id: string, fallback: string) {
+  return KNOCKOUT_KICKOFF_BY_ID[id] ?? fallback;
+}
+
 export function buildKnockoutCalendar(): CalendarEvent[] {
   const events: CalendarEvent[] = [];
 
@@ -1427,7 +1466,7 @@ export function buildKnockoutCalendar(): CalendarEvent[] {
     events.push({
       id,
       stage: '16avos',
-      date: '2026-06-28T19:00:00.000Z',
+      date: getKnockoutKickoffIso(id, '2026-06-28T19:00:00.000Z'),
       homeTeam: matchup?.homeTeam ?? slot.home.label,
       awayTeam: matchup?.awayTeam ?? slot.away.label,
     });
@@ -1439,7 +1478,7 @@ export function buildKnockoutCalendar(): CalendarEvent[] {
     events.push({
       id,
       stage: '8vos',
-      date: '2026-07-04T17:00:00.000Z',
+      date: getKnockoutKickoffIso(id, '2026-07-06T19:00:00.000Z'),
       homeTeam: slot.homeTeam,
       awayTeam: slot.awayTeam,
     });
@@ -1449,7 +1488,7 @@ export function buildKnockoutCalendar(): CalendarEvent[] {
     events.push({
       id: slot.id,
       stage: 'Cuartos',
-      date: '2026-07-09T20:00:00.000Z',
+      date: getKnockoutKickoffIso(slot.id, '2026-07-11T19:00:00.000Z'),
       homeTeam: slot.homeTeam,
       awayTeam: slot.awayTeam,
     });
@@ -1459,7 +1498,7 @@ export function buildKnockoutCalendar(): CalendarEvent[] {
     events.push({
       id: slot.id,
       stage: 'Semifinal',
-      date: '2026-07-14T19:00:00.000Z',
+      date: getKnockoutKickoffIso(slot.id, '2026-07-15T22:00:00.000Z'),
       homeTeam: slot.homeTeam,
       awayTeam: slot.awayTeam,
     });
@@ -1468,14 +1507,14 @@ export function buildKnockoutCalendar(): CalendarEvent[] {
   events.push({
     id: 'KO-103',
     stage: 'Tercer puesto',
-    date: '2026-07-18T20:00:00.000Z',
+    date: getKnockoutKickoffIso('KO-103', '2026-07-18T22:00:00.000Z'),
     homeTeam: 'Perdedor SF1',
     awayTeam: 'Perdedor SF2',
   });
   events.push({
     id: 'KO-104',
     stage: 'Final',
-    date: '2026-07-19T20:00:00.000Z',
+    date: getKnockoutKickoffIso('KO-104', '2026-07-19T22:00:00.000Z'),
     homeTeam: 'Ganador SF1',
     awayTeam: 'Ganador SF2',
   });
@@ -1496,7 +1535,7 @@ export function buildKnockoutMatches(): Match[] {
       matchday: index + 1,
       homeTeam: fixture.homeTeam,
       awayTeam: fixture.awayTeam,
-      kickoffAt: row ? getOfficialRowKickoffIso(row) : fixture.date,
+      kickoffAt: getKnockoutKickoffIso(fixture.id, fixture.date),
       venue: row?.venue ?? fixture.venue ?? null,
       officialResult: null,
     } satisfies Match;
