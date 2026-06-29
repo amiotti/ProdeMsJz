@@ -1434,22 +1434,22 @@ const KNOCKOUT_KICKOFF_BY_ID: Record<string, string> = {
   'KO-88': '2026-07-04T01:30:00.000Z',
   'KO-86': '2026-07-03T18:00:00.000Z',
   'KO-87': '2026-07-03T22:00:00.000Z',
-  'KO-89': '2026-07-06T19:00:00.000Z',
-  'KO-90': '2026-07-06T22:00:00.000Z',
-  'KO-91': '2026-07-07T19:00:00.000Z',
-  'KO-92': '2026-07-07T22:00:00.000Z',
-  'KO-93': '2026-07-08T19:00:00.000Z',
-  'KO-94': '2026-07-08T22:00:00.000Z',
-  'KO-95': '2026-07-09T19:00:00.000Z',
-  'KO-96': '2026-07-09T22:00:00.000Z',
-  'KO-97': '2026-07-11T19:00:00.000Z',
-  'KO-98': '2026-07-11T22:00:00.000Z',
-  'KO-99': '2026-07-12T19:00:00.000Z',
-  'KO-100': '2026-07-12T22:00:00.000Z',
-  'KO-101': '2026-07-15T22:00:00.000Z',
-  'KO-102': '2026-07-16T22:00:00.000Z',
-  'KO-103': '2026-07-18T22:00:00.000Z',
-  'KO-104': '2026-07-19T22:00:00.000Z',
+  'KO-89': '2026-07-04T17:00:00.000Z',
+  'KO-90': '2026-07-04T21:00:00.000Z',
+  'KO-91': '2026-07-05T20:00:00.000Z',
+  'KO-92': '2026-07-06T00:00:00.000Z',
+  'KO-93': '2026-07-06T19:00:00.000Z',
+  'KO-94': '2026-07-07T00:00:00.000Z',
+  'KO-95': '2026-07-07T16:00:00.000Z',
+  'KO-96': '2026-07-07T20:00:00.000Z',
+  'KO-97': '2026-07-09T20:00:00.000Z',
+  'KO-98': '2026-07-10T19:00:00.000Z',
+  'KO-99': '2026-07-11T21:00:00.000Z',
+  'KO-100': '2026-07-12T01:00:00.000Z',
+  'KO-101': '2026-07-14T19:00:00.000Z',
+  'KO-102': '2026-07-15T19:00:00.000Z',
+  'KO-103': '2026-07-18T21:00:00.000Z',
+  'KO-104': '2026-07-19T19:00:00.000Z',
 };
 
 function getKnockoutKickoffIso(id: string, fallback: string) {
@@ -1837,13 +1837,12 @@ export function buildCalendarFixtures(
       };
     }
 
-    const date = getOfficialRowKickoffIso(row);
     const knockoutEvent = knockoutEvents[knockoutIndex++];
     const knockoutId = knockoutEvent?.id ?? `KO-${counters.knockout++}`;
     return {
       id: knockoutId,
       stage: knockoutEvent?.stage ?? 'Fase final',
-      date,
+      date: knockoutEvent?.date ?? getOfficialRowKickoffIso(row),
       homeTeam: knockoutEvent?.homeTeam ?? row.matchLabel,
       awayTeam: knockoutEvent?.awayTeam ?? '',
       venue: row.venue,
