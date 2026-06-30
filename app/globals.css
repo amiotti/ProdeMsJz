@@ -1868,8 +1868,8 @@ select {
 }
 
 .knockout-panel-compact {
-  --knockout-card-height: 90px;
-  --knockout-row-step: 100px;
+  --knockout-card-height: 88px;
+  --knockout-row-step: 94px;
 }
 
 .knockout-panel h3 {
@@ -1882,6 +1882,7 @@ select {
   padding: 0.45rem 0.15rem 0.7rem;
   scroll-behavior: smooth;
   scroll-padding-inline: 0.85rem;
+  scroll-snap-type: x proximity;
   scrollbar-color: rgba(0, 211, 183, 0.55) transparent;
   scrollbar-width: thin;
 }
@@ -1899,17 +1900,14 @@ select {
   align-items: start;
   gap: 1.65rem;
   min-width: max-content;
-}
-
-.knockout-bracket::after {
-  content: '';
-  width: min(64vw, 680px);
+  padding-right: min(78vw, 820px);
 }
 
 .knockout-round {
   display: grid;
   gap: 0.75rem;
   position: relative;
+  scroll-snap-align: start;
   z-index: 1;
   --knockout-pair-span: 1;
 }

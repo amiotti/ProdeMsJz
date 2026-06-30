@@ -119,12 +119,8 @@ export function KnockoutBracket({ matches }: { matches: Match[] }) {
         const updatedNode = roundRefs.current.get(stage);
         if (!updatedNode) return;
 
-        const containerLeft = scrollContainer.getBoundingClientRect().left;
-        const roundLeft = updatedNode.getBoundingClientRect().left;
-        const nextLeft = scrollContainer.scrollLeft + roundLeft - containerLeft;
-
         scrollContainer.scrollTo({
-          left: Math.max(nextLeft, 0),
+          left: Math.max(updatedNode.offsetLeft, 0),
           behavior: 'smooth',
         });
       });
