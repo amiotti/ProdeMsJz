@@ -2009,6 +2009,21 @@ select {
   --knockout-pair-span: 8;
 }
 
+.knockout-panel[data-active-stage='8vos'] .knockout-round:nth-child(2),
+.knockout-panel[data-active-stage='Cuartos'] .knockout-round:nth-child(3),
+.knockout-panel[data-active-stage='Semifinal'] .knockout-round:nth-child(4) {
+  --knockout-pair-span: 1;
+}
+
+.knockout-panel[data-active-stage='8vos'] .knockout-round:nth-child(3),
+.knockout-panel[data-active-stage='Cuartos'] .knockout-round:nth-child(4) {
+  --knockout-pair-span: 2;
+}
+
+.knockout-panel[data-active-stage='8vos'] .knockout-round:nth-child(4) {
+  --knockout-pair-span: 4;
+}
+
 .knockout-round h4 {
   margin: 0;
   min-height: 2.2rem;
