@@ -1868,8 +1868,8 @@ select {
 }
 
 .knockout-panel-compact {
-  --knockout-card-height: 92px;
-  --knockout-row-step: 104px;
+  --knockout-card-height: 98px;
+  --knockout-row-step: 114px;
 }
 
 .knockout-panel h3 {
@@ -1899,18 +1899,34 @@ select {
   align-items: start;
   gap: 1.65rem;
   min-width: max-content;
-  transition: gap 180ms ease;
-}
-
-.knockout-panel-compact .knockout-bracket {
-  gap: 1.35rem;
 }
 
 .knockout-round {
   display: grid;
   gap: 0.75rem;
   position: relative;
+  z-index: 1;
   --knockout-pair-span: 1;
+}
+
+.knockout-round:nth-child(2) {
+  z-index: 2;
+}
+
+.knockout-round:nth-child(3) {
+  z-index: 3;
+}
+
+.knockout-round:nth-child(4) {
+  z-index: 4;
+}
+
+.knockout-round:nth-child(5) {
+  z-index: 5;
+}
+
+.knockout-round:nth-child(6) {
+  z-index: 6;
 }
 
 .knockout-round:nth-child(2) {
@@ -2013,7 +2029,6 @@ select {
   right: -1.66rem;
   width: 1.66rem;
   border-top: 1px solid rgba(0, 211, 183, 0.42);
-  z-index: -1;
   pointer-events: none;
 }
 
@@ -2024,14 +2039,11 @@ select {
   right: -1.66rem;
   height: calc(var(--knockout-row-step) * var(--knockout-pair-span));
   border-right: 1px solid rgba(0, 211, 183, 0.42);
-  z-index: -1;
   pointer-events: none;
 }
 
 .knockout-round:nth-child(n + 5) .knockout-match-card::before,
 .knockout-round:nth-child(n + 5) .knockout-match-card::after,
-.knockout-panel-compact .knockout-match-card::before,
-.knockout-panel-compact .knockout-match-card::after,
 .knockout-match-card:nth-child(even)::before,
 .knockout-round:last-child .knockout-match-card::after {
   display: none;

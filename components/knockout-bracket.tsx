@@ -86,9 +86,9 @@ function getKnockoutRounds(matches: Match[]) {
 
 function getKnockoutSlot(stage: string, index: number) {
   if (stage === '16avos') return index;
-  if (stage === '8vos') return index * 1.7 + 0.45;
-  if (stage === 'Cuartos') return index * 3.4 + 1.3;
-  if (stage === 'Semifinal') return index * 6.8 + 3;
+  if (stage === '8vos') return index * 2 + 0.5;
+  if (stage === 'Cuartos') return index * 4 + 1.5;
+  if (stage === 'Semifinal') return index * 8 + 3.5;
   if (stage === 'Final') return 7.5;
   if (stage === 'Tercer puesto') return 7.5;
   return index;
@@ -110,17 +110,17 @@ export function KnockoutBracket({ matches }: { matches: Match[] }) {
 
   function focusRound(stage: string) {
     const scrollContainer = scrollRef.current;
-    if (!scrollContainer || !roundRefs.current.get(stage)) return;
+    const roundNode = roundRefs.current.get(stage);
+    if (!scrollContainer || !roundNode) return;
 
     setActiveStage(stage);
+    const containerLeft = scrollContainer.getBoundingClientRect().left;
+    const roundLeft = roundNode.getBoundingClientRect().left;
+    const nextLeft = scrollContainer.scrollLeft + roundLeft - containerLeft;
 
-    window.requestAnimationFrame(() => {
-      const updatedNode = roundRefs.current.get(stage);
-      if (!updatedNode) return;
-      scrollContainer.scrollTo({
-        left: Math.max(updatedNode.offsetLeft, 0),
-        behavior: 'smooth',
-      });
+    scrollContainer.scrollTo({
+      left: Math.max(nextLeft, 0),
+      behavior: 'smooth',
     });
   }
 
