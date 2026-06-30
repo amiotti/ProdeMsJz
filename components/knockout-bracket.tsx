@@ -1,3 +1,6 @@
+'use client';
+
+import { useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 
 import { TeamName } from '@/components/team-name';
@@ -93,9 +96,32 @@ function getKnockoutSlot(stage: string, index: number) {
 
 export function KnockoutBracket({ matches }: { matches: Match[] }) {
   const knockoutRounds = getKnockoutRounds(matches);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const roundRefs = useRef(new Map<string, HTMLDivElement>());
+  const [activeStage, setActiveStage] = useState<string>(knockoutRounds[0]?.stage ?? '16avos');
+
+  function setRoundRef(stage: string, node: HTMLDivElement | null) {
+    if (!node) {
+      roundRefs.current.delete(stage);
+      return;
+    }
+    roundRefs.current.set(stage, node);
+  }
+
+  function focusRound(stage: string) {
+    const scrollContainer = scrollRef.current;
+    const roundNode = roundRefs.current.get(stage);
+    if (!scrollContainer || !roundNode) return;
+
+    setActiveStage(stage);
+    scrollContainer.scrollTo({
+      left: Math.max(roundNode.offsetLeft - 12, 0),
+      behavior: 'smooth',
+    });
+  }
 
   return (
-    <div className="panel stack-md knockout-panel">
+    <div className={`panel stack-md knockout-panel ${activeStage !== '16avos' ? 'knockout-panel-compact' : ''}`}>
       <div>
         <p className="eyebrow">Llaves actualizadas</p>
         <h3>Fase Eliminatoria</h3>
@@ -103,11 +129,20 @@ export function KnockoutBracket({ matches }: { matches: Match[] }) {
           Los cruces se recalculan automáticamente con las posiciones actuales de los grupos y los resultados oficiales cargados.
         </p>
       </div>
-      <div className="knockout-scroll" role="region" aria-label="Cuadro de fase eliminatoria" tabIndex={0}>
+      <div ref={scrollRef} className="knockout-scroll" role="region" aria-label="Cuadro de fase eliminatoria" tabIndex={0}>
         <div className="knockout-bracket">
           {knockoutRounds.map((round) => (
-            <div key={round.stage} className="knockout-round">
-              <h4>{round.label}</h4>
+            <div key={round.stage} ref={(node) => setRoundRef(round.stage, node)} className="knockout-round">
+              <h4>
+                <button
+                  type="button"
+                  className={`knockout-round-link ${activeStage === round.stage ? 'is-active' : ''}`}
+                  onClick={() => focusRound(round.stage)}
+                  aria-current={activeStage === round.stage ? 'true' : undefined}
+                >
+                  {round.label}
+                </button>
+              </h4>
               <div className="knockout-match-list">
                 {round.matches.map((match, matchIndex) => (
                   <article
