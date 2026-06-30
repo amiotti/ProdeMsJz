@@ -1072,8 +1072,8 @@ export function buildTeamSportFacts(teamName: string, groupTeams?: string[]) {
 
   const avgWinProb = rivals.length
     ? Math.round(
-        rivals.reduce((acc, rival) => acc + estimateMatchProbabilities(team.name, rival).homeWinPct, 0) / rivals.length,
-      )
+      rivals.reduce((acc, rival) => acc + estimateMatchProbabilities(team.name, rival).homeWinPct, 0) / rivals.length,
+    )
     : null;
 
   const confedProfile =
@@ -1261,12 +1261,12 @@ export function buildTeamEditorialNotes(teamName: string, groupId?: string, grou
 
   const relevantFact = normalizeSpanishDisplayText(
     TEAM_RELEVANT_FACT_OVERRIDES[team.name] ??
-      `Dato relevante: ${sportFacts[1] ?? `la app la valora con Ã­ndice ${team.fifaStrength} para estimar probabilidades prepartido.`}`,
+    `Dato relevante: ${sportFacts[1] ?? `la app la valora con Ã­ndice ${team.fifaStrength} para estimar probabilidades prepartido.`}`,
   );
 
   const curiousFact = normalizeSpanishDisplayText(
     TEAM_CURIOUS_FACT_OVERRIDES[team.name] ??
-      `Dato curioso: las selecciones de ${team.confederation} suelen mostrar patrones de juego distintos entre sÃ­, asÃ­ que mirar rivales y contexto del grupo mejora mucho el pronÃ³stico.`,
+    `Dato curioso: las selecciones de ${team.confederation} suelen mostrar patrones de juego distintos entre sÃ­, asÃ­ que mirar rivales y contexto del grupo mejora mucho el pronÃ³stico.`,
   );
 
   return { summary, relevantFact, curiousFact };
@@ -1436,12 +1436,12 @@ const KNOCKOUT_KICKOFF_BY_ID: Record<string, string> = {
   'KO-87': '2026-07-03T22:00:00.000Z',
   'KO-89': '2026-07-04T17:00:00.000Z',
   'KO-90': '2026-07-04T21:00:00.000Z',
-  'KO-91': '2026-07-05T20:00:00.000Z',
-  'KO-92': '2026-07-06T00:00:00.000Z',
-  'KO-93': '2026-07-06T19:00:00.000Z',
-  'KO-94': '2026-07-07T00:00:00.000Z',
-  'KO-95': '2026-07-07T16:00:00.000Z',
-  'KO-96': '2026-07-07T20:00:00.000Z',
+  'KO-91': '2026-07-07T00:00:00.000Z',
+  'KO-92': '2026-07-06T19:00:00.000Z',
+  'KO-93': '2026-07-05T20:00:00.000Z',
+  'KO-94': '2026-07-06T00:00:00.000Z',
+  'KO-95': '2026-07-07T20:00:00.000Z',
+  'KO-96': '2026-07-07T16:00:00.000Z',
   'KO-97': '2026-07-09T20:00:00.000Z',
   'KO-98': '2026-07-10T19:00:00.000Z',
   'KO-99': '2026-07-11T21:00:00.000Z',
@@ -1710,23 +1710,23 @@ export function resolveDynamicKnockoutParticipants(matches: Match[], groups: Gro
     awaySourceId: string;
     outcome: 'winner' | 'loser';
   }> = [
-    { targetId: 'KO-89', homeSourceId: 'KO-73', awaySourceId: 'KO-76', outcome: 'winner' as const },
-    { targetId: 'KO-90', homeSourceId: 'KO-74', awaySourceId: 'KO-75', outcome: 'winner' as const },
-    { targetId: 'KO-91', homeSourceId: 'KO-78', awaySourceId: 'KO-77', outcome: 'winner' as const },
-    { targetId: 'KO-92', homeSourceId: 'KO-79', awaySourceId: 'KO-80', outcome: 'winner' as const },
-    { targetId: 'KO-93', homeSourceId: 'KO-82', awaySourceId: 'KO-81', outcome: 'winner' as const },
-    { targetId: 'KO-94', homeSourceId: 'KO-84', awaySourceId: 'KO-83', outcome: 'winner' as const },
-    { targetId: 'KO-95', homeSourceId: 'KO-85', awaySourceId: 'KO-88', outcome: 'winner' as const },
-    { targetId: 'KO-96', homeSourceId: 'KO-86', awaySourceId: 'KO-87', outcome: 'winner' as const },
-    { targetId: 'KO-97', homeSourceId: 'KO-89', awaySourceId: 'KO-90', outcome: 'winner' as const },
-    { targetId: 'KO-98', homeSourceId: 'KO-93', awaySourceId: 'KO-94', outcome: 'winner' as const },
-    { targetId: 'KO-99', homeSourceId: 'KO-91', awaySourceId: 'KO-92', outcome: 'winner' as const },
-    { targetId: 'KO-100', homeSourceId: 'KO-95', awaySourceId: 'KO-96', outcome: 'winner' as const },
-    { targetId: 'KO-101', homeSourceId: 'KO-97', awaySourceId: 'KO-98', outcome: 'winner' as const },
-    { targetId: 'KO-102', homeSourceId: 'KO-99', awaySourceId: 'KO-100', outcome: 'winner' as const },
-    { targetId: 'KO-103', homeSourceId: 'KO-101', awaySourceId: 'KO-102', outcome: 'loser' as const },
-    { targetId: 'KO-104', homeSourceId: 'KO-101', awaySourceId: 'KO-102', outcome: 'winner' as const },
-  ];
+      { targetId: 'KO-89', homeSourceId: 'KO-73', awaySourceId: 'KO-76', outcome: 'winner' as const },
+      { targetId: 'KO-90', homeSourceId: 'KO-74', awaySourceId: 'KO-75', outcome: 'winner' as const },
+      { targetId: 'KO-91', homeSourceId: 'KO-78', awaySourceId: 'KO-77', outcome: 'winner' as const },
+      { targetId: 'KO-92', homeSourceId: 'KO-79', awaySourceId: 'KO-80', outcome: 'winner' as const },
+      { targetId: 'KO-93', homeSourceId: 'KO-82', awaySourceId: 'KO-81', outcome: 'winner' as const },
+      { targetId: 'KO-94', homeSourceId: 'KO-84', awaySourceId: 'KO-83', outcome: 'winner' as const },
+      { targetId: 'KO-95', homeSourceId: 'KO-85', awaySourceId: 'KO-88', outcome: 'winner' as const },
+      { targetId: 'KO-96', homeSourceId: 'KO-86', awaySourceId: 'KO-87', outcome: 'winner' as const },
+      { targetId: 'KO-97', homeSourceId: 'KO-89', awaySourceId: 'KO-90', outcome: 'winner' as const },
+      { targetId: 'KO-98', homeSourceId: 'KO-93', awaySourceId: 'KO-94', outcome: 'winner' as const },
+      { targetId: 'KO-99', homeSourceId: 'KO-91', awaySourceId: 'KO-92', outcome: 'winner' as const },
+      { targetId: 'KO-100', homeSourceId: 'KO-95', awaySourceId: 'KO-96', outcome: 'winner' as const },
+      { targetId: 'KO-101', homeSourceId: 'KO-97', awaySourceId: 'KO-98', outcome: 'winner' as const },
+      { targetId: 'KO-102', homeSourceId: 'KO-99', awaySourceId: 'KO-100', outcome: 'winner' as const },
+      { targetId: 'KO-103', homeSourceId: 'KO-101', awaySourceId: 'KO-102', outcome: 'loser' as const },
+      { targetId: 'KO-104', homeSourceId: 'KO-101', awaySourceId: 'KO-102', outcome: 'winner' as const },
+    ];
 
   for (const link of links) {
     const target = byId.get(link.targetId);
