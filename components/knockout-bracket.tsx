@@ -99,6 +99,10 @@ export function KnockoutBracket({ matches }: { matches: Match[] }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const roundRefs = useRef(new Map<string, HTMLDivElement>());
   const [activeStage, setActiveStage] = useState<string>(knockoutRounds[0]?.stage ?? '16avos');
+  const activeRoundIndex = Math.max(
+    knockoutRounds.findIndex((round) => round.stage === activeStage),
+    0,
+  );
 
   function setRoundRef(stage: string, node: HTMLDivElement | null) {
     if (!node) {
@@ -127,6 +131,12 @@ export function KnockoutBracket({ matches }: { matches: Match[] }) {
     });
   }
 
+  function focusAdjacentRound(direction: -1 | 1) {
+    const nextRound = knockoutRounds[activeRoundIndex + direction];
+    if (!nextRound) return;
+    focusRound(nextRound.stage);
+  }
+
   return (
     <div className={`panel stack-md knockout-panel ${activeStage !== '16avos' ? 'knockout-panel-compact' : ''}`}>
       <div>
@@ -135,6 +145,20 @@ export function KnockoutBracket({ matches }: { matches: Match[] }) {
         <p className="muted compact-text">
           Los cruces se recalculan automáticamente con las posiciones actuales de los grupos y los resultados oficiales cargados.
         </p>
+      </div>
+      <div className="knockout-stage-controls" aria-label="Navegar fases eliminatorias">
+        <button type="button" className="knockout-nav-btn" onClick={() => focusAdjacentRound(-1)} disabled={activeRoundIndex === 0}>
+          Atrás
+        </button>
+        <span>{knockoutRounds[activeRoundIndex]?.label ?? 'Fase eliminatoria'}</span>
+        <button
+          type="button"
+          className="knockout-nav-btn"
+          onClick={() => focusAdjacentRound(1)}
+          disabled={activeRoundIndex >= knockoutRounds.length - 1}
+        >
+          Siguiente
+        </button>
       </div>
       <div ref={scrollRef} className="knockout-scroll" role="region" aria-label="Cuadro de fase eliminatoria" tabIndex={0}>
         <div className="knockout-bracket">
