@@ -110,17 +110,24 @@ export function KnockoutBracket({ matches }: { matches: Match[] }) {
 
   function focusRound(stage: string) {
     const scrollContainer = scrollRef.current;
-    const roundNode = roundRefs.current.get(stage);
-    if (!scrollContainer || !roundNode) return;
+    if (!scrollContainer || !roundRefs.current.get(stage)) return;
 
     setActiveStage(stage);
-    const containerLeft = scrollContainer.getBoundingClientRect().left;
-    const roundLeft = roundNode.getBoundingClientRect().left;
-    const nextLeft = scrollContainer.scrollLeft + roundLeft - containerLeft;
 
-    scrollContainer.scrollTo({
-      left: Math.max(nextLeft, 0),
-      behavior: 'smooth',
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        const updatedNode = roundRefs.current.get(stage);
+        if (!updatedNode) return;
+
+        const containerLeft = scrollContainer.getBoundingClientRect().left;
+        const roundLeft = updatedNode.getBoundingClientRect().left;
+        const nextLeft = scrollContainer.scrollLeft + roundLeft - containerLeft;
+
+        scrollContainer.scrollTo({
+          left: Math.max(nextLeft, 0),
+          behavior: 'smooth',
+        });
+      });
     });
   }
 

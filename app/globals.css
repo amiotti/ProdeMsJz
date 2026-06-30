@@ -1868,8 +1868,8 @@ select {
 }
 
 .knockout-panel-compact {
-  --knockout-card-height: 98px;
-  --knockout-row-step: 114px;
+  --knockout-card-height: 90px;
+  --knockout-row-step: 100px;
 }
 
 .knockout-panel h3 {
@@ -1899,6 +1899,11 @@ select {
   align-items: start;
   gap: 1.65rem;
   min-width: max-content;
+}
+
+.knockout-bracket::after {
+  content: '';
+  width: min(64vw, 680px);
 }
 
 .knockout-round {
