@@ -1867,11 +1867,6 @@ select {
   --knockout-row-step: 122px;
 }
 
-.knockout-panel-compact {
-  --knockout-card-height: 104px;
-  --knockout-row-step: 108px;
-}
-
 .knockout-panel h3 {
   margin-bottom: 0.25rem;
 }
@@ -1894,25 +1889,28 @@ select {
 }
 
 .knockout-stage-controls {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(74px, max-content) minmax(0, 1fr) minmax(74px, max-content);
   align-items: center;
-  justify-content: center;
   gap: 0.65rem;
-  flex-wrap: wrap;
   margin-top: -0.15rem;
 }
 
 .knockout-stage-controls span {
-  min-width: min(220px, 100%);
+  min-width: 0;
   color: var(--gold);
   font-family: var(--font-title), sans-serif;
   font-size: 0.9rem;
   font-weight: 500;
   letter-spacing: 0.04em;
   text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .knockout-nav-btn {
+  width: 100%;
   min-height: 34px;
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -1929,6 +1927,24 @@ select {
     transform 150ms ease,
     border-color 150ms ease,
     opacity 150ms ease;
+}
+
+@media (max-width: 640px) {
+  .knockout-stage-controls {
+    grid-template-columns: 70px minmax(0, 1fr) 82px;
+    gap: 0.42rem;
+  }
+
+  .knockout-stage-controls span {
+    font-size: 0.76rem;
+    letter-spacing: 0.025em;
+  }
+
+  .knockout-nav-btn {
+    min-height: 32px;
+    padding: 0.28rem 0.48rem;
+    font-size: 0.7rem;
+  }
 }
 
 .knockout-nav-btn:hover:not(:disabled),
@@ -2045,6 +2061,37 @@ select {
   transition: height 180ms ease;
 }
 
+.knockout-panel[data-active-stage='8vos'] {
+  --knockout-visible-slots: 7;
+}
+
+.knockout-panel[data-active-stage='Cuartos'] {
+  --knockout-visible-slots: 3;
+}
+
+.knockout-panel[data-active-stage='Semifinal'],
+.knockout-panel[data-active-stage='Final'],
+.knockout-panel[data-active-stage='Tercer puesto'] {
+  --knockout-visible-slots: 1;
+}
+
+.knockout-panel[data-active-stage='8vos'] .knockout-match-list,
+.knockout-panel[data-active-stage='Cuartos'] .knockout-match-list,
+.knockout-panel[data-active-stage='Semifinal'] .knockout-match-list,
+.knockout-panel[data-active-stage='Final'] .knockout-match-list,
+.knockout-panel[data-active-stage='Tercer puesto'] .knockout-match-list {
+  height: calc(var(--knockout-row-step) * var(--knockout-visible-slots) + var(--knockout-card-height));
+}
+
+.knockout-panel[data-active-stage='8vos'] .knockout-round:nth-child(1),
+.knockout-panel[data-active-stage='Cuartos'] .knockout-round:nth-child(-n + 2),
+.knockout-panel[data-active-stage='Semifinal'] .knockout-round:nth-child(-n + 3),
+.knockout-panel[data-active-stage='Final'] .knockout-round:nth-child(-n + 4),
+.knockout-panel[data-active-stage='Tercer puesto'] .knockout-round:nth-child(-n + 4) {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .knockout-match-card {
   position: absolute;
   top: calc(var(--knockout-slot) * var(--knockout-row-step));
@@ -2093,6 +2140,19 @@ select {
 .knockout-round:nth-child(n + 5) .knockout-match-card::after,
 .knockout-match-card:nth-child(even)::before,
 .knockout-round:last-child .knockout-match-card::after {
+  display: none;
+}
+
+.knockout-panel[data-active-stage='8vos'] .knockout-round:nth-child(1) .knockout-match-card::before,
+.knockout-panel[data-active-stage='8vos'] .knockout-round:nth-child(1) .knockout-match-card::after,
+.knockout-panel[data-active-stage='Cuartos'] .knockout-round:nth-child(-n + 2) .knockout-match-card::before,
+.knockout-panel[data-active-stage='Cuartos'] .knockout-round:nth-child(-n + 2) .knockout-match-card::after,
+.knockout-panel[data-active-stage='Semifinal'] .knockout-round:nth-child(-n + 3) .knockout-match-card::before,
+.knockout-panel[data-active-stage='Semifinal'] .knockout-round:nth-child(-n + 3) .knockout-match-card::after,
+.knockout-panel[data-active-stage='Final'] .knockout-round:nth-child(-n + 4) .knockout-match-card::before,
+.knockout-panel[data-active-stage='Final'] .knockout-round:nth-child(-n + 4) .knockout-match-card::after,
+.knockout-panel[data-active-stage='Tercer puesto'] .knockout-round:nth-child(-n + 4) .knockout-match-card::before,
+.knockout-panel[data-active-stage='Tercer puesto'] .knockout-round:nth-child(-n + 4) .knockout-match-card::after {
   display: none;
 }
 

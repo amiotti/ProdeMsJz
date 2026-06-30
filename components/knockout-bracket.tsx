@@ -84,7 +84,24 @@ function getKnockoutRounds(matches: Match[]) {
   })).filter((round) => round.matches.length > 0);
 }
 
-function getKnockoutSlot(stage: string, index: number) {
+function getKnockoutSlot(stage: string, index: number, activeStage: string) {
+  if (activeStage !== '16avos') {
+    if (stage === activeStage) return index;
+    if (activeStage === '8vos') {
+      if (stage === 'Cuartos') return index * 2 + 0.5;
+      if (stage === 'Semifinal') return index * 4 + 1.5;
+      if (stage === 'Final' || stage === 'Tercer puesto') return 3.5;
+    }
+    if (activeStage === 'Cuartos') {
+      if (stage === 'Semifinal') return index * 2 + 0.5;
+      if (stage === 'Final' || stage === 'Tercer puesto') return 1.5;
+    }
+    if (activeStage === 'Semifinal') {
+      if (stage === 'Final' || stage === 'Tercer puesto') return 0.5;
+    }
+    return index;
+  }
+
   if (stage === '16avos') return index;
   if (stage === '8vos') return index * 2 + 0.5;
   if (stage === 'Cuartos') return index * 4 + 1.5;
@@ -138,7 +155,7 @@ export function KnockoutBracket({ matches }: { matches: Match[] }) {
   }
 
   return (
-    <div className={`panel stack-md knockout-panel ${activeStage !== '16avos' ? 'knockout-panel-compact' : ''}`}>
+    <div className="panel stack-md knockout-panel" data-active-stage={activeStage}>
       <div>
         <p className="eyebrow">Llaves actualizadas</p>
         <h3>Fase Eliminatoria</h3>
@@ -179,7 +196,7 @@ export function KnockoutBracket({ matches }: { matches: Match[] }) {
                   <article
                     key={match.id}
                     className="knockout-match-card"
-                    style={{ '--knockout-slot': getKnockoutSlot(round.stage, matchIndex) } as CSSProperties}
+                    style={{ '--knockout-slot': getKnockoutSlot(round.stage, matchIndex, activeStage) } as CSSProperties}
                   >
                     <span className="knockout-date">{formatKnockoutDate(match.kickoffAt)}</span>
                     <div className="knockout-team-row">
