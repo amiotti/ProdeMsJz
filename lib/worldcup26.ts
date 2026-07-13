@@ -1413,9 +1413,14 @@ const QUARTERFINAL_SLOTS = [
 ] as const;
 
 const SEMIFINAL_SLOTS = [
-  { id: 'KO-101', homeTeam: 'Ganador M97', awayTeam: 'Ganador M98' },
-  { id: 'KO-102', homeTeam: 'Ganador M99', awayTeam: 'Ganador M100' },
+  { id: 'KO-101', homeTeam: 'Francia', awayTeam: 'Espana' },
+  { id: 'KO-102', homeTeam: 'Inglaterra', awayTeam: 'Argentina' },
 ] as const;
+
+const SEMIFINAL_FINAL_MATCHUPS = new Map<string, { homeTeam: string; awayTeam: string }>([
+  ['KO-101', { homeTeam: 'Francia', awayTeam: 'Espana' }],
+  ['KO-102', { homeTeam: 'Inglaterra', awayTeam: 'Argentina' }],
+]);
 
 const KNOCKOUT_KICKOFF_BY_ID: Record<string, string> = {
   'KO-73': '2026-06-28T19:00:00.000Z',
@@ -1731,6 +1736,12 @@ export function resolveDynamicKnockoutParticipants(matches: Match[], groups: Gro
   for (const link of links) {
     const target = byId.get(link.targetId);
     if (!target) continue;
+    const finalSemifinal = SEMIFINAL_FINAL_MATCHUPS.get(link.targetId);
+    if (finalSemifinal) {
+      target.homeTeam = finalSemifinal.homeTeam;
+      target.awayTeam = finalSemifinal.awayTeam;
+      continue;
+    }
     target.homeTeam =
       getDecidedKnockoutTeam(byId.get(link.homeSourceId), link.outcome, knownTeams) ?? target.homeTeam;
     target.awayTeam =
