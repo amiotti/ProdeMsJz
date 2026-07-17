@@ -64,6 +64,13 @@ type InstantUserExactCelebrationsDoc = {
   updatedAt: string;
 };
 
+type InstantUserPodiumCelebrationsDoc = {
+  id: string;
+  userId: string;
+  seenPodiumKeys: string[];
+  updatedAt: string;
+};
+
 type InstantOfficialResultDoc = {
   id: string;
   matchId: string;
@@ -126,6 +133,7 @@ type InstantQueryResult = {
   prode_user_predictions?: InstantUserPredictionsDoc[];
   prode_user_trivia_predictions?: InstantUserTriviaPredictionsDoc[];
   prode_user_exact_celebrations?: InstantUserExactCelebrationsDoc[];
+  prode_user_podium_celebrations?: InstantUserPodiumCelebrationsDoc[];
   prode_official_results?: InstantOfficialResultDoc[];
   prode_official_trivia_results?: InstantOfficialTriviaResultDoc[];
   prode_config?: InstantConfigDoc[];
@@ -851,6 +859,14 @@ async function queryUserExactCelebrationsDocByUserOnly(userId: string) {
   return (data.prode_user_exact_celebrations ?? [])[0] ?? null;
 }
 
+async function queryUserPodiumCelebrationsDocByUserOnly(userId: string) {
+  const db = getInstantAdminDb();
+  const data = (await db.query({
+    prode_user_podium_celebrations: { $: { where: { userId } } },
+  })) as InstantQueryResult;
+  return (data.prode_user_podium_celebrations ?? [])[0] ?? null;
+}
+
 export async function resetPasswordWithRecoveryData(input: {
   email: string;
   phone: string;
@@ -1086,6 +1102,81 @@ export async function acknowledgeExactCelebrations(userId: string, matchIds: str
   ]);
 }
 
+export type PendingPodiumCelebration = {
+  podiumKey: string;
+  rank: 1 | 2 | 3;
+  points: number;
+  topThree: Array<{ rank: 1 | 2 | 3; userId: string; name: string; points: number }>;
+};
+
+function getFinalPodiumKey(db: ProdeDB) {
+  if (db.triviaResults.length < TRIVIA_QUESTIONS.length) return null;
+  const resultByQuestionId = new Map(db.triviaResults.map((result) => [result.questionId, result] as const));
+  const hasAllTriviaResults = TRIVIA_QUESTIONS.every((question) => {
+    const result = resultByQuestionId.get(question.id);
+    return Boolean(result?.answer?.trim());
+  });
+  if (!hasAllTriviaResults) return null;
+
+  const triviaStamp = TRIVIA_QUESTIONS
+    .map((question) => {
+      const result = resultByQuestionId.get(question.id);
+      return `${question.id}:${result?.updatedAt ?? ''}:${result?.answer ?? ''}`;
+    })
+    .join('|');
+  const topThreeIds = computeLeaderboard(db).slice(0, 3).map((row) => row.userId).join(',');
+  return `final-podium:${topThreeIds}:${triviaStamp}`;
+}
+
+export async function getPendingPodiumCelebration(userId: string): Promise<PendingPodiumCelebration | null> {
+  await ensureBaseData();
+  const core = await getCoreStateSnapshot();
+  const podiumKey = getFinalPodiumKey(core.db);
+  if (!podiumKey) return null;
+
+  const topThree = core.leaderboard.slice(0, 3).map((row, index) => ({
+    rank: (index + 1) as 1 | 2 | 3,
+    userId: row.userId,
+    name: `${row.firstName} ${row.lastName}`.trim() || row.userName,
+    points: row.totalPoints,
+  }));
+  const ownPodium = topThree.find((item) => item.userId === userId);
+  if (!ownPodium) return null;
+
+  const celebrationsDoc = await queryUserPodiumCelebrationsDocByUserOnly(userId);
+  const seen = new Set(celebrationsDoc?.seenPodiumKeys ?? []);
+  if (seen.has(podiumKey)) return null;
+
+  return {
+    podiumKey,
+    rank: ownPodium.rank,
+    points: ownPodium.points,
+    topThree,
+  };
+}
+
+export async function acknowledgePodiumCelebration(userId: string, podiumKey: string): Promise<void> {
+  await ensureBaseData();
+  if (typeof podiumKey !== 'string' || !podiumKey.startsWith('final-podium:') || podiumKey.length > 2000) return;
+
+  const pending = await getPendingPodiumCelebration(userId);
+  if (!pending || pending.podiumKey !== podiumKey) return;
+
+  const celebrationsDoc = await queryUserPodiumCelebrationsDocByUserOnly(userId);
+  const seen = new Set(celebrationsDoc?.seenPodiumKeys ?? []);
+  seen.add(podiumKey);
+
+  const id = celebrationsDoc?.id ?? userId;
+  await getInstantAdminDb().transact([
+    tx.prode_user_podium_celebrations[id].update({
+      id,
+      userId,
+      seenPodiumKeys: Array.from(seen),
+      updatedAt: nowIso(),
+    }),
+  ]);
+}
+
 export async function saveTriviaPredictions(
   userId: string,
   items: Array<{ questionId: string; answer: string }>,
@@ -1286,15 +1377,19 @@ export async function deleteUserAccount(userId: string) {
   if (userTriviaPredDoc) {
     operations.push(tx.prode_user_trivia_predictions[userTriviaPredDoc.id].delete());
   }
-  const [userGroups, celebrationsDoc] = await Promise.all([
+  const [userGroups, celebrationsDoc, podiumCelebrationsDoc] = await Promise.all([
     queryUserLeaderboardGroupsOnly(userId),
     queryUserExactCelebrationsDocByUserOnly(userId),
+    queryUserPodiumCelebrationsDocByUserOnly(userId),
   ]);
   for (const group of userGroups) {
     operations.push(tx.prode_user_leaderboard_groups[group.id].delete());
   }
   if (celebrationsDoc) {
     operations.push(tx.prode_user_exact_celebrations[celebrationsDoc.id].delete());
+  }
+  if (podiumCelebrationsDoc) {
+    operations.push(tx.prode_user_podium_celebrations[podiumCelebrationsDoc.id].delete());
   }
   operations.push(tx.prode_users[userId].delete());
 
@@ -1324,15 +1419,19 @@ export async function adminDeleteUser(targetUserId: string) {
   if (userTriviaPredDoc) {
     operations.push(tx.prode_user_trivia_predictions[userTriviaPredDoc.id].delete());
   }
-  const [userGroups, celebrationsDoc] = await Promise.all([
+  const [userGroups, celebrationsDoc, podiumCelebrationsDoc] = await Promise.all([
     queryUserLeaderboardGroupsOnly(targetUserId),
     queryUserExactCelebrationsDocByUserOnly(targetUserId),
+    queryUserPodiumCelebrationsDocByUserOnly(targetUserId),
   ]);
   for (const group of userGroups) {
     operations.push(tx.prode_user_leaderboard_groups[group.id].delete());
   }
   if (celebrationsDoc) {
     operations.push(tx.prode_user_exact_celebrations[celebrationsDoc.id].delete());
+  }
+  if (podiumCelebrationsDoc) {
+    operations.push(tx.prode_user_podium_celebrations[podiumCelebrationsDoc.id].delete());
   }
   operations.push(tx.prode_users[targetUserId].delete());
   await getInstantAdminDb().transact(operations);

@@ -70,6 +70,13 @@ function PositionChange({ value = 0 }: { value?: number }) {
   );
 }
 
+function PodiumMedal({ position }: { position?: number }) {
+  if (position === 1) return <span className="leaderboard-medal medal-gold" title="1° puesto" aria-label="Medalla de oro">🥇</span>;
+  if (position === 2) return <span className="leaderboard-medal medal-silver" title="2° puesto" aria-label="Medalla de plata">🥈</span>;
+  if (position === 3) return <span className="leaderboard-medal medal-bronze" title="3° puesto" aria-label="Medalla de bronce">🥉</span>;
+  return null;
+}
+
 export function LeaderboardTable({
   views,
   isLoggedIn,
@@ -174,6 +181,10 @@ export function LeaderboardTable({
   const positionByUserId = useMemo(
     () => new Map(rows.map((row, index) => [row.userId, index + 1] as const)),
     [rows],
+  );
+  const generalPositionByUserId = useMemo(
+    () => new Map(views.general.rows.map((row, index) => [row.userId, index + 1] as const)),
+    [views.general.rows],
   );
 
   function openCreateModal() {
@@ -394,6 +405,7 @@ export function LeaderboardTable({
                           aria-label={`Ver detalle de ${displayName(row)}`}
                         >
                           <strong>{displayName(row)}</strong>
+                          <PodiumMedal position={generalPositionByUserId.get(row.userId)} />
                         </button>
                       </div>
                     </td>

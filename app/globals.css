@@ -2948,6 +2948,30 @@ html[data-theme='dark'] .knockout-winner-select select {
   font-size: 0.78rem;
 }
 
+.leaderboard-medal {
+  display: inline-grid;
+  width: 1.65rem;
+  height: 1.65rem;
+  margin-left: 0.35rem;
+  place-items: center;
+  border-radius: 999px;
+  font-size: 1.1rem;
+  line-height: 1;
+  filter: drop-shadow(0 0.25rem 0.55rem rgba(0, 0, 0, 0.25));
+}
+
+.medal-gold {
+  background: rgba(255, 215, 106, 0.16);
+}
+
+.medal-silver {
+  background: rgba(226, 232, 240, 0.16);
+}
+
+.medal-bronze {
+  background: rgba(205, 127, 50, 0.16);
+}
+
 .leaderboard-create-group-row {
   display: flex;
   justify-content: flex-end;
@@ -4292,9 +4316,197 @@ html[data-theme='dark'] .topbar {
   }
 }
 
+.podium-celebration-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 3vw, 2rem);
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255, 215, 106, 0.28), transparent 34%),
+    rgba(8, 10, 22, 0.56);
+  backdrop-filter: blur(10px);
+  overflow: auto;
+}
+
+.podium-celebration-card {
+  position: relative;
+  z-index: 10002;
+  width: min(94vw, 580px);
+  max-height: min(88vh, 720px);
+  overflow: auto;
+  border-color: rgba(255, 215, 106, 0.38);
+  text-align: center;
+  box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.38);
+  animation: podium-celebration-pop 520ms cubic-bezier(0.2, 0.9, 0.22, 1.18) both;
+}
+
+.podium-celebration-card::before {
+  content: '';
+  position: absolute;
+  inset: -35% -15% auto;
+  height: 62%;
+  background: radial-gradient(circle, rgba(255, 215, 106, 0.3), transparent 64%);
+  pointer-events: none;
+}
+
+.podium-celebration-medal {
+  position: relative;
+  display: inline-grid;
+  width: 5.25rem;
+  height: 5.25rem;
+  margin-inline: auto;
+  place-items: center;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255, 215, 106, 0.32), rgba(89, 227, 215, 0.16));
+  font-size: 3.25rem;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28), 0 1rem 2rem rgba(0, 0, 0, 0.25);
+}
+
+.podium-celebration-card h2 {
+  position: relative;
+  margin: 0;
+  font-family: var(--font-title), sans-serif;
+  letter-spacing: 0.02em;
+}
+
+.podium-celebration-card p,
+.podium-celebration-card .eyebrow {
+  position: relative;
+}
+
+.podium-celebration-list {
+  position: relative;
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 0.25rem;
+}
+
+.podium-celebration-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.08);
+  text-align: left;
+}
+
+.podium-celebration-row > span {
+  font-size: 1.4rem;
+}
+
+.podium-celebration-row em {
+  color: var(--accent-strong);
+  font-style: normal;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.podium-rank-1 {
+  border-color: rgba(255, 215, 106, 0.42);
+  background: linear-gradient(135deg, rgba(255, 215, 106, 0.18), rgba(255, 255, 255, 0.07));
+}
+
+.podium-rank-2 {
+  border-color: rgba(226, 232, 240, 0.34);
+}
+
+.podium-rank-3 {
+  border-color: rgba(205, 127, 50, 0.34);
+}
+
+@keyframes podium-celebration-pop {
+  from {
+    opacity: 0;
+    transform: translateY(1rem) scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .exact-hit-confetti {
     display: none;
+  }
+
+  .podium-celebration-card {
+    animation: none;
+  }
+}
+
+@media (min-width: 760px) {
+  .podium-celebration-card {
+    padding: 2rem;
+  }
+
+  .podium-celebration-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .podium-celebration-backdrop {
+    align-items: end;
+    padding: 0.85rem;
+    background:
+      radial-gradient(circle at 50% 8%, rgba(255, 215, 106, 0.24), transparent 42%),
+      rgba(8, 10, 22, 0.66);
+  }
+
+  .podium-celebration-card {
+    width: 100%;
+    max-height: 82svh;
+    padding: 1.1rem;
+    border-radius: 1.35rem;
+    text-align: left;
+    animation-name: podium-celebration-sheet;
+  }
+
+  .podium-celebration-medal {
+    width: 4rem;
+    height: 4rem;
+    margin-inline: 0;
+    font-size: 2.45rem;
+  }
+
+  .podium-celebration-card h2 {
+    font-size: clamp(1.55rem, 9vw, 2.35rem);
+  }
+
+  .podium-celebration-row {
+    gap: 0.55rem;
+    padding: 0.65rem 0.75rem;
+    border-radius: 0.9rem;
+  }
+
+  .podium-celebration-row strong {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .podium-celebration-row em {
+    font-size: 0.86rem;
+  }
+}
+
+@keyframes podium-celebration-sheet {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -5077,6 +5289,8 @@ html[data-theme='dark'] .trivia-question-card {
 
 .leader-player-button {
   display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
   padding: 0;
   border: 0;
   color: inherit;

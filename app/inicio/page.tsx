@@ -1,9 +1,10 @@
 ﻿
 import { ExactHitConfetti } from '@/components/exact-hit-confetti';
+import { FinalPodiumCelebration } from '@/components/final-podium-celebration';
 import { KnockoutBracket } from '@/components/knockout-bracket';
 import { NextMatchCountdown } from '@/components/next-match-countdown';
 import { TeamName } from '@/components/team-name';
-import { getHomePageState, getPendingExactCelebrations } from '@/lib/db';
+import { getHomePageState, getPendingExactCelebrations, getPendingPodiumCelebration } from '@/lib/db';
 import { requireAuthenticatedUser } from '@/lib/route-guard';
 import { getTeamDisplayName } from '@/lib/worldcup26';
 
@@ -23,9 +24,10 @@ function getRegistrationAmountArs() {
 
 export default async function InicioPage() {
   const { user } = await requireAuthenticatedUser();
-  const [state, pendingExactMatchIds] = await Promise.all([
+  const [state, pendingExactMatchIds, pendingPodium] = await Promise.all([
     getHomePageState(),
     user.role === 'admin' ? Promise.resolve([]) : getPendingExactCelebrations(user.id),
+    user.role === 'admin' ? Promise.resolve(null) : getPendingPodiumCelebration(user.id),
   ]);
   const hasApprovedPayment = user.role === 'admin' || user.registrationPaymentStatus === 'approved';
   const registrationAmountArs = getRegistrationAmountArs();
@@ -51,6 +53,7 @@ export default async function InicioPage() {
   return (
     <section className="stack-lg">
       <ExactHitConfetti pendingMatchIds={pendingExactMatchIds} />
+      <FinalPodiumCelebration podium={pendingPodium} />
       <div className="hero">
         <div className="panel stack-md">
           <p className="eyebrow hero-kicker">FIFA WORLD CUP 26</p>
