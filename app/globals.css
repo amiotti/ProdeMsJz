@@ -2952,7 +2952,7 @@ html[data-theme='dark'] .knockout-winner-select select {
   display: inline-grid;
   width: 1.65rem;
   height: 1.65rem;
-  margin-left: 0.35rem;
+  margin-right: 0.25rem;
   place-items: center;
   border-radius: 999px;
   font-size: 1.1rem;

@@ -80,9 +80,11 @@ function PodiumMedal({ position }: { position?: number }) {
 export function LeaderboardTable({
   views,
   isLoggedIn,
+  showPodiumMedals,
 }: {
   views: Record<LeaderboardScope, LeaderboardView>;
   isLoggedIn: boolean;
+  showPodiumMedals?: boolean;
 }) {
   const [activeScope, setActiveScope] = useState<LeaderboardScope>('general');
   const [groups, setGroups] = useState<SavedGroup[]>([]);
@@ -404,8 +406,8 @@ export function LeaderboardTable({
                           onClick={() => void openPlayerDetail(row, positionByUserId.get(row.userId) ?? index + 1)}
                           aria-label={`Ver detalle de ${displayName(row)}`}
                         >
+                          {showPodiumMedals ? <PodiumMedal position={generalPositionByUserId.get(row.userId)} /> : null}
                           <strong>{displayName(row)}</strong>
-                          <PodiumMedal position={generalPositionByUserId.get(row.userId)} />
                         </button>
                       </div>
                     </td>

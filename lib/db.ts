@@ -1109,14 +1109,21 @@ export type PendingPodiumCelebration = {
   topThree: Array<{ rank: 1 | 2 | 3; userId: string; name: string; points: number }>;
 };
 
-function getFinalPodiumKey(db: ProdeDB) {
-  if (db.triviaResults.length < TRIVIA_QUESTIONS.length) return null;
+function isFinalLeaderboardDefined(db: ProdeDB) {
+  const hasAllMatchResults = db.matches.every((match) => Boolean(match.officialResult));
+  if (!hasAllMatchResults) return false;
+
+  if (db.triviaResults.length < TRIVIA_QUESTIONS.length) return false;
   const resultByQuestionId = new Map(db.triviaResults.map((result) => [result.questionId, result] as const));
-  const hasAllTriviaResults = TRIVIA_QUESTIONS.every((question) => {
+  return TRIVIA_QUESTIONS.every((question) => {
     const result = resultByQuestionId.get(question.id);
     return Boolean(result?.answer?.trim());
   });
-  if (!hasAllTriviaResults) return null;
+}
+
+function getFinalPodiumKey(db: ProdeDB) {
+  if (!isFinalLeaderboardDefined(db)) return null;
+  const resultByQuestionId = new Map(db.triviaResults.map((result) => [result.questionId, result] as const));
 
   const triviaStamp = TRIVIA_QUESTIONS
     .map((question) => {
@@ -1126,6 +1133,12 @@ function getFinalPodiumKey(db: ProdeDB) {
     .join('|');
   const topThreeIds = computeLeaderboard(db).slice(0, 3).map((row) => row.userId).join(',');
   return `final-podium:${topThreeIds}:${triviaStamp}`;
+}
+
+export async function getFinalLeaderboardDefined(): Promise<boolean> {
+  await ensureBaseData();
+  const core = await getCoreStateSnapshot();
+  return isFinalLeaderboardDefined(core.db);
 }
 
 export async function getPendingPodiumCelebration(userId: string): Promise<PendingPodiumCelebration | null> {
@@ -1860,6 +1873,7 @@ export async function getLeaderboardPageState() {
 
   return {
     pointsConfig: core.db.pointsConfig,
+    finalLeaderboardDefined: isFinalLeaderboardDefined(core.db),
     views: {
       general,
       groups,

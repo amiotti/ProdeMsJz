@@ -43,6 +43,7 @@ export default async function LeaderboardPage() {
             groups: { rows: [] },
             knockout: { rows: [] },
           }}
+          showPodiumMedals={Boolean(state?.finalLeaderboardDefined)}
           isLoggedIn
         />
       ) : (
